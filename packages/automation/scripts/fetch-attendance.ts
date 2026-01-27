@@ -8,13 +8,12 @@
  */
 
 import Database from 'better-sqlite3';
-import { chromium } from 'playwright';
 import { z } from 'zod';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, '../../api/quienatiende.db');
+const DB_PATH = process.env.DATABASE_URL || path.join(__dirname, '../../api/data/attendance.db');
 
 // Validation schema
 const AttendanceRecordSchema = z.object({

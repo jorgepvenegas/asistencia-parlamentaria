@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { runMigrations } from './migrate';
@@ -15,7 +16,6 @@ export function initDatabase(): Database.Database {
   const dataDir = path.dirname(dbPath);
   if (!dataDir.includes(':') && dataDir !== '.' && dataDir !== '..') {
     // Simple directory creation (not a path variable)
-    const fs = await import('fs');
     fs.mkdirSync(dataDir, { recursive: true });
   }
 

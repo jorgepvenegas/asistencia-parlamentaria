@@ -83,19 +83,16 @@ async function seedDatabase(): Promise<void> {
         'PARTY_001',
         'Diputada',
         'San José',
-        true,
+        1, // is_active
       ],
-      ['POL_002', 'Carlos Rodríguez Silva', 'PARTY_002', 'Diputado', 'Cartago', true],
-      ['POL_003', 'Ana Martínez Campos', 'PARTY_003', 'Diputada', 'Alajuela', true],
-      ['POL_004', 'Juan Pérez Mora', 'PARTY_001', 'Diputado', 'Limón', true],
-      ['POL_005', 'Rosa Santos Díaz', 'PARTY_002', 'Diputada', 'Puntarenas', true],
+      ['POL_002', 'Carlos Rodríguez Silva', 'PARTY_002', 'Diputado', 'Cartago', 1],
+      ['POL_003', 'Ana Martínez Campos', 'PARTY_003', 'Diputada', 'Alajuela', 1],
+      ['POL_004', 'Juan Pérez Mora', 'PARTY_001', 'Diputado', 'Limón', 1],
+      ['POL_005', 'Rosa Santos Díaz', 'PARTY_002', 'Diputada', 'Puntarenas', 1],
     ];
 
     for (const politician of politicians) {
-      // Convert boolean to integer for SQLite
-      const values = [...politician];
-      values[5] = values[5] ? 1 : 0;
-      insertPolitician.run(...values);
+      insertPolitician.run(...politician);
     }
     console.log(`✓ Inserted ${politicians.length} politicians`);
 
