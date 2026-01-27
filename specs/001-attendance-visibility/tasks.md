@@ -29,14 +29,14 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Monorepo & Workspace Setup
 
-- [ ] T001 Setup pnpm workspaces and root configuration
+- [x] T001 Setup pnpm workspaces and root configuration
   - Create `pnpm-workspace.yaml` defining `packages/**` glob
   - Create root `package.json` with shared scripts: `pnpm -r run build`, `pnpm -r run test`
   - Create root `tsconfig.json` base configuration for TypeScript inheritance
   - Reference: plan.md Section "Project Structure", quickstart.md Section 1
   - Expected: Workspace ready for `pnpm install`
 
-- [ ] T002 [P] Create Astro frontend project structure
+- [x] T002 [P] Create Astro frontend project structure
   - Run: `pnpm create astro -- --template minimal packages/frontend`
   - Configure `packages/frontend/package.json` with Astro, Tailwind, Vitest, Playwright
   - Setup TypeScript strict mode in `packages/frontend/tsconfig.json`
@@ -44,7 +44,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Reference: quickstart.md Section 2
   - Expected: `packages/frontend/` ready for component development
 
-- [ ] T003 [P] Create Hono.js API project structure
+- [x] T003 [P] Create Hono.js API project structure
   - Run: `pnpm create hono -- packages/api`
   - Configure `packages/api/package.json` with Hono, better-sqlite3, Zod, Vitest
   - Setup TypeScript strict mode in `packages/api/tsconfig.json`
@@ -52,14 +52,14 @@ description: "Task list for QuienAtiende feature implementation"
   - Reference: quickstart.md Section 3
   - Expected: `packages/api/` ready for endpoint development
 
-- [ ] T004 [P] Create shared types/schemas package
+- [x] T004 [P] Create shared types/schemas package
   - Create `packages/shared/src/types.ts` with TypeScript interfaces for all entities
   - Create `packages/shared/src/schemas.ts` with Zod validation schemas
   - Setup `packages/shared/package.json` and `tsconfig.json`
   - Reference: data-model.md "Core Entities" sections 1.1-1.5
   - Expected: Shared types available to both frontend and API via `@quienatiende/shared`
 
-- [ ] T005 [P] Configure linting, formatting, and CI/CD foundations
+- [x] T005 [P] Configure linting, formatting, and CI/CD foundations
   - Create `.eslintrc.json` at root (TypeScript strict rules)
   - Create `.prettierrc` for code formatting
   - Create `scripts/lint.sh` and `scripts/format.sh` at root
@@ -75,7 +75,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 **Critical Path**: These 3 tasks unlock all API endpoints and frontend features.
 
-- [ ] T006 Create SQLite schema migration
+- [x] T006 Create SQLite schema migration
   - Create: `packages/api/db/migrations/001_init.sql`
   - Schema: All 5 tables per data-model.md sections 1.1-1.5
     - `parties` (id, name, slug, color)
@@ -89,7 +89,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/api/tests/integration/db/schema.test.ts` verify table structure + constraints
   - Expected: Migration file ready to apply, schema matches data-model.md exactly
 
-- [ ] T007 Implement migration runner & database initialization
+- [x] T007 Implement migration runner & database initialization
   - Create: `packages/api/src/db/migrate.ts`
   - Functionality: Runs pending migrations, tracks applied migrations in DB
   - Create: `packages/api/src/db/init.ts` (database connection + migration execution)
@@ -98,7 +98,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/api/tests/unit/db/migrate.test.ts` verify tracking + idempotence
   - Expected: Can run `pnpm -F api run migrate` successfully; second run is idempotent
 
-- [ ] T008 Create data seeding script with sample data
+- [x] T008 Create data seeding script with sample data
   - Create: `packages/api/db/seed.ts` or `seed.sql`
   - Seed data: 3 political parties, 3 test politicians, 30 days attendance records (all statuses)
   - Reference: data-model.md "Data Seeding" section + spec.md edge cases (handle missing data)
@@ -126,14 +126,14 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### API Implementation for US1
 
-- [ ] T009 [P] Create TypeScript types and Zod schemas for API responses
+- [x] T009 [P] Create TypeScript types and Zod schemas for API responses
   - Export from `packages/shared/src/types.ts`: Politician, Party, AttendanceSummary, AttendanceRecord
   - Create in `packages/shared/src/schemas.ts`: Zod schemas for validation
   - Reference: data-model.md sections 1.1, 1.2, 1.4 for field definitions
   - Test: `packages/shared/tests/schemas.test.ts` verify schema validation
   - Expected: Types + schemas compile, usable by API routes + frontend
 
-- [ ] T010 [P] Implement GET /metadata endpoint (health check, no aggregation)
+- [x] T010 [P] Implement GET /metadata endpoint (health check, no aggregation)
   - Create: `packages/api/src/routes/metadata.ts`
   - Response: `{ last_update, data_source, schema_version, available_years }`
   - Reference: contracts/openapi.yaml `/metadata` section
@@ -141,7 +141,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Performance: <100ms response (no DB aggregation)
   - Expected: `GET http://localhost:3000/api/metadata` returns correct structure
 
-- [ ] T011 [P] Implement GET /parties endpoint (foundational for filtering)
+- [x] T011 [P] Implement GET /parties endpoint (foundational for filtering)
   - Create: `packages/api/src/routes/parties.ts` + `packages/api/src/services/parties.ts`
   - Service function: `getParties()` → returns all parties with colors
   - Response: Array of `{ id, name, slug, color, abbreviation }`
@@ -150,7 +150,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Performance: <200ms response
   - Expected: `GET http://localhost:3000/api/parties` returns 3 test parties with colors
 
-- [ ] T012 [P] Implement database service layer for politicians queries
+- [x] T012 [P] Implement database service layer for politicians queries
   - Create: `packages/api/src/services/politicians.ts`
   - Functions:
     - `getPoliticiansWithSummary(year, party_id?, sort?, limit, offset)` → yearly overview
@@ -161,7 +161,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/api/tests/unit/services/politicians.test.ts` query correctness
   - Expected: All functions return correct data structure, handle edge cases (missing data)
 
-- [ ] T013 Implement GET /politicians endpoint (main data endpoint for US1)
+- [x] T013 Implement GET /politicians endpoint (main data endpoint for US1)
   - Create: `packages/api/src/routes/politicians.ts`
   - Endpoint: `GET /api/politicians?year=2025&party_id=PARTY_001&sort=attendance_desc&limit=100&offset=0`
   - Uses: `getPoliticiansWithSummary()` from T012 service
@@ -172,7 +172,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Performance: <500ms p95 for 400 politicians (per constitution.md)
   - Expected: Endpoint works, returns correct data, performance target met
 
-- [ ] T014 [US1] Implement error handling and CORS middleware for API
+- [x] T014 [US1] Implement error handling and CORS middleware for API
   - Create: `packages/api/src/middleware/errorHandler.ts`
   - Create: `packages/api/src/middleware/cors.ts`
   - Setup in `packages/api/src/index.ts`: middleware chain
@@ -185,7 +185,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Frontend Implementation for US1
 
-- [ ] T015 [US1] Create yearly overview page (index.astro)
+- [x] T015 [US1] Create yearly overview page (index.astro)
   - Create: `packages/frontend/src/pages/index.astro`
   - Layout: Use `BaseLayout.astro` (create in T016)
   - Content:
@@ -201,7 +201,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Performance: <2s load time on 4G mobile (per SC-001)
   - Expected: Home page renders, fetches data, displays correctly
 
-- [ ] T016 [P] [US1] Create base layout component
+- [x] T016 [P] [US1] Create base layout component
   - Create: `packages/frontend/src/layouts/BaseLayout.astro`
   - Content: Header with app title, navigation, metadata display (last update timestamp)
   - Style: Tailwind CSS, mobile-responsive, accessible semantic HTML
@@ -209,7 +209,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Reference: research.md "Astro Mobile-First", constitution.md "Usability"
   - Expected: Reusable layout for all pages
 
-- [ ] T017 [P] [US1] Create stacked chart component (implementation for User Story 5)
+- [x] T017 [P] [US1] Create stacked chart component (implementation for User Story 5)
   - Create: `packages/frontend/src/components/StackedChart.astro`
   - Visualization: Stacked bar chart with attended/unattended/excused breakdown
   - Interactivity:
@@ -222,7 +222,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/frontend/tests/unit/components/StackedChart.test.ts` + a11y test
   - Expected: Chart renders correctly, responsive, accessible
 
-- [ ] T018 [US1] Integrate API calls and display data on yearly page
+- [x] T018 [US1] Integrate API calls and display data on yearly page
   - Update: `packages/frontend/src/pages/index.astro` with API integration
   - Use: `fetch('/api/politicians?year=2025')` to get data
   - Use: `fetch('/api/parties')` to get party colors
@@ -231,7 +231,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/frontend/tests/e2e/pages/yearly.e2e.ts` end-to-end test
   - Expected: Page loads data, displays politicians, no console errors
 
-- [ ] T019 [US1] Add accessibility testing and WCAG AA compliance for yearly page
+- [x] T019 [US1] Add accessibility testing and WCAG AA compliance for yearly page
   - Manual: Screen reader testing (VoiceOver, NVDA, JAWS)
   - Automated: Axe-core accessibility checks in `packages/frontend/tests/a11y/yearly.a11y.ts`
   - Verify: Semantic HTML, keyboard navigation, color contrast (4.5:1 per constitution.md)
