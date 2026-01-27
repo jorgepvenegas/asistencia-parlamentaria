@@ -375,7 +375,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Testing for US6
 
-- [ ] T029 [US6] Mobile responsive testing and optimization
+- [x] T029 [US6] Mobile responsive testing and optimization
   - Test: On real mobile device (iPhone, Android) or emulator
   - Verify: No horizontal scrolling, text readable, buttons touchable
   - Optimize: Tailwind responsive classes, touch-friendly button sizes (48px minimum)
@@ -383,7 +383,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/frontend/tests/e2e/mobile.e2e.ts` Playwright mobile emulation test
   - Expected: All pages render correctly on mobile, <2s load time on 4G
 
-- [ ] T030 [US6] Charts and interactions optimized for mobile
+- [x] T030 [US6] Charts and interactions optimized for mobile
   - Verify: Stacked charts readable on small screens
   - Optimize: Touch interactions (no hover-only features)
   - Verify: Tooltips appear on tap (not hover)
