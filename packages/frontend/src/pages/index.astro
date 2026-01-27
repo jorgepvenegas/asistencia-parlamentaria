@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StackedChart from '../components/StackedChart.astro';
+import PartyFilter from '../components/PartyFilter.astro';
 
 const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
 
@@ -28,10 +29,24 @@ let politicians: Politician[] = [];
 let parties: Party[] = [];
 let currentYear = new Date().getFullYear();
 let error: string | null = null;
+let selectedParties: string[] = [];
+
+// Get party filter from URL
+const url = new URL(Astro.request.url);
+const partiesParam = url.searchParams.get('parties');
+if (partiesParam) {
+  selectedParties = partiesParam.split(',').filter((id) => id.trim().length > 0);
+}
 
 try {
+  // Build query string with filters
+  let queryParams = `year=${currentYear}&limit=400`;
+  if (selectedParties.length > 0) {
+    queryParams += `&party_id=${selectedParties[0]}`; // API supports single party_id param
+  }
+
   // Fetch politicians with attendance data
-  const politiciansRes = await fetch(`${API_URL}/api/politicians?year=${currentYear}&limit=400`);
+  const politiciansRes = await fetch(`${API_URL}/api/politicians?${queryParams}`);
   if (politiciansRes.ok) {
     const data = await politiciansRes.json();
     politicians = data.data || [];
@@ -84,6 +99,33 @@ function getPartyName(partyId: string): string {
       <p class="text-xl text-gray-600">
         Transparencia sobre la asistencia de diputados a sesiones parlamentarias
       </p>
+
+      <!-- Year Navigation -->
+      <div class="mt-4 flex gap-2">
+        <label for="year-select" class="text-sm font-medium text-gray-700">Ver mes:</label>
+        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="navigateToMonth(this.value)">
+          <option value="">Selecciona un mes...</option>
+          <option value="/2026/1">Enero 2026</option>
+          <option value="/2026/2">Febrero 2026</option>
+          <option value="/2026/3">Marzo 2026</option>
+          <option value="/2026/4">Abril 2026</option>
+          <option value="/2026/5">Mayo 2026</option>
+          <option value="/2026/6">Junio 2026</option>
+          <option value="/2026/7">Julio 2026</option>
+          <option value="/2026/8">Agosto 2026</option>
+          <option value="/2026/9">Septiembre 2026</option>
+          <option value="/2026/10">Octubre 2026</option>
+          <option value="/2026/11">Noviembre 2026</option>
+          <option value="/2026/12">Diciembre 2026</option>
+        </select>
+      </div>
+      <script>
+        function navigateToMonth(url) {
+          if (url) {
+            window.location.href = url;
+          }
+        }
+      </script>
     </section>
 
     {error && (
@@ -95,6 +137,11 @@ function getPartyName(partyId: string): string {
 
     {!error && politicians.length > 0 && (
       <>
+        <!-- Party Filter -->
+        <section>
+          <PartyFilter parties={parties} selectedParties={selectedParties} />
+        </section>
+
         <!-- Statistics Cards -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-gradient-to-br from-brand-50 to-brand-100 rounded-lg p-6 border border-brand-200">

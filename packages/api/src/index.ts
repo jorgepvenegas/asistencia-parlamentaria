@@ -9,6 +9,7 @@ import { metadataRoute } from './routes/metadata';
 import { partiesRoute } from './routes/parties';
 import { politiciansRoute } from './routes/politicians';
 import { searchRoute } from './routes/search';
+import { attendanceRoute } from './routes/attendance';
 
 interface AppContext {
   Variables: {
@@ -54,6 +55,7 @@ app.route('/api', metadataRoute);
 app.route('/api', partiesRoute);
 app.route('/api', politiciansRoute);
 app.route('/api', searchRoute);
+app.route('/api', attendanceRoute);
 
 // Health check
 app.get('/health', (c) => {

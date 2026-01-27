@@ -250,7 +250,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### API Implementation for US2
 
-- [ ] T020 [P] Implement GET /politicians/:id endpoint (politician detail)
+- [x] T020 [P] Implement GET /politicians/:id endpoint (politician detail)
   - Create: `packages/api/src/routes/politicians/:id.ts`
   - Response: `{ id, name, party_id, position, yearly_summaries: [...], recent_attendance: [...] }`
   - Uses: `getPoliticianDetail(id)` from T012 service
@@ -258,7 +258,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: Contract + integration tests for politician detail
   - Expected: Returns full politician profile with attendance history
 
-- [ ] T021 [P] [US2] Implement GET /politicians/:id/attendance endpoint (monthly detail)
+- [x] T021 [P] [US2] Implement GET /politicians/:id/attendance endpoint (monthly detail)
   - Create: `packages/api/src/routes/politicians/:id/attendance.ts`
   - Endpoint: `GET /api/politicians/:id/attendance?year=2026&month=3`
   - Response: Array of `{ date, status, reason }` for that month
@@ -269,7 +269,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Frontend Implementation for US2
 
-- [ ] T022 [P] [US2] Create monthly detail page
+- [x] T022 [P] [US2] Create monthly detail page
   - Create: `packages/frontend/src/pages/[year]/[month].astro`
   - Content: Politicians list with daily attendance for selected month
   - Fetch: `GET /api/politicians/:id/attendance?year=2026&month=3`
@@ -290,7 +290,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### API Implementation for US3
 
-- [ ] T023 [P] Implement GET /attendance/summary endpoint (party aggregation)
+- [x] T023 [P] Implement GET /attendance/summary endpoint (party aggregation)
   - Create: `packages/api/src/routes/attendance/summary.ts`
   - Endpoint: `GET /api/attendance/summary?year=2025&parties=PARTY_001,PARTY_002&month=3`
   - Response: Aggregate attendance by party with per-politician stats
@@ -302,7 +302,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Frontend Implementation for US3
 
-- [ ] T024 [P] [US3] Create party filter component
+- [x] T024 [P] [US3] Create party filter component
   - Create: `packages/frontend/src/components/PartyFilter.astro`
   - Multi-select dropdown: Select multiple parties
   - "Clear Filters" button (spec.md US3 acceptance scenario 3)
@@ -311,7 +311,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: `packages/frontend/tests/unit/components/PartyFilter.test.ts`
   - Expected: Filter component selectable, working
 
-- [ ] T025 [US3] Integrate party filter into yearly page
+- [x] T025 [US3] Integrate party filter into yearly page
   - Update: `packages/frontend/src/pages/index.astro`
   - Add: PartyFilter component (T024)
   - Behavior: When filter changes, re-fetch data with `?party_id=...`
@@ -332,7 +332,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### API Implementation for US4
 
-- [ ] T026 [P] Implement GET /search endpoint (autocomplete)
+- [x] T026 [P] Implement GET /search endpoint (autocomplete)
   - Create: `packages/api/src/routes/search.ts`
   - Endpoint: `GET /api/search?q=María&limit=10`
   - Uses: `searchPoliticians(query, limit)` from T012 service
@@ -344,7 +344,7 @@ description: "Task list for QuienAtiende feature implementation"
 
 ### Frontend Implementation for US4
 
-- [ ] T027 [P] [US4] Create search component
+- [x] T027 [P] [US4] Create search component
   - Create: `packages/frontend/src/components/Search.astro`
   - Input: Text field with autocomplete
   - Fetch: On input change, call `GET /api/search?q=...`
@@ -354,7 +354,7 @@ description: "Task list for QuienAtiende feature implementation"
   - Test: Unit + E2E test verify autocomplete works
   - Expected: Search suggests politician names
 
-- [ ] T028 [US4] Create politician profile page
+- [x] T028 [US4] Create politician profile page
   - Create: `packages/frontend/src/pages/politician/[id].astro`
   - Content: Name, party, position, total attendance %, reasons for absence (spec.md scenario 2)
   - Visualization: Month-by-month trend chart (scenario 3)
