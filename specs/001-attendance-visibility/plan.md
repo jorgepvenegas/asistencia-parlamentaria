@@ -188,3 +188,494 @@ After design is complete, verify:
 - ✅ Accessibility: WCAG AA testing plan included
 - ✅ Performance: Bundle analysis and monitoring strategy defined
 - ✅ Code Quality: TypeScript strict mode, ESLint, no `any` types
+
+---
+
+## Phase 2: Implementation Task Generation
+
+**Prerequisites**: Phase 1 complete (research.md, data-model.md, contracts/openapi.yaml, quickstart.md)
+
+**Purpose**: Break down implementation into sequenced, measurable, dependent tasks organized by critical path to MVP.
+
+### 2.1 Task Organization Strategy
+
+Tasks are organized in **three blocking phases** that enforce dependencies:
+
+```
+Phase 2a: Database Foundation (CRITICAL PATH)
+  ├─ T001-T003: Schema, migrations, seeding
+  └─ Blocks: All API endpoints (Phase 2b)
+
+Phase 2b: API Implementation
+  ├─ T004-T010: Endpoints ordered by dependency
+  └─ Blocks: All frontend features (Phase 2c)
+
+Phase 2c: Frontend Implementation
+  ├─ T011-T020: Pages/components by user story priority
+  └─ Depends on: Phase 2b complete
+
+Phase 2d: Automation & Deployment
+  ├─ T021+: GitHub Actions workflow, performance setup
+  └─ Depends on: Phase 2a + 2b complete
+```
+
+**Why this ordering?**
+- **Foundation (2a) blocks everything**: Without database schema + seeding, no API endpoint can be tested
+- **API (2b) blocks frontend**: Frontend needs working endpoints to consume
+- **Frontend (2c) can start incrementally**: Each page can be built independently once API ready
+- **Automation (2d) last**: Deploy foundation + API + frontend first, then setup daily fetching
+
+### 2.2 Critical Path to MVP
+
+**MVP Definition**: Users can browse yearly attendance for 2025 and see stacked charts by politician + party
+
+**Tasks Required for MVP** (minimum viable product):
+- T001-T003 (Database foundation)
+- T004 (GET /metadata - health check)
+- T005 (GET /parties - party list for filtering)
+- T006 (GET /politicians - main data endpoint, implements User Story 1)
+- T011 (Yearly overview page - implements User Story 1 frontend)
+- T012 (Stacked chart component - implements User Story 5)
+
+**After MVP:** Can deploy and demonstrate core value. Then add remaining features in parallel.
+
+### 2.3 Task Definition Format
+
+Each task should include:
+
+```markdown
+**T###** [P] [User Story] - Brief title
+
+**Reference Documents**:
+- Spec: spec.md User Story X, FR-YYY
+- Data Model: data-model.md section Z
+- API: contracts/openapi.yaml /path/method
+- Implementation: quickstart.md section N
+
+**Dependencies**:
+- Blocks: [Other task IDs that depend on this]
+- Blocked By: [Task IDs that must complete first]
+
+**Acceptance Criteria**:
+- [ ] Code passes TypeScript strict mode
+- [ ] >80% test coverage (unit + integration)
+- [ ] Specific functional requirement met (from spec)
+- [ ] Accessibility: WCAG AA where applicable
+- [ ] Performance: meets constitutional requirement (e.g., <500ms API)
+
+**Test Plan**:
+- Unit: [Test file location, e.g., packages/api/tests/unit/...]
+- Integration: [Integration test, e.g., packages/api/tests/integration/...]
+- E2E: [If frontend, Playwright test location]
+
+**Deliverables**:
+- [List of files created/modified]
+- [Code quality checks passed]
+- [Tests written and passing]
+```
+
+### 2.4 Detailed Phase 2a: Database Foundation
+
+**Purpose**: Get schema working with sample data so API development can proceed.
+
+**T001** [P] [Foundational] - Create SQLite schema migration
+
+**Reference Documents**:
+- data-model.md: "Core Entities" (sections 1.1-1.5) for complete schema
+- data-model.md: "Data Validation & Constraints" for rules
+- data-model.md: "Query Patterns" for indices needed
+- quickstart.md: Section 4 for database path
+
+**Dependencies**: None (critical path starts here)
+
+**Acceptance Criteria**:
+- [ ] Migration file: `packages/api/db/migrations/001_init.sql`
+- [ ] All 5 tables created: politicians, parties, attendance_records, attendance_summaries, metadata
+- [ ] All foreign key constraints defined
+- [ ] All unique constraints defined (e.g., politician_id + date)
+- [ ] All indices created for query performance (see data-model.md indices section)
+- [ ] TypeScript types compile without errors
+
+**Test Plan**:
+- Unit: `packages/api/tests/unit/db/migration.test.ts` - verify schema structure
+- Integration: `packages/api/tests/integration/db/schema.test.ts` - verify constraints work
+
+**Deliverables**:
+- `packages/api/db/migrations/001_init.sql` (complete schema)
+- `packages/api/tests/unit/db/migration.test.ts`
+- `packages/api/tests/integration/db/schema.test.ts`
+
+---
+
+**T002** [P] [Foundational] - Implement migration runner
+
+**Reference Documents**:
+- data-model.md: "Migration & Seeding" → "Migration Runner" section (includes code)
+- quickstart.md: Section 4 for expected behavior
+
+**Dependencies**:
+- Blocked By: T001
+- Blocks: T003, T004
+
+**Acceptance Criteria**:
+- [ ] File: `packages/api/src/db/migrate.ts`
+- [ ] Function tracks applied migrations in database
+- [ ] Handles pending migrations correctly
+- [ ] Idempotent: running twice doesn't break (test by running twice)
+- [ ] Error handling: logs errors clearly, doesn't crash silently
+
+**Test Plan**:
+- Unit: `packages/api/tests/unit/db/migrate.test.ts` - test migration tracking
+- Integration: `packages/api/tests/integration/db/migrate.test.ts` - test with real DB file
+
+**Deliverables**:
+- `packages/api/src/db/migrate.ts`
+- `packages/api/tests/unit/db/migrate.test.ts`
+- `packages/api/tests/integration/db/migrate.test.ts`
+
+---
+
+**T003** [P] [Foundational] - Create data seeding script
+
+**Reference Documents**:
+- data-model.md: "Data Seeding" section (includes sample data structure)
+- data-model.md: "Entity Relationships" diagram for seed order
+- quickstart.md: Section 4 shows expected usage
+
+**Dependencies**:
+- Blocked By: T002 (migration runner must exist)
+- Blocks: API testing (all endpoints need sample data)
+
+**Acceptance Criteria**:
+- [ ] File: `packages/api/db/seed.ts`
+- [ ] Creates: 3 political parties with distinct colors
+- [ ] Creates: 3 test politicians across 2-3 parties
+- [ ] Creates: 30 days of attendance records (all statuses: attended, unattended, excused)
+- [ ] Updates metadata with last_update timestamp
+- [ ] Idempotent: can be run multiple times without duplicates
+- [ ] Script callable from package.json: `pnpm run seed`
+
+**Test Plan**:
+- Integration: `packages/api/tests/integration/db/seed.test.ts` - verify seed produces expected data structure
+
+**Deliverables**:
+- `packages/api/db/seed.ts`
+- `packages/api/db/seed.sql` (alternative if pure SQL preferred)
+- `packages/api/tests/integration/db/seed.test.ts`
+- Updated `packages/api/package.json` with seed script
+
+---
+
+### 2.5 Detailed Phase 2b: API Implementation
+
+**Purpose**: Build RESTful endpoints consuming database, ordered by complexity + dependency.
+
+**Endpoint Build Order** (simplest first):
+1. T004: GET /metadata (no DB queries, returns static data)
+2. T005: GET /parties (simple list query)
+3. T006: GET /politicians (main endpoint, aggregation from AttendanceSummary)
+4. T007: GET /search (name search, autocomplete)
+5. T008: GET /politicians/:id (detail endpoint)
+6. T009: GET /politicians/:id/attendance (monthly detail)
+7. T010: GET /attendance/summary (party filtering, aggregation)
+
+**T004** [P] [Foundational] - Implement GET /metadata endpoint
+
+**Reference Documents**:
+- contracts/openapi.yaml: `/metadata` section (schema, responses)
+- plan.md: "Technical Context" (data source, schema version)
+- quickstart.md: Section 7 for test command
+
+**Dependencies**:
+- Blocked By: T002 (needs migration runner to initialize DB)
+- Blocks: T006+ (provides system health check)
+
+**Acceptance Criteria**:
+- [ ] Endpoint: `GET /api/metadata`
+- [ ] Returns: last_update, data_source, schema_version, available_years (per openapi.yaml)
+- [ ] Response matches openapi.yaml schema exactly
+- [ ] Handles missing metadata gracefully
+- [ ] Response time <100ms (fast endpoint, no aggregation)
+
+**Test Plan**:
+- Contract: `packages/api/tests/contract/metadata.test.ts` - validate response matches openapi.yaml schema
+- Integration: `packages/api/tests/integration/routes/metadata.test.ts` - test actual endpoint
+
+**Deliverables**:
+- `packages/api/src/routes/metadata.ts`
+- `packages/api/src/services/metadata.ts` (if separating logic)
+- `packages/api/tests/contract/metadata.test.ts`
+- `packages/api/tests/integration/routes/metadata.test.ts`
+
+---
+
+**T005** [P] [Foundational] - Implement GET /parties endpoint
+
+**Reference Documents**:
+- contracts/openapi.yaml: `/parties` section (response schema)
+- data-model.md: Section 1.2 "Party entity" (fields, colors)
+- quickstart.md: Section 7 for manual testing
+
+**Dependencies**:
+- Blocked By: T003 (needs seeded parties data)
+- Blocks: T006 (politicians endpoint depends on parties for filtering)
+
+**Acceptance Criteria**:
+- [ ] Endpoint: `GET /api/parties`
+- [ ] Returns: all parties with id, name, slug, color
+- [ ] Response matches openapi.yaml schema
+- [ ] Colors are valid hex codes (for chart rendering)
+- [ ] Response time <200ms
+- [ ] Returns empty array if no parties (graceful)
+
+**Test Plan**:
+- Contract: `packages/api/tests/contract/parties.test.ts`
+- Integration: `packages/api/tests/integration/routes/parties.test.ts` - verify seeded data returned
+
+**Deliverables**:
+- `packages/api/src/routes/parties.ts`
+- `packages/api/src/services/parties.ts` (queries)
+- Contract + integration tests
+
+---
+
+**T006** [P] [User Story 1] - Implement GET /politicians endpoint
+
+**Reference Documents**:
+- contracts/openapi.yaml: `/politicians` section (full specification)
+- data-model.md: Section 1.1 "Politician entity", Section 1.4 "AttendanceSummary entity"
+- data-model.md: "Query Patterns" → Query 1 (get yearly summary)
+- spec.md: User Story 1 "Browse Yearly Attendance" (acceptance criteria)
+- quickstart.md: Section 7 for testing
+
+**Dependencies**:
+- Blocked By: T003, T005 (needs seeded data + parties endpoint working)
+- Blocks: T011 (frontend needs this endpoint)
+
+**Acceptance Criteria**:
+- [ ] Endpoint: `GET /api/politicians?year=2025&party_id=PARTY_001&sort=attendance_desc&limit=100`
+- [ ] Returns: politicians list with attendance_percent (from AttendanceSummary)
+- [ ] Filtering by year: only returns records for that year
+- [ ] Filtering by party_id: correctly filters by party
+- [ ] Sorting: attendance_desc, attendance_asc, name_asc, name_desc
+- [ ] Pagination: limit + offset work
+- [ ] Response matches openapi.yaml exactly
+- [ ] Response time <500ms for 400 politicians (p95)
+- [ ] Implements User Story 1 acceptance criteria (yearly attendance visible)
+
+**Test Plan**:
+- Unit: `packages/api/tests/unit/services/politicians.test.ts` - test query logic
+- Integration: `packages/api/tests/integration/routes/politicians.test.ts` - test endpoint with seeded data
+- Contract: `packages/api/tests/contract/politicians.test.ts` - validate schema
+- Performance: `packages/api/tests/integration/perf/politicians.perf.test.ts` - verify <500ms response
+
+**Deliverables**:
+- `packages/api/src/routes/politicians.ts`
+- `packages/api/src/services/politicians.ts` (getPoliticiansWithSummary query)
+- All test files above
+- Update API middleware if needed (CORS, error handling)
+
+---
+
+**T007** [P] [User Story 4] - Implement GET /search endpoint
+
+**Reference Documents**:
+- contracts/openapi.yaml: `/search` section
+- data-model.md: Section 1.1 Politician entity, Query Pattern 3 (search index)
+- spec.md: User Story 4 "Search and View Individual Politician Details"
+- quickstart.md: Section 7 for testing
+
+**Dependencies**:
+- Blocked By: T003 (needs seeded politicians data)
+- Independent of: T006 (can be built in parallel)
+
+**Acceptance Criteria**:
+- [ ] Endpoint: `GET /api/search?q=María&limit=10`
+- [ ] Returns: matching politicians with autocomplete suggestions
+- [ ] Search uses name field with LIKE or full-text index
+- [ ] Limit parameter works (default 10, max 50)
+- [ ] Case-insensitive search
+- [ ] Response time <200ms
+- [ ] Returns [] if no matches
+
+**Test Plan**:
+- Integration: `packages/api/tests/integration/routes/search.test.ts` - test with seeded data
+
+**Deliverables**:
+- `packages/api/src/routes/search.ts`
+- `packages/api/src/services/politicians.ts` - add searchPoliticians function
+
+---
+
+**T008, T009, T010** - [Continue for remaining endpoints following same pattern]
+
+Each endpoint task should:
+- Reference openapi.yaml for exact contract
+- Reference data-model.md for entities + query patterns
+- Reference spec.md for user stories it implements
+- Include contract + integration tests
+- Specify performance requirements
+
+### 2.6 Detailed Phase 2c: Frontend Implementation
+
+**Purpose**: Build Astro pages + components consuming API, ordered by user story priority + dependencies.
+
+**T011** [P] [User Story 1] - Create yearly overview page (index.astro)
+
+**Reference Documents**:
+- spec.md: User Story 1 "Browse Yearly Attendance" (acceptance scenarios)
+- contracts/openapi.yaml: `/politicians`, `/parties`, `/metadata` endpoints consumed
+- research.md: Section 2 "Astro Mobile-First Optimization" (image optimization, responsive design)
+- research.md: Section 7 "Accessibility in Astro + charts" (WCAG AA requirements)
+- quickstart.md: Section 2 "Create Astro Frontend"
+
+**Dependencies**:
+- Blocked By: T006, T005 (API endpoints must be working)
+- Blocks: T012, T013 (chart + filter components)
+
+**Acceptance Criteria**:
+- [ ] Page: `packages/frontend/src/pages/index.astro`
+- [ ] Displays: all politicians with attendance % (User Story 1 acceptance scenario 1)
+- [ ] Shows: top performers + bottom performers highlighted (scenario 2)
+- [ ] Includes: legend explaining "attended", "unattended", "reason unavailable" (scenario 3)
+- [ ] Mobile-responsive: works on mobile without horizontal scroll (User Story 6)
+- [ ] Accessible: WCAG 2.1 AA (semantic HTML, keyboard nav, screen reader)
+- [ ] Performance: page load <2s on 4G mobile (constitution requirement)
+- [ ] Tests: E2E test verifies data displays correctly
+
+**Test Plan**:
+- E2E: `packages/frontend/tests/e2e/pages/index.e2e.ts` - load page, verify data renders
+- Accessibility: Manual screen reader testing (NVDA/JAWS/VoiceOver)
+- Performance: Lighthouse CI check in pre-deploy
+
+**Deliverables**:
+- `packages/frontend/src/pages/index.astro`
+- `packages/frontend/src/layouts/BaseLayout.astro` (if creating shared layout)
+- `packages/frontend/tests/e2e/pages/index.e2e.ts`
+- Accessibility testing notes
+
+---
+
+**T012** [P] [User Story 5] - Create stacked chart component
+
+**Reference Documents**:
+- spec.md: User Story 5 "Visualize Attendance Distribution with Stacked Charts" (acceptance criteria)
+- research.md: Section 7 "Accessibility in Astro + charts" (Recharts vs Chart.js, WCAG AA)
+- data-model.md: "AttendanceSummary" entity (attended_count, unattended_count, excused_count fields)
+
+**Dependencies**:
+- Blocked By: T011 (page needs chart component)
+- Blocks: All pages using charts
+
+**Acceptance Criteria**:
+- [ ] Component: `packages/frontend/src/components/StackedChart.astro`
+- [ ] Renders: stacked bar chart with attended/unattended/excused breakdown
+- [ ] Tooltip: hovering/tapping shows exact count + percentage (scenario 2)
+- [ ] Mobile: readable on small screens, optimized layout (scenario 3, User Story 6)
+- [ ] Accessible: WCAG 2.1 AA (aria-label, color not sole info source, keyboard nav)
+- [ ] Props: accepts data array with attended/unattended/excused counts
+
+**Test Plan**:
+- Unit: `packages/frontend/tests/unit/components/StackedChart.test.ts` - component renders correctly
+- Accessibility: `packages/frontend/tests/a11y/StackedChart.a11y.ts` - axe-core checks, manual review
+- E2E: Charts in page tests verify interactivity
+
+**Deliverables**:
+- `packages/frontend/src/components/StackedChart.astro`
+- Unit + a11y tests
+- Integration with Recharts or Chart.js (per research.md selection)
+
+---
+
+[Subsequent tasks T013-T020 follow same pattern for remaining user stories]
+
+### 2.7 Phase 2d: Automation & Deployment
+
+**T021** - Setup GitHub Actions daily fetch workflow
+
+**Reference Documents**:
+- research.md: Section 6 "GitHub Actions Scheduling (3 am PT daily)" (workflow template)
+- quickstart.md: Section 3 "Create Hono.js API" (API setup for automated runner)
+
+**Dependencies**:
+- Blocked By: T001-T010 (API + database must be stable before automation)
+
+**Acceptance Criteria**:
+- [ ] Workflow: `.github/workflows/fetch-daily.yml`
+- [ ] Trigger: cron `0 10 * * *` (10 am UTC = 3 am PT, handles DST)
+- [ ] Runs: Playwright script to fetch attendance data
+- [ ] Updates: database with new records
+- [ ] Error handling: logs errors, retries up to 3x with backoff
+
+---
+
+### 2.8 MVP Checkpoint
+
+**After T001-T003, T004-T006, T011, T012 complete:**
+
+✅ **Minimum Viable Product Ready**
+
+What's working:
+- Citizens can load home page
+- See all politicians with yearly attendance %
+- View stacked charts showing attended/unattended/excused breakdown
+- Mobile responsive
+
+What's coming next (parallel development):
+- Monthly detail view (T014)
+- Party filtering (T015)
+- Individual search (T016)
+- GitHub Actions automation (T021)
+- Performance optimization & deployment (T022+)
+
+Can deploy at this checkpoint and gather user feedback.
+
+### 2.9 Task Generation Command
+
+Run `/speckit.tasks` to generate the complete task list from this plan.
+
+**Command**:
+```bash
+speckit.tasks
+```
+
+**Expected Output**:
+- `specs/001-attendance-visibility/tasks.md`
+- Detailed breakdown of all 25+ tasks
+- Dependencies clearly marked
+- Test requirements specified
+- Cross-references to spec, data-model, openapi
+
+---
+
+## Implementation Quality Checklist
+
+Every task should include tests that verify:
+
+### Code Quality (per Constitution)
+- [ ] TypeScript strict mode passes (no `any`, strict null checks)
+- [ ] ESLint + Prettier pass (code formatting)
+- [ ] No dead code or unused imports
+
+### Testing (per Constitution)
+- [ ] Unit tests for services/models (>80% coverage target)
+- [ ] Integration tests for API endpoints
+- [ ] E2E tests for user workflows (Playwright)
+- [ ] Contract tests validate openapi.yaml compliance
+
+### Accessibility (per Constitution)
+- [ ] WCAG 2.1 AA level for UI components
+- [ ] Screen reader testing (manual)
+- [ ] Keyboard navigation verified
+- [ ] Color contrast 4.5:1 minimum (axe-core checks)
+
+### Performance (per Constitution)
+- [ ] API responses <500ms (p95)
+- [ ] Frontend <2s load time (Lighthouse CI)
+- [ ] JS bundle <500KB
+- [ ] Images optimized (WebP with fallback)
+
+### Documentation
+- [ ] Inline code comments for complex logic
+- [ ] README updates for new features
+- [ ] Test descriptions explain acceptance criteria
