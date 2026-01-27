@@ -1,50 +1,96 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version: 0.0.0 → 1.0.0 (MINOR: Initial constitution with 7 core principles + governance framework)
+Modified Principles: N/A (initial creation)
+Added Sections: Core Principles (7x), Quality Gates, Governance
+Removed Sections: N/A
+Templates Updated: ✅ plan-template.md, ✅ spec-template.md, ✅ tasks-template.md
+Follow-up TODOs: RATIFICATION_DATE, LAST_AMENDED_DATE - mark as today (2026-01-27) on first approval
+-->
+
+# Asistencia Cámara Charts Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality
+Every feature MUST meet quality standards: types checked, linting passed, no dead code, clear naming. Code readability > cleverness. Technical debt is tracked and repaid incrementally. No shortcuts for convenience or schedule pressure.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+**Rationale**: Quality compounds. Small shortcuts accumulate into unmaintainable systems. Prevent regression and reduce future refactoring burden by enforcing standards upfront.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Modularity
+Code MUST be organized into isolated, independently testable units. Each module has single responsibility. Dependencies flow one direction only—no circular refs. Interfaces are explicit, not implicit. Modules can be understood without reading the entire codebase.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Modularity enables parallel development, independent testing, and safe refactoring. Tight coupling breeds complexity and blocks agility.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Usability
+User-facing features MUST be discoverable and intuitive. Actions require minimal learning curve. Error messages guide users toward solutions. Workflows reduce cognitive load. If a feature requires documentation to understand, it is not ready.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Usability determines adoption. Complex UX drives support costs and abandonment. Every interaction is a design decision that impacts user success.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Accessibility
+All user-facing interfaces MUST comply with WCAG 2.1 AA standards. Screen reader support required. Keyboard navigation required. Color MUST not be sole information vector. Text contrast minimum 4.5:1 for body text. Testing with assistive tech is non-negotiable before merge.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: Accessibility is inclusion, not compliance checkbox. Benefit all users: elderly, distracted, diverse abilities. Legal requirement in many jurisdictions.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Testing Standards
+Coverage target: >80% for core logic. Unit tests MUST be written first (red-green-refactor). Integration tests MUST validate user journeys. Tests are documentation—names describe what/why. Flaky tests MUST be fixed immediately, not skipped. No test merges if coverage drops.
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+**Rationale**: Tests catch regressions early. Test-first clarifies requirements. Coverage <80% indicates unmeasured risk.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### VI. User Experience Consistency
+All user-facing interactions MUST follow consistent patterns within this app. Button styles, form layouts, error handling, loading states, success feedback use same components/logic. Visual design system is single source of truth. Deviations require explicit design approval.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Rationale**: Consistency reduces learning curve. Users build mental models; breaking them is costly. One design language scales across features.
+
+### VII. Performance Requirements
+Page/view load times MUST be <3 seconds for core interactions. API responses <500ms (p95). Bundle size <500KB initial JS. Memory usage <100MB for typical session. Mobile-first: test on 4G + mid-tier device (Pixel 4a equivalent). Performance budgets enforced in CI/CD.
+
+**Rationale**: Performance is feature. Slow apps lose users. Mobile users on poor networks are real. Performance debt multiplies across features.
+
+## Quality Gates
+
+These gates enforce principles before code merges:
+
+1. **Type Safety**: TypeScript/language type checking MUST pass. No `any` types unless documented exception.
+2. **Linting & Formatting**: ESLint/language linter configuration MUST pass. Auto-fix applied where safe.
+3. **Test Coverage**: All new code MUST have tests. Coverage <80% blocks merge. Tests MUST be reviewed for quality, not just coverage %.
+4. **Accessibility**: Automated a11y checks MUST pass. Manual screen reader test MUST be done for UX changes.
+5. **Performance**: Bundle analysis MUST show no unexplained regressions. Load time tests MUST pass.
+6. **Design Review**: UX consistency MUST be approved (visual diff required if touching UI).
+
+## Development Workflow
+
+### Implementation Checklist Per Feature
+
+Before starting:
+- [ ] Constitution Check: Does feature align with 7 principles? Flag conflicts in PR.
+- [ ] Design approved: UX consistency gate passed.
+- [ ] Tests planned: User journey tests outlined before code.
+
+During development:
+- [ ] Tests written first, then implementation.
+- [ ] Code passes all quality gates.
+- [ ] Accessibility verified on real devices/readers.
+- [ ] Performance budgets met.
+- [ ] Documentation updated (inline code + user-facing).
+
+Before merge:
+- [ ] All gates pass.
+- [ ] Code review covers: principle alignment, modularity, edge cases.
+- [ ] Accessibility sign-off from design.
+
+### Amendment & Versioning
+
+**Amendment Procedure**: Principle changes require pull request with justification. Changes proposed in PR description map to: which principle, why change needed, impact on templates. All team members must have opportunity to comment. Merge when consensus reached or after defined discussion period.
+
+**Version Bumps**:
+- **MAJOR**: Principle removal/redefinition (breaking change to development standards).
+- **MINOR**: New principle added or significant expansion to existing principle.
+- **PATCH**: Wording clarification, typo fix, non-material refinement.
+
+**Compliance Review**: Constitution governs all PRs. Every PR MUST reference which principles it upholds. Violations require explicit justification in PR (complexity tracking section in plan.md).
+
+---
+
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Approve and set to 2026-01-27 | **Last Amended**: TODO(LAST_AMENDED_DATE): Approve and set to 2026-01-27
