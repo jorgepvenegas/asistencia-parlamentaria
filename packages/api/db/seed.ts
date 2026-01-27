@@ -92,7 +92,10 @@ async function seedDatabase(): Promise<void> {
     ];
 
     for (const politician of politicians) {
-      insertPolitician.run(...politician);
+      // Convert boolean to integer for SQLite
+      const values = [...politician];
+      values[5] = values[5] ? 1 : 0;
+      insertPolitician.run(...values);
     }
     console.log(`✓ Inserted ${politicians.length} politicians`);
 

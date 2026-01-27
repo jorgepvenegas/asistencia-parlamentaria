@@ -22,7 +22,6 @@
   "devDependencies": {
     "@astrojs/tailwind": "^5.0.0",
     "@playwright/test": "^1.40.0",
-    "@testing-library/astro": "^3.0.0",
     "@testing-library/dom": "^9.3.3",
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.13.2",

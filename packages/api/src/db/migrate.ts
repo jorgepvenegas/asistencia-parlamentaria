@@ -28,7 +28,7 @@ export function runMigrations(dbPath: string): void {
     `);
 
     // Find and run pending migrations
-    const migrationsDir = path.join(__dirname, '../migrations');
+    const migrationsDir = path.join(__dirname, '../../db/migrations');
     if (!fs.existsSync(migrationsDir)) {
       console.warn(`Migrations directory not found: ${migrationsDir}`);
       return;
