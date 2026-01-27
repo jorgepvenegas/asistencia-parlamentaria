@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "analyze:bundle": "node scripts/analyze-bundle.js",
     "test": "vitest",
     "test:e2e": "playwright test",
     "lint": "eslint src",
