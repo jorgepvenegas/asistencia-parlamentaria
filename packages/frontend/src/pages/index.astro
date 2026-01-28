@@ -1,0 +1,280 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StackedChart from '../components/StackedChart.astro';
+import PartyFilter from '../components/PartyFilter.astro';
+
+const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+
+interface Politician {
+  id: string;
+  name: string;
+  party_id: string;
+  position?: string;
+  percentage_attended: number;
+  attended_count: number;
+  unattended_count: number;
+  excused_count: number;
+}
+
+interface Party {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  abbreviation?: string;
+}
+
+// Fetch data from API
+let politicians: Politician[] = [];
+let parties: Party[] = [];
+let currentYear = new Date().getFullYear();
+let error: string | null = null;
+let selectedParties: string[] = [];
+
+// Get party filter from URL
+const url = new URL(Astro.request.url);
+const partiesParam = url.searchParams.get('parties');
+if (partiesParam) {
+  selectedParties = partiesParam.split(',').filter((id) => id.trim().length > 0);
+}
+
+try {
+  // Build query string with filters
+  let queryParams = `year=${currentYear}&limit=400`;
+  if (selectedParties.length > 0) {
+    queryParams += `&party_id=${selectedParties[0]}`; // API supports single party_id param
+  }
+
+  // Fetch politicians with attendance data
+  const politiciansRes = await fetch(`${API_URL}/api/politicians?${queryParams}`);
+  if (politiciansRes.ok) {
+    const data = await politiciansRes.json();
+    politicians = data.data || [];
+  } else {
+    error = 'Failed to load politicians data';
+  }
+
+  // Fetch parties for color coding
+  const partiesRes = await fetch(`${API_URL}/api/parties`);
+  if (partiesRes.ok) {
+    const data = await partiesRes.json();
+    parties = data.data || [];
+  }
+} catch (err) {
+  error = 'Error connecting to server';
+  console.error(err);
+}
+
+// Calculate statistics
+const totalPoliticians = politicians.length;
+const averageAttendance = totalPoliticians > 0
+  ? (politicians.reduce((sum, p) => sum + p.percentage_attended, 0) / totalPoliticians).toFixed(1)
+  : 0;
+
+// Find top and bottom performers
+const sorted = [...politicians].sort((a, b) => b.percentage_attended - a.percentage_attended);
+const topPerformers = sorted.slice(0, 5);
+const bottomPerformers = sorted.slice(-5).reverse();
+
+// Prepare chart data
+const chartData = politicians.map(p => ({
+  name: p.name.split(' ')[0], // First name only for space
+  attended: p.attended_count,
+  unattended: p.unattended_count,
+  excused: p.excused_count,
+  percentage: p.percentage_attended,
+}));
+
+// Get party name by ID
+function getPartyName(partyId: string): string {
+  return parties.find(p => p.id === partyId)?.name || partyId;
+}
+---
+
+<BaseLayout title="Asistencia Parlamentaria - QuienAtiende" description="Ver datos de asistencia de diputados y oficiales del gobierno">
+  <div class="space-y-8">
+    <!-- Page Header -->
+    <section>
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Asistencia Parlamentaria {currentYear}</h1>
+      <p class="text-xl text-gray-600">
+        Transparencia sobre la asistencia de diputados a sesiones parlamentarias
+      </p>
+
+      <!-- Year Navigation -->
+      <div class="mt-4 flex gap-2">
+        <label for="year-select" class="text-sm font-medium text-gray-700">Ver mes:</label>
+        <select id="year-select" class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="navigateToMonth(this.value)">
+          <option value="">Selecciona un mes...</option>
+          <option value="/2026/1">Enero 2026</option>
+          <option value="/2026/2">Febrero 2026</option>
+          <option value="/2026/3">Marzo 2026</option>
+          <option value="/2026/4">Abril 2026</option>
+          <option value="/2026/5">Mayo 2026</option>
+          <option value="/2026/6">Junio 2026</option>
+          <option value="/2026/7">Julio 2026</option>
+          <option value="/2026/8">Agosto 2026</option>
+          <option value="/2026/9">Septiembre 2026</option>
+          <option value="/2026/10">Octubre 2026</option>
+          <option value="/2026/11">Noviembre 2026</option>
+          <option value="/2026/12">Diciembre 2026</option>
+        </select>
+      </div>
+      <script>
+        function navigateToMonth(url) {
+          if (url) {
+            window.location.href = url;
+          }
+        }
+      </script>
+    </section>
+
+    {error && (
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+        <p class="font-semibold">Error loading data</p>
+        <p class="text-sm">{error}</p>
+      </div>
+    )}
+
+    {!error && politicians.length > 0 && (
+      <>
+        <!-- Party Filter -->
+        <section>
+          <PartyFilter parties={parties} selectedParties={selectedParties} />
+        </section>
+
+        <!-- Statistics Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-gradient-to-br from-brand-50 to-brand-100 rounded-lg p-6 border border-brand-200">
+            <p class="text-sm text-brand-700 font-medium mb-1">Total de Diputados</p>
+            <p class="text-3xl font-bold text-brand-900">{totalPoliticians}</p>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+            <p class="text-sm text-blue-700 font-medium mb-1">Asistencia Promedio</p>
+            <p class="text-3xl font-bold text-blue-900">{averageAttendance}%</p>
+          </div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+            <p class="text-sm text-purple-700 font-medium mb-1">Año</p>
+            <p class="text-3xl font-bold text-purple-900">{currentYear}</p>
+          </div>
+        </section>
+
+        <!-- Top Performers -->
+        <section>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Top 5 Mayor Asistencia</h2>
+          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Nombre</th>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Partido</th>
+                  <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Asistencia</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {topPerformers.map(politician => (
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{politician.name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{getPartyName(politician.party_id)}</td>
+                    <td class="px-6 py-4 text-right">
+                      <span class="text-sm font-bold text-green-600">{politician.percentage_attended.toFixed(1)}%</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Bottom Performers -->
+        <section>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Menor Asistencia</h2>
+          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Nombre</th>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Partido</th>
+                  <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Asistencia</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {bottomPerformers.map(politician => (
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{politician.name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{getPartyName(politician.party_id)}</td>
+                    <td class="px-6 py-4 text-right">
+                      <span class="text-sm font-bold text-red-600">{politician.percentage_attended.toFixed(1)}%</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Distribución de Asistencia</h2>
+          <StackedChart data={chartData} title="Attendance by Politician" />
+        </section>
+
+        <!-- All Politicians Table -->
+        <section>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Todos los Diputados</h2>
+          <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
+                <tr>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Nombre</th>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Partido</th>
+                  <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cargo</th>
+                  <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Presente</th>
+                  <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Ausente</th>
+                  <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Justificado</th>
+                  <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700">Asistencia</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {politicians.map(politician => (
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{politician.name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{getPartyName(politician.party_id)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{politician.position || '-'}</td>
+                    <td class="px-6 py-4 text-center text-sm text-green-600 font-medium">{politician.attended_count}</td>
+                    <td class="px-6 py-4 text-center text-sm text-red-600 font-medium">{politician.unattended_count}</td>
+                    <td class="px-6 py-4 text-center text-sm text-amber-600 font-medium">{politician.excused_count}</td>
+                    <td class="px-6 py-4 text-right">
+                      <span class={`text-sm font-bold px-3 py-1 rounded ${
+                        politician.percentage_attended >= 80 ? 'bg-green-100 text-green-700' :
+                        politician.percentage_attended >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {politician.percentage_attended.toFixed(1)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </>
+    )}
+
+    {!error && politicians.length === 0 && (
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+        <p class="text-yellow-800">No hay datos disponibles. Por favor, verifica que el servidor API esté ejecutándose.</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  table {
+    @apply text-xs md:text-sm;
+  }
+
+  thead {
+    @apply text-xs md:text-sm;
+  }
+</style>

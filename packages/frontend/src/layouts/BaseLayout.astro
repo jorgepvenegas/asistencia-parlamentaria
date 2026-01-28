@@ -1,0 +1,120 @@
+---
+import Search from '../components/Search.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'QuienAtiende', description = 'Ciudadano Transparencia de Asistencia Parlamentaria' } = Astro.props;
+
+// Fetch metadata to display last update
+let lastUpdate = 'Loading...';
+try {
+  const metadataRes = await fetch(`${import.meta.env.API_URL || 'http://localhost:3000'}/api/metadata`);
+  if (metadataRes.ok) {
+    const data = await metadataRes.json();
+    if (data.data?.last_update) {
+      const date = new Date(data.data.last_update);
+      lastUpdate = date.toLocaleDateString('es-CR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+  }
+} catch (error) {
+  console.error('Error fetching metadata:', error);
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#16a34a" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+    <header class="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-40">
+      <nav class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between gap-4 mb-4">
+          <div class="flex items-center gap-3">
+            <a href="/" class="hover:opacity-80 transition-opacity">
+              <h1 class="text-2xl font-bold text-brand-600">QuienAtiende</h1>
+            </a>
+            <p class="text-sm text-gray-500">Transparencia Parlamentaria</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Datos actualizados:</p>
+            <p class="text-sm font-medium text-gray-700">{lastUpdate}</p>
+          </div>
+        </div>
+        <div class="flex-1 max-w-md">
+          <Search placeholder="Buscar diputado por nombre..." />
+        </div>
+      </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <slot />
+    </main>
+
+    <footer class="mt-16 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Acerca de</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              QuienAtiende es una plataforma de transparencia que permite a los ciudadanos ver datos de asistencia parlamentaria.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Características</h3>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><a href="#" class="hover:text-brand-600">Ver asistencia anual</a></li>
+              <li><a href="#" class="hover:text-brand-600">Buscar diputado</a></li>
+              <li><a href="#" class="hover:text-brand-600">Filtrar por partido</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Información</h3>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+              <li><a href="#" class="hover:text-brand-600">Fuente de datos</a></li>
+              <li><a href="#" class="hover:text-brand-600">Metodología</a></li>
+              <li><a href="#" class="hover:text-brand-600">Contacto</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-600">
+          <p>&copy; 2026 QuienAtiende. Transparencia para todos.</p>
+        </div>
+      </div>
+    </footer>
+
+    <style is:global>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      * {
+        @apply border-gray-200;
+      }
+
+      html {
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+
+      code {
+        @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono;
+      }
+
+      pre code {
+        @apply bg-gray-900 text-white px-4 py-3 rounded block overflow-x-auto;
+      }
+    </style>
+  </body>
+</html>

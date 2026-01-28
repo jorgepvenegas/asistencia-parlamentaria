@@ -1,0 +1,109 @@
+# name: Lighthouse Performance Monitor
+
+# on:
+#   push:
+#     branches: [main, master]
+#   pull_request:
+#     branches: [main, master]
+#   schedule:
+#     # Weekly check on Monday at 9am UTC
+#     - cron: '0 9 * * 1'
+
+# jobs:
+#   lighthouse:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '18'
+#           cache: 'pnpm'
+
+#       - name: Install pnpm
+#         uses: pnpm/action-setup@v2
+#         with:
+#           version: 8
+
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
+
+#       - name: Build frontend
+#         run: pnpm -F frontend run build
+
+#       - name: Run bundle analyzer
+#         id: bundle
+#         run: |
+#           pnpm -F frontend run analyze:bundle > bundle-report.txt 2>&1 || true
+#           cat bundle-report.txt
+#           SIZE_KB=$(grep -oP 'Total size: \K[\d.]+' bundle-report.txt || echo "0")
+#           echo "bundle_size=${SIZE_KB}" >> $GITHUB_OUTPUT
+
+#       - name: Check bundle size
+#         run: |
+#           SIZE_KB=${{ steps.bundle.outputs.bundle_size }}
+#           LIMIT=500
+#           if (( $(echo "$SIZE_KB > $LIMIT" | bc -l) )); then
+#             echo "❌ Bundle size ${SIZE_KB}KB exceeds limit ${LIMIT}KB"
+#             exit 1
+#           else
+#             echo "✅ Bundle size ${SIZE_KB}KB is within limit ${LIMIT}KB"
+#           fi
+
+#       - name: Start API server
+#         run: |
+#           cd packages/api
+#           pnpm run dev &
+#           sleep 2
+#         timeout-minutes: 1
+
+#       - name: Run Lighthouse CI
+#         uses: treosh/lighthouse-ci-action@v10
+#         with:
+#           configPath: './lighthouserc.json'
+#           uploadArtifacts: true
+#           temporaryPublicStorage: true
+#         continue-on-error: true
+
+#       - name: Comment PR with results
+#         if: github.event_name == 'pull_request'
+#         uses: actions/github-script@v7
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           script: |
+#             const fs = require('fs');
+#             const results = fs.existsSync('./.lighthouseci/manifest.json')
+#               ? JSON.parse(fs.readFileSync('./.lighthouseci/manifest.json', 'utf-8'))
+#               : null;
+
+#             if (results && results.length > 0) {
+#               const scores = results[0].summary;
+#               const comment = `## 📊 Lighthouse Performance Report
+
+#               | Metric | Score |
+#               |--------|-------|
+#               | Performance | ${scores.performance * 100} |
+#               | Accessibility | ${scores.accessibility * 100} |
+#               | Best Practices | ${scores['best-practices'] * 100} |
+#               | SEO | ${scores.seo * 100} |
+#               | PWA | ${scores.pwa * 100} |
+
+#               📖 [Full Report](${results[0].url})`;
+
+#               github.rest.issues.createComment({
+#                 issue_number: context.issue.number,
+#                 owner: context.repo.owner,
+#                 repo: context.repo.repo,
+#                 body: comment
+#               });
+#             }
+
+#       - name: Upload results
+#         if: always()
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: lighthouse-results
+#           path: .lighthouseci/
+#           retention-days: 90
