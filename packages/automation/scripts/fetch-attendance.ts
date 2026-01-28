@@ -7,38 +7,38 @@
  * Intended to run daily via GitHub Actions at 3am PT (10am UTC)
  */
 
-import Database from 'better-sqlite3';
-import { z } from 'zod';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// import Database from 'better-sqlite3';
+// import { z } from 'zod';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = process.env.DATABASE_URL || path.join(__dirname, '../../api/data/attendance.db');
+// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// const DB_PATH = process.env.DATABASE_URL || path.join(__dirname, '../../api/data/attendance.db');
 
-// Validation schema
-const AttendanceRecordSchema = z.object({
-  politician_id: z.string(),
-  date: z.string().date(),
-  status: z.enum(['attended', 'unattended', 'excused']),
-  reason: z.string().optional().nullable(),
-  year: z.number().int(),
-  month: z.number().int().min(1).max(12),
-});
+// // Validation schema
+// const AttendanceRecordSchema = z.object({
+//   politician_id: z.string(),
+//   date: z.string().date(),
+//   status: z.enum(['attended', 'unattended', 'excused']),
+//   reason: z.string().optional().nullable(),
+//   year: z.number().int(),
+//   month: z.number().int().min(1).max(12),
+// });
 
-type AttendanceRecord = z.infer<typeof AttendanceRecordSchema>;
+// type AttendanceRecord = z.infer<typeof AttendanceRecordSchema>;
 
-interface FetchResult {
-  success: boolean;
-  recordsProcessed: number;
-  recordsInserted: number;
-  error?: string;
-  timestamp: string;
-}
+// interface FetchResult {
+//   success: boolean;
+//   recordsProcessed: number;
+//   recordsInserted: number;
+//   error?: string;
+//   timestamp: string;
+// }
 
 /**
  * Mock data fetcher - in production would connect to real data source
  */
-async function fetchDataFromSource(): Promise<AttendanceRecord[]> {
+async function fetchDataFromSource(): Promise<[]> {
   console.log('Fetching attendance data from source...');
 
   // NOTE: This is a placeholder implementation
@@ -49,7 +49,7 @@ async function fetchDataFromSource(): Promise<AttendanceRecord[]> {
   // 4. Return array of records
 
   // Example of what this might look like:
-  /*
+
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
@@ -69,7 +69,6 @@ async function fetchDataFromSource(): Promise<AttendanceRecord[]> {
   } finally {
     await browser.close();
   }
-  */
 
   // For now, return empty array (no production data source configured)
   console.log('No production data source configured. Returning empty data.');
@@ -168,31 +167,31 @@ async function main(): Promise<FetchResult> {
     console.log(`Retrieved ${rawData.length} records from source`);
 
     // Validate data
-    const validatedData = validateRecords(rawData);
-    console.log(`Validated ${validatedData.length} records`);
+    // const validatedData = validateRecords(rawData);
+    // console.log(`Validated ${validatedData.length} records`);
 
     // Connect to database
-    const db = new Database(DB_PATH);
+    // const db = new Database(DB_PATH);
 
     try {
       // Upsert records
-      const inserted = upsertRecords(db, validatedData);
-      console.log(`Inserted/updated ${inserted} records in database`);
+      // const inserted = upsertRecords(db, validatedData);
+      // console.log(`Inserted/updated ${inserted} records in database`);
 
       // Update metadata
-      updateMetadata(db);
+      // updateMetadata(db);
 
-      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-      console.log(`\nCompleted successfully in ${duration}s`);
+      // const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+      // console.log(`\nCompleted successfully in ${duration}s`);
 
-      return {
-        success: true,
-        recordsProcessed: rawData.length,
-        recordsInserted: inserted,
-        timestamp: new Date().toISOString(),
-      };
+      // return {
+      //   success: true,
+      //   recordsProcessed: rawData.length,
+      //   recordsInserted: inserted,
+      //   timestamp: new Date().toISOString(),
+      // };
     } finally {
-      db.close();
+      // db.close();
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
