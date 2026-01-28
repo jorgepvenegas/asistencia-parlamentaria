@@ -1,6 +1,8 @@
 import type { AppType } from "@quienatiende/api/routes";
 import { hc } from "hono/client";
 
+export type Client = ReturnType<typeof hc<AppType>>;
 
-export const client = hc<AppType>(process.env.BASE_URL_API!);
-export type Client = typeof client;
+export function createClient(baseUrl: string): Client {
+  return hc<AppType>(baseUrl);
+}
