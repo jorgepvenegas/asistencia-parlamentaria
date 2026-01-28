@@ -10,9 +10,11 @@
     "format:check": "prettier --check src"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "@quienatiende/api": "workspace:^",
+    "hono": "^4.11.7"
   },
   "devDependencies": {
+    "@types/node": "^25.1.0",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",

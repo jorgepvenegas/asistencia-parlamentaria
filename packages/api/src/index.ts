@@ -1,36 +1,8 @@
-import { Hono } from 'hono'
-import { partiesRoute } from './routes/parties';
-import { logger } from 'hono/logger';
-import { cors } from 'hono/cors';
+import { registerRoutes } from "./routes/index.js";
+import createApp from "./lib/index.js";
 
-const app = new Hono()
+const app = registerRoutes(createApp())
 
-app.use(logger());
-app.use(
-  cors({
-    origin: '*',
-    allowMethods: ['GET'],
-    allowHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+export default app;
 
-app.route('/api', partiesRoute);
-
-// Health check
-app.get('/health', (c) => {
-  return c.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// 404 handler
-app.notFound((c) => {
-  return c.json(
-    { error: 'Not found', statusCode: 404 },
-    404
-  );
-});
-
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
-
-export default app
+export type AppType = typeof app

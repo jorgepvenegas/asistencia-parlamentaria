@@ -1,5 +1,6 @@
-// Export all types
-export * from './types';
+import type { AppType } from "@quienatiende/api/routes";
+import { hc } from "hono/client";
 
-// Export all schemas
-export * from './schemas';
+
+export const client = hc<AppType>("http://localhost:8787");
+export type Client = typeof client;
