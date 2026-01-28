@@ -1,61 +1,20 @@
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
-import { Database } from 'better-sqlite3';
-import { initDatabase } from './db/init';
-
-// Import routes
-import { metadataRoute } from './routes/metadata';
+import { Hono } from 'hono'
 import { partiesRoute } from './routes/parties';
-import { politiciansRoute } from './routes/politicians';
-import { searchRoute } from './routes/search';
-import { attendanceRoute } from './routes/attendance';
+import { logger } from 'hono/logger';
+import { cors } from 'hono/cors';
 
-interface AppContext {
-  Variables: {
-    db: Database.Database;
-  };
-}
+const app = new Hono()
 
-const app = new Hono<AppContext>();
-
-// Middleware
 app.use(logger());
 app.use(
   cors({
     origin: '*',
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET'],
     allowHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
-// Database middleware
-app.use(async (c, next) => {
-  if (!c.get('db')) {
-    c.set('db', initDatabase());
-  }
-  await next();
-});
-
-// Error handling middleware
-app.onError((err, c) => {
-  console.error('Error:', err);
-  return c.json(
-    {
-      error: err.message || 'Internal server error',
-      statusCode: 500,
-      details: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    },
-    500
-  );
-});
-
-// Routes
-app.route('/api', metadataRoute);
 app.route('/api', partiesRoute);
-app.route('/api', politiciansRoute);
-app.route('/api', searchRoute);
-app.route('/api', attendanceRoute);
 
 // Health check
 app.get('/health', (c) => {
@@ -70,15 +29,8 @@ app.notFound((c) => {
   );
 });
 
-const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+app.get('/', (c) => {
+  return c.text('Hello Hono!')
+})
 
-console.log(`🚀 API server running at http://localhost:${port}`);
-console.log(`📊 Metadata endpoint: GET /api/metadata`);
-console.log(`🏛️  Parties endpoint: GET /api/parties`);
-console.log(`👥 Politicians endpoint: GET /api/politicians`);
-console.log(`🔍 Search endpoint: GET /api/search`);
-
-export default {
-  port,
-  fetch: app.fetch,
-};
+export default app

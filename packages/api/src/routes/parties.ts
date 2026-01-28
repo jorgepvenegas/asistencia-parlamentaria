@@ -1,31 +1,16 @@
 import { Hono } from 'hono';
-import { Database } from 'better-sqlite3';
-import type { Party } from '@quienatiende/shared';
+import 'dotenv/config';
+import { drizzle } from 'drizzle-orm/libsql';
+import { partiesTable } from '../db/schema';
+import { db } from '../db';
 
-interface PartiesContext {
-  Variables: {
-    db: Database.Database;
-  };
-}
+export const partiesRoute = new Hono();
 
-export const partiesRoute = new Hono<PartiesContext>();
-
-/**
- * GET /api/parties
- * Returns all political parties with colors for chart rendering
- */
-partiesRoute.get('/parties', (c) => {
+partiesRoute.get('/parties', async (c) => {  
   try {
-    const db = c.get('db');
-
-    const getParties = db.prepare(`
-      SELECT id, name, slug, color, secondary_color, abbreviation, created_at
-      FROM parties
-      ORDER BY name ASC
-    `);
-
-    const parties = getParties.all() as Party[];
-
+    
+    // const db = drizzle(process.env.DB_FILE_NAME!);
+    const parties = await db.select().from(partiesTable);
     return c.json({
       data: parties,
       statusCode: 200,
