@@ -1,17 +1,13 @@
 import { client } from '@quienatiende/shared';
 import fs from 'fs';
 import path from 'path';
-
-interface PoliticianData {
-  name: string;
-  partySlug: string;
-}
+import { getTodayFormatted, PoliticianAttendance } from './scrape-attendance';
 
 async function createPoliticiansFromFile(filePath: string) {
   try {
     // Read politicians data from JSON file
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const politicians: PoliticianData[] = JSON.parse(fileContent);
+    const politicians: PoliticianAttendance[] = JSON.parse(fileContent);
 
     console.log(`Creating ${politicians.length} politicians...`);
 
@@ -19,15 +15,41 @@ async function createPoliticiansFromFile(filePath: string) {
     let failed = 0;
     const failedRecords: { name: string; error: string }[] = [];
 
+    const politiciansRequest = await client.api.politicians.$get();
+    const existingPoliticiansData = await politiciansRequest.json();
+
     // Process sequentially with delay to avoid worker timeout
-    for (const { name, partySlug } of politicians) {
+    for (const { name, partySlug, absent, attended, justifiedAbsent, percentage, unjustifiedAbsent } of politicians) {
       try {
-        await client.api.politicians.$post({
+        // Create only if doesn't exist
+
+        let match = existingPoliticiansData.data.find(epd => epd.name === name);
+
+        if(!match) {
+          match = await client.api.politicians.$post({
+            json: {
+              name,
+              partySlug
+            }
+          });
+          await new Promise(r => setTimeout(r, 100));
+        }
+
+        const attendanceResponse = await client.api.attendance.$post({
           json: {
-            name,
-            partySlug
+            attendanceAverage: percentage,
+            attendanceCount: attended,
+            politicianId: match.id,
+            date: getTodayFormatted()
           }
-        });
+        })
+
+        if(!attendanceResponse.ok) {
+          const errorData = await attendanceResponse.json();
+          console.error(`\nError creating attendance for ${name}:`, attendanceResponse.status, errorData);
+        }
+
+        
         successful++;
         process.stdout.write('.');
       } catch (error) {
@@ -40,7 +62,7 @@ async function createPoliticiansFromFile(filePath: string) {
       }
 
       // Small delay between requests
-      await new Promise(r => setTimeout(r, 50));
+      await new Promise(r => setTimeout(r, 100));
     }
 
     console.log(`\n\n✓ Successfully created ${successful} politicians`);
@@ -63,7 +85,7 @@ async function createPoliticiansFromFile(filePath: string) {
 }
 
 // Get file path from command line args or use default
-const filePath = process.argv[2] || './politicians.json';
+const filePath = process.argv[2] || './temp/politicians.json';
 const resolvedPath = path.resolve(filePath);
 
 if (!fs.existsSync(resolvedPath)) {
