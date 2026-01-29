@@ -5,14 +5,16 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "fetch-attendance": "tsx scripts/fetch-attendance.ts",
-    "scrape-chamber": "tsx scripts/scrape-chamber.ts",
-    "build": "tsc",
-    "dev": "tsx scripts/fetch-attendance.ts"
+    "scrape-attendance": "tsx scripts/scrape-attendance.ts",
+    "create-parties": "tsx scripts/create-parties.ts",
+    "create-politicians": "tsx scripts/create-politicians.ts",
+    "sync": "tsx scripts/sync-data.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "@quienatiende/shared": "workspace:*",
     "better-sqlite3": "^9.2.0",
+    "cheerio": "^1.0.0-rc.12",
     "playwright": "^1.58.0",
     "zod": "^3.22.0"
   },
