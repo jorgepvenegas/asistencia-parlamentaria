@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import partiesRoute from "./parties.js";
+import politiciansRoute from "./politicians.js";
 
 
 export function registerRoutes(app: Hono) {
   return app
-    .route("/api", partiesRoute);
+    .route("/api", partiesRoute)
+    .route("/api", politiciansRoute);
 }
