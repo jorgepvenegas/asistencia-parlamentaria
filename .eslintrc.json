@@ -15,14 +15,14 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "project": ["./tsconfig.json", "./packages/*/tsconfig.json"]
   },
   "plugins": ["@typescript-eslint", "import"],
   "rules": {
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
     "no-debugger": "warn",
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/explicit-function-return-types": "warn",
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-floating-promises": "error",
     "import/no-unused-modules": "warn",

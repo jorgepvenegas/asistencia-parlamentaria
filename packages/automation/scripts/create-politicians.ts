@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { client } from '@quienatiende/shared';
 import fs from 'fs';
 import path from 'path';
-import { getTodayFormatted, PoliticianAttendance } from './scrape-attendance';
+import { getTodayFormatted, PoliticianAttendance } from './scrape-attendance.js';
 
 async function createPoliticiansFromFile(filePath: string) {
   try {
@@ -29,21 +30,21 @@ async function createPoliticiansFromFile(filePath: string) {
       try {
         // Create only if doesn't exist
 
-        let match = existingPoliticiansData.data.find(epd => epd.name === name);
+        let match = existingPoliticiansData.data.find((epd) => epd.name === name);
 
-        if(!match) {
+        if (!match) {
           const createResponse = await client.api.politicians.$post({
             json: {
               name,
-              partySlug
-            }
+              partySlug,
+            },
           });
           const createData = await createResponse.json();
           if ('error' in createData) {
             throw new Error(createData.error);
           }
           match = createData.data;
-          await new Promise(r => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 100));
         }
 
         const attendanceResponse = await client.api.attendance.$post({
@@ -51,29 +52,32 @@ async function createPoliticiansFromFile(filePath: string) {
             attendanceAverage: percentage,
             attendanceCount: attended,
             politicianId: match.id,
-            date: getTodayFormatted()
-          }
-        })
+            date: getTodayFormatted(),
+          },
+        });
 
-        if(!attendanceResponse.ok) {
+        if (!attendanceResponse.ok) {
           const errorData = await attendanceResponse.json();
-          console.error(`\nError creating attendance for ${name}:`, attendanceResponse.status, errorData);
+          console.error(
+            `\nError creating attendance for ${name}:`,
+            attendanceResponse.status,
+            errorData
+          );
         }
 
-        
         successful++;
         process.stdout.write('.');
       } catch (error) {
         failed++;
         failedRecords.push({
           name,
-          error: String(error)
+          error: String(error),
         });
         process.stdout.write('X');
       }
 
       // Small delay between requests
-      await new Promise(r => setTimeout(r, 100));
+      await new Promise((r) => setTimeout(r, 100));
     }
 
     console.log(`\n\n✓ Successfully created ${successful} politicians`);
@@ -105,4 +109,4 @@ if (!fs.existsSync(resolvedPath)) {
   process.exit(1);
 }
 
-createPoliticiansFromFile(resolvedPath);
+void createPoliticiansFromFile(resolvedPath);

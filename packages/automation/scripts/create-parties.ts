@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { client } from '@quienatiende/shared';
 import fs from 'fs';
 import path from 'path';
@@ -26,8 +27,8 @@ async function createPartiesFromFile(filePath: string) {
           json: {
             abbreviation: party,
             name: party,
-            slug
-          }
+            slug,
+          },
         });
         successful++;
         process.stdout.write('.');
@@ -35,13 +36,13 @@ async function createPartiesFromFile(filePath: string) {
         failed++;
         failedRecords.push({
           slug,
-          error: String(error)
+          error: String(error),
         });
         process.stdout.write('X');
       }
 
       // Small delay between requests
-      await new Promise(r => setTimeout(r, 50));
+      await new Promise((r) => setTimeout(r, 50));
     }
 
     console.log(`\n\n✓ Successfully created ${successful} parties`);
@@ -73,4 +74,4 @@ if (!fs.existsSync(resolvedPath)) {
   process.exit(1);
 }
 
-createPartiesFromFile(resolvedPath);
+void createPartiesFromFile(resolvedPath);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { chromium } from 'playwright';
 import { load } from 'cheerio';
 import fs from 'fs';
@@ -11,16 +12,13 @@ export type PoliticianAttendance = {
   unjustifiedAbsent: number;
   absent: number;
   percentage: number;
-}
+};
 
 function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/~/g, '');
+  return text.toLowerCase().replace(/\s+/g, '-').replace(/~/g, '');
 }
 
-function generateCurrentMonthDates(): {from: string, to: string} {
+function generateCurrentMonthDates(): { from: string; to: string } {
   const now = new Date();
   const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -34,8 +32,8 @@ function generateCurrentMonthDates(): {from: string, to: string} {
 
   return {
     from: formatDate(firstDay),
-    to: formatDate(lastDay)
-  }
+    to: formatDate(lastDay),
+  };
 }
 
 function parsePercentage(percentageStr: string): number {
@@ -50,7 +48,8 @@ export function getTodayFormatted(): string {
   return `${day}/${month}/${year}`;
 }
 
-const ASISTENCIA_RESUMEN_URL = 'https://www.camara.cl/legislacion/sala_sesiones/asistencia_resumen.aspx';
+const ASISTENCIA_RESUMEN_URL =
+  'https://www.camara.cl/legislacion/sala_sesiones/asistencia_resumen.aspx';
 
 async function scrapeAttendance() {
   const browser = await chromium.launch();
@@ -71,93 +70,88 @@ async function scrapeAttendance() {
     await page.fill(dateToSelector, to);
 
     const searchButton = '#ContentPlaceHolder1_ContentPlaceHolder1_PaginaContent_btnBuscar';
-    
 
-    console.log('searching for', from, to)
+    console.log('searching for', from, to);
 
     await page.click(searchButton);
 
-    const resultTable = '.tabla'
+    const resultTable = '.tabla';
     await page.waitForSelector(resultTable, { timeout: 10000 });
 
     // Get page HTML and extract in Node.js (debugger can stop here)
     const html = await page.content();
     const $ = load(html);
 
-    const parties = new Map<string, {party: string}>();
-
-    type PoliticianAttendance = {
-      name: string;
-      partySlug: string;
-      attended: number;
-      justifiedAbsent: number;
-      unjustifiedAbsent: number;
-      absent: number;
-      percentage: number;
-    }
+    const parties = new Map<string, { party: string }>();
 
     const politicians = new Map<string, PoliticianAttendance>();
 
     // Extract data from first table - NOW IN NODE.JS CONTEXT
-    const attendance = $('table.tabla').first().find('tbody > tr').map((_, row) => {
-      const $row = $(row);
-      const cells = $row.children('td');
+    const attendance = $('table.tabla')
+      .first()
+      .find('tbody > tr')
+      .map((_, row) => {
+        const $row = $(row);
+        const cells = $row.children('td');
 
-      // Skip rows that don't have expected number of columns
-      if (cells.length < 7) return null;
+        // Skip rows that don't have expected number of columns
+        if (cells.length < 7) {
+          return null;
+        }
 
-      let [
-        nameCell,
-        partyCell,
-        attendedCell,
-        justifiedAbsentCell,
-        unjustifiedAbsentCell,
-        absentCell,
-        percentageCell
-      ] = cells;
+        const [
+          nameCell,
+          partyCell,
+          attendedCell,
+          justifiedAbsentCell,
+          unjustifiedAbsentCell,
+          absentCell,
+          percentageCell,
+        ] = cells;
 
-      let name = $(nameCell).text().trim();
-      let nameSlug = slugify(name);
-      let party = $(partyCell).text().trim();
-      let partySlug = slugify(party);
-      let attended = Number($(attendedCell).text().trim());
-      let justifiedAbsent = Number($(justifiedAbsentCell).find('a span').text().trim());
-      let unjustifiedAbsent = Number($(unjustifiedAbsentCell).find('a span').text().trim());
-      let absent = Number($(absentCell).text().trim());
-      let percentage = parsePercentage($(percentageCell).text().trim());
+        const name = $(nameCell).text().trim();
+        const nameSlug = slugify(name);
+        const party = $(partyCell).text().trim();
+        const partySlug = slugify(party);
+        const attended = Number($(attendedCell).text().trim());
+        const justifiedAbsent = Number($(justifiedAbsentCell).find('a span').text().trim());
+        const unjustifiedAbsent = Number($(unjustifiedAbsentCell).find('a span').text().trim());
+        const absent = Number($(absentCell).text().trim());
+        const percentage = parsePercentage($(percentageCell).text().trim());
 
+        if (!parties.has(partySlug)) {
+          parties.set(partySlug, { party });
+        }
 
-      if(!parties.has(partySlug)) {
-        parties.set(partySlug, {party})
-      }
+        if (!politicians.has(nameSlug)) {
+          politicians.set(nameSlug, {
+            name,
+            partySlug,
+            attended,
+            justifiedAbsent,
+            unjustifiedAbsent,
+            absent,
+            percentage,
+          });
+        }
 
-      if(!politicians.has(nameSlug)) {
-        politicians.set(nameSlug, {
+        return {
           name,
+          party,
           partySlug,
           attended,
           justifiedAbsent,
           unjustifiedAbsent,
           absent,
-          percentage
-        })
-      }
-
-      return {
-        name,
-        party,
-        partySlug,
-        attended,
-        justifiedAbsent,
-        unjustifiedAbsent,
-        absent,
-        percentage
-      };
-    }).get().filter(item => item !== null);
+          percentage,
+        };
+      })
+      .get()
+      .filter((item) => item !== null);
 
     const partiesArray = Array.from(parties, ([k, v]) => ({
       slug: k,
-      party: v.party
+      party: v.party,
     }));
 
     // Write to ./temp directory
@@ -172,12 +166,12 @@ async function scrapeAttendance() {
     console.log(`✓ Wrote ${partiesArray.length} parties to ./temp/parties.json`);
     console.log(`✓ Collected attendance for ${attendance.length} politicians`);
 
-    const politiciansArray = Array.from(politicians, ([_, v]) => v);
+    const politiciansArray = Array.from(politicians, ([_k, v]) => v);
     fs.writeFileSync(politiciansPath, JSON.stringify(politiciansArray, null, 2));
     console.log(`✓ Wrote ${politiciansArray.length} politicians to ./temp/politicians.json`);
 
     fs.writeFileSync(attendancePath, JSON.stringify(attendance, null, 2));
-    console.log(`✓ Wrote ${attendancePath.length} attendance entries to ./temp/attendance.json`);
+    console.log(`✓ Wrote ${attendance.length} attendance entries to ./temp/attendance.json`);
 
     console.log('\nNext steps:');
     console.log('  1. pnpm create-parties ./temp/parties.json');
@@ -188,5 +182,5 @@ async function scrapeAttendance() {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  scrapeAttendance().catch(console.error);
+  void scrapeAttendance().catch(console.error);
 }
