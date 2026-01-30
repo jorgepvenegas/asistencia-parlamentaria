@@ -22,7 +22,10 @@ const partiesRoute = new Hono()
       });
     } catch (error) {
       console.error('Error fetching parties:', error);
-      throw error;
+      return c.json({
+        error: 'Failed to fetch parties',
+        statusCode: 500,
+      }, 500);
     }
   })
   .post('/parties', zValidator('json', createPartySchema), async (c) => {

@@ -16,22 +16,33 @@ async function createPoliticiansFromFile(filePath: string) {
     const failedRecords: { name: string; error: string }[] = [];
 
     const politiciansRequest = await client.api.politicians.$get();
+
+    if (!politiciansRequest.ok) {
+      console.error('Failed to fetch existing politicians:', politiciansRequest.statusText);
+      process.exit(1);
+    }
+
     const existingPoliticiansData = await politiciansRequest.json();
 
     // Process sequentially with delay to avoid worker timeout
-    for (const { name, partySlug, absent, attended, justifiedAbsent, percentage, unjustifiedAbsent } of politicians) {
+    for (const { name, partySlug, attended, percentage } of politicians) {
       try {
         // Create only if doesn't exist
 
         let match = existingPoliticiansData.data.find(epd => epd.name === name);
 
         if(!match) {
-          match = await client.api.politicians.$post({
+          const createResponse = await client.api.politicians.$post({
             json: {
               name,
               partySlug
             }
           });
+          const createData = await createResponse.json();
+          if ('error' in createData) {
+            throw new Error(createData.error);
+          }
+          match = createData.data;
           await new Promise(r => setTimeout(r, 100));
         }
 
