@@ -8,7 +8,7 @@ interface PartyData {
   party: string;
 }
 
-async function createPartiesFromFile(filePath: string) {
+async function updateAttendanceFromFile(filePath: string) {
   try {
     // Read parties data from JSON file
     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -65,7 +65,7 @@ async function createPartiesFromFile(filePath: string) {
 }
 
 // Get file path from command line args or use default
-const filePath = process.argv[2] || './temp/parties.json';
+const filePath = process.argv[2] || './parties.json';
 const resolvedPath = path.resolve(filePath);
 
 if (!fs.existsSync(resolvedPath)) {
@@ -74,4 +74,4 @@ if (!fs.existsSync(resolvedPath)) {
   process.exit(1);
 }
 
-void createPartiesFromFile(resolvedPath);
+void updateAttendanceFromFile(resolvedPath);

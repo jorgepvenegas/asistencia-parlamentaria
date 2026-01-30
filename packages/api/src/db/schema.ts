@@ -1,4 +1,4 @@
-import { int, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { int, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 
 export const politiciansTable = sqliteTable("politicians", {
@@ -22,9 +22,13 @@ export const attendanceRecordsTable = sqliteTable("attendance_records", {
   id: int().primaryKey({ autoIncrement: true }),
   politicianId: int().notNull().references(() => politiciansTable.id),
   date: text().notNull(),
-  totalSessions: int().notNull(),
-  attendedCount: int().notNull(),
-  unattendedCount: int().notNull(),
-  excusedUnattendedCount: int().notNull(),
-  excusedReason: text(),
-});
+  attendanceCount: int().notNull(),
+  // unattendedCount: int().notNull(),
+  // unattendedValidCount: int().notNull(),
+  // unattendedInvalidCount: int().notNull(),
+  // validJustifications: text(),
+  // invalidJustifications: text(),
+  attendanceAverage: real().notNull(),
+}, (table) => [
+  uniqueIndex("politicianId").on(table.politicianId)
+]);
