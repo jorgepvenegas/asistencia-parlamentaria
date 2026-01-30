@@ -10,10 +10,11 @@
     "create-politicians": "tsx scripts/create-politicians.ts",
     "sync": "tsx scripts/sync-data.ts",
     "build": "tsc",
-    "lint": "eslint scripts/ --ext .ts",
-    "lint:fix": "eslint scripts/ --ext .ts --fix",
-    "format": "prettier --write scripts/",
-    "format:check": "prettier --check scripts/"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/ scripts/ --ext .ts",
+    "lint:fix": "eslint src/ scripts/ --ext .ts --fix",
+    "format": "prettier --write src/ scripts/",
+    "format:check": "prettier --check src/ scripts/"
   },
   "dependencies": {
     "@quienatiende/shared": "workspace:*",

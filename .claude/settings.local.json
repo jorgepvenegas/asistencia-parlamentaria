@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)"
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(tree:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm type-check:*)"
     ]
   }
 }
