@@ -6,8 +6,7 @@
 export const config = {
   // URLs
   urls: {
-    chamberAttendance:
-      'https://www.camara.cl/legislacion/sala_sesiones/asistencia_resumen.aspx',
+    chamberAttendance: 'https://www.camara.cl/legislacion/sala_sesiones/asistencia_resumen.aspx',
   },
 
   // CSS Selectors for Playwright scraping
@@ -20,15 +19,15 @@ export const config = {
 
   // Timeouts in milliseconds
   timeouts: {
-    selectorWait: 5000,      // 5 seconds for selector visibility
-    tableWait: 10000,        // 10 seconds for results table
-    pageLoad: 30000,         // 30 seconds for page load
+    selectorWait: 5000, // 5 seconds for selector visibility
+    tableWait: 10000, // 10 seconds for results table
+    pageLoad: 30000, // 30 seconds for page load
   },
 
   // Request delays in milliseconds
   delays: {
-    partyCreate: 50,         // 50ms between party creation requests
-    politicianCreate: 100,   // 100ms between politician/attendance requests
+    partyCreate: 50, // 50ms between party creation requests
+    politicianCreate: 100, // 100ms between politician/attendance requests
   },
 
   // File paths

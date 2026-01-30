@@ -64,11 +64,7 @@ export async function processWithDelay<T, R>(
 /**
  * Log API result summary to console.
  */
-export function logApiResult(
-  result: ApiResult<unknown>,
-  itemType: string,
-  verbPast: string
-): void {
+export function logApiResult(result: ApiResult<unknown>, itemType: string, verbPast: string): void {
   // eslint-disable-next-line no-console
   console.log(`\n✓ Successfully ${verbPast} ${result.successCount} ${itemType}`);
 

@@ -60,12 +60,12 @@ export async function syncData(): Promise<SyncResult> {
     result.steps.scraping.success = true;
     // Count scraped items
     const partiesData = JSON.parse(fs.readFileSync(partiesPath, 'utf-8')) as { length: number };
-    const politiciansData = JSON.parse(
-      fs.readFileSync(politiciansPath, 'utf-8')
-    ) as { length: number };
-    const attendanceData = JSON.parse(
-      fs.readFileSync(attendancePath, 'utf-8')
-    ) as { length: number };
+    const politiciansData = JSON.parse(fs.readFileSync(politiciansPath, 'utf-8')) as {
+      length: number;
+    };
+    const attendanceData = JSON.parse(fs.readFileSync(attendancePath, 'utf-8')) as {
+      length: number;
+    };
 
     result.steps.scraping.partiesCount = partiesData.length;
     result.steps.scraping.politiciansCount = politiciansData.length;

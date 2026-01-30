@@ -95,9 +95,7 @@ export async function scrapeAttendance(): Promise<ScrapingResult> {
         const partySlug = slugify(party);
         const attended = Number($(attendedCell).text().trim());
         const justifiedAbsent = Number($(justifiedAbsentCell).find('a span').text().trim());
-        const unjustifiedAbsent = Number(
-          $(unjustifiedAbsentCell).find('a span').text().trim()
-        );
+        const unjustifiedAbsent = Number($(unjustifiedAbsentCell).find('a span').text().trim());
         const absent = Number($(absentCell).text().trim());
         const percentage = parsePercentage($(percentageCell).text().trim());
 
@@ -168,15 +166,21 @@ export async function scrapeAndWriteFiles(): Promise<{
 
   fs.writeFileSync(partiesPath, JSON.stringify(result.parties, null, 2));
   // eslint-disable-next-line no-console
-  console.log(`✓ Wrote ${result.parties.length} parties to ${config.paths.tempDir}/${config.paths.partiesFile}`);
+  console.log(
+    `✓ Wrote ${result.parties.length} parties to ${config.paths.tempDir}/${config.paths.partiesFile}`
+  );
 
   fs.writeFileSync(politiciansPath, JSON.stringify(result.politicians, null, 2));
   // eslint-disable-next-line no-console
-  console.log(`✓ Wrote ${result.politicians.length} politicians to ${config.paths.tempDir}/${config.paths.politiciansFile}`);
+  console.log(
+    `✓ Wrote ${result.politicians.length} politicians to ${config.paths.tempDir}/${config.paths.politiciansFile}`
+  );
 
   fs.writeFileSync(attendancePath, JSON.stringify(result.attendance, null, 2));
   // eslint-disable-next-line no-console
-  console.log(`✓ Wrote ${result.attendance.length} attendance entries to ${config.paths.tempDir}/${config.paths.attendanceFile}`);
+  console.log(
+    `✓ Wrote ${result.attendance.length} attendance entries to ${config.paths.tempDir}/${config.paths.attendanceFile}`
+  );
 
   return {
     partiesPath,
