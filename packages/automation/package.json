@@ -9,6 +9,7 @@
     "create-parties": "tsx scripts/create-parties.ts",
     "create-politicians": "tsx scripts/create-politicians.ts",
     "sync": "tsx scripts/sync-data.ts",
+    "sync:year": "tsx scripts/sync-year.ts",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint src/ scripts/ --ext .ts",

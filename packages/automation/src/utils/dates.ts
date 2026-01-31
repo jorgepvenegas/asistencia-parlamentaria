@@ -33,3 +33,21 @@ export function generateCurrentMonthDates(): { from: string; to: string } {
     to: formatDateDDMMYYYY(lastDay),
   };
 }
+
+/**
+ * Get current year and month as integers.
+ */
+export function getCurrentYearMonth(): { year: number; month: number } {
+  const now = new Date();
+  return { year: now.getFullYear(), month: now.getMonth() + 1 };
+}
+
+/**
+ * Get full year date range (Jan 1 - Dec 31) in DD/MM/YYYY format.
+ */
+export function getYearDateRange(year: number): { from: string; to: string } {
+  return {
+    from: `01/01/${year}`,
+    to: `31/12/${year}`,
+  };
+}

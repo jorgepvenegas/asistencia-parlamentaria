@@ -18,17 +18,29 @@ export const partiesTable = sqliteTable("parties", {
   uniqueIndex("slug").on(table.slug),
 ]);
 
-export const attendanceRecordsTable = sqliteTable("attendance_records", {
+export const attendanceMonthlyTable = sqliteTable("attendance_monthly", {
   id: int().primaryKey({ autoIncrement: true }),
   politicianId: int().notNull().references(() => politiciansTable.id),
-  date: text().notNull(),
+  year: int().notNull(),
+  month: int().notNull(),
   attendanceCount: int().notNull(),
-  unattendedCount: int().notNull(),
-  unattendedValidCount: int().notNull(),
-  unattendedInvalidCount: int().notNull(),
-  // validJustifications: text(),
-  // invalidJustifications: text(),
+  absentCount: int().notNull(),
+  justifiedAbsentCount: int().notNull(),
+  unjustifiedAbsentCount: int().notNull(),
   attendanceAverage: real().notNull(),
 }, (table) => [
-  uniqueIndex("politicianId").on(table.politicianId)
+  uniqueIndex("politician_month_idx").on(table.politicianId, table.year, table.month)
+]);
+
+export const attendanceYearlyTable = sqliteTable("attendance_yearly", {
+  id: int().primaryKey({ autoIncrement: true }),
+  politicianId: int().notNull().references(() => politiciansTable.id),
+  year: int().notNull(),
+  attendanceCount: int().notNull(),
+  absentCount: int().notNull(),
+  justifiedAbsentCount: int().notNull(),
+  unjustifiedAbsentCount: int().notNull(),
+  attendanceAverage: real().notNull(),
+}, (table) => [
+  uniqueIndex("politician_year_idx").on(table.politicianId, table.year)
 ]);

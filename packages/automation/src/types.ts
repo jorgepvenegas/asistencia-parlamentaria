@@ -40,7 +40,8 @@ export type CreatePoliticianRequest = z.infer<typeof CreatePoliticianRequestSche
 
 export const CreateAttendanceRequestSchema = z.object({
   politicianId: z.number().min(1),
-  date: z.string().min(1),
+  year: z.number().min(2000).max(2100),
+  month: z.number().min(1).max(12),
   attendanceCount: z.number().min(0),
   attendanceAverage: z.number().min(0).max(100),
 });
@@ -61,13 +62,15 @@ export const SyncResultSchema = z.object({
     }),
     partyCreation: z.object({
       success: z.boolean(),
-      successCount: z.number(),
+      createdCount: z.number(),
+      existingCount: z.number(),
       failureCount: z.number(),
       errors: z.array(z.object({ slug: z.string(), error: z.string() })),
     }),
     politicianCreation: z.object({
       success: z.boolean(),
-      successCount: z.number(),
+      createdCount: z.number(),
+      foundCount: z.number(),
       failureCount: z.number(),
       errors: z.array(z.object({ name: z.string(), error: z.string() })),
     }),
