@@ -29,12 +29,15 @@ export interface ScrapingResult {
 
 /**
  * Scrape attendance data from chamber website and return parsed data.
+ * @param dateRange Optional date range; defaults to current month.
  */
-export async function scrapeAttendance(): Promise<ScrapingResult> {
+export async function scrapeAttendance(
+  dateRange?: { from: string; to: string }
+): Promise<ScrapingResult> {
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
-  const { from, to } = generateCurrentMonthDates();
+  const { from, to } = dateRange ?? generateCurrentMonthDates();
 
   try {
     await page.goto(config.urls.chamberAttendance);
@@ -149,13 +152,16 @@ export async function scrapeAttendance(): Promise<ScrapingResult> {
 /**
  * Scrape attendance and write results to temp JSON files.
  * Returns file paths for parties and politicians.
+ * @param dateRange Optional date range; defaults to current month.
  */
-export async function scrapeAndWriteFiles(): Promise<{
+export async function scrapeAndWriteFiles(
+  dateRange?: { from: string; to: string }
+): Promise<{
   partiesPath: string;
   politiciansPath: string;
   attendancePath: string;
 }> {
-  const result = await scrapeAttendance();
+  const result = await scrapeAttendance(dateRange);
 
   const tempDir = path.join(process.cwd(), config.paths.tempDir);
   fs.mkdirSync(tempDir, { recursive: true });
