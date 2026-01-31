@@ -61,6 +61,8 @@ export async function createPartiesFromFile(filePath: string): Promise<PartyResu
           });
           createdCount++;
           process.stdout.write('+');
+          // eslint-disable-next-line no-await-in-loop
+          await withDelay(config.delays.partyCreate);
         }
       } catch (error) {
         failureCount++;
@@ -70,9 +72,6 @@ export async function createPartiesFromFile(filePath: string): Promise<PartyResu
         });
         process.stdout.write('X');
       }
-
-      // eslint-disable-next-line no-await-in-loop
-      await withDelay(config.delays.partyCreate);
     }
 
     const total = createdCount + existingCount;

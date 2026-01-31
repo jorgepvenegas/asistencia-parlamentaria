@@ -113,9 +113,6 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
         });
         process.stdout.write('X');
       }
-
-      // eslint-disable-next-line no-await-in-loop
-      await withDelay(config.delays.politicianCreate);
     }
 
     const total = createdCount + foundCount;
@@ -244,9 +241,6 @@ export async function createPoliticiansFromFileYearly(
         errors.push({ name, error: String(error) });
         process.stdout.write('X');
       }
-
-      // eslint-disable-next-line no-await-in-loop
-      await withDelay(config.delays.politicianCreate);
     }
 
     const total = createdCount + foundCount;
