@@ -7,7 +7,7 @@ import fs from 'fs';
 import type { PoliticianAttendance } from '../types.js';
 import { config } from '../config.js';
 import { withDelay } from '../utils/http.js';
-import { getTodayFormatted } from '../utils/dates.js';
+import { getCurrentYearMonth } from '../utils/dates.js';
 
 export interface PoliticianResult {
   success: boolean;
@@ -67,7 +67,8 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
         }
 
         // Create attendance record
-        const attendanceResponse = await client.api.attendance.$post({
+        const { year, month } = getCurrentYearMonth();
+        const attendanceResponse = await client.api.attendance.monthly.$post({
           json: {
             attendanceAverage: percentage,
             attendanceCount: attended,
@@ -76,7 +77,8 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
             unjustifiedAbsentCount: unjustifiedAbsent,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             politicianId: match.id,
-            date: getTodayFormatted(),
+            year,
+            month,
           },
         });
 

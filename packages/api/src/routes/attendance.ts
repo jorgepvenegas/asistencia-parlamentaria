@@ -27,9 +27,8 @@ const yearlySchema = z.object({
   attendanceAverage: z.number().min(0).max(100),
 });
 
-const attendanceRoute = new Hono()
-  // Monthly endpoints
-  .get('/attendance/monthly', async (c) => {
+const monthlyRoute = new Hono()
+  .get('/', async (c) => {
     try {
       const year = c.req.query('year');
       const month = c.req.query('month');
@@ -56,7 +55,7 @@ const attendanceRoute = new Hono()
       return c.json({ error: 'Failed to fetch monthly attendance', statusCode: 500 }, 500);
     }
   })
-  .post('/attendance/monthly', zValidator('json', monthlySchema), async (c) => {
+  .post('/', zValidator('json', monthlySchema), async (c) => {
     try {
       const data = c.req.valid('json');
 
@@ -86,9 +85,10 @@ const attendanceRoute = new Hono()
       console.error('Error creating monthly attendance:', error);
       return c.json({ error: 'Failed to create monthly attendance', statusCode: 500 }, 500);
     }
-  })
-  // Yearly endpoints
-  .get('/attendance/yearly', async (c) => {
+  });
+
+const yearlyRoute = new Hono()
+  .get('/', async (c) => {
     try {
       const year = c.req.query('year');
 
@@ -105,7 +105,7 @@ const attendanceRoute = new Hono()
       return c.json({ error: 'Failed to fetch yearly attendance', statusCode: 500 }, 500);
     }
   })
-  .post('/attendance/yearly', zValidator('json', yearlySchema), async (c) => {
+  .post('/', zValidator('json', yearlySchema), async (c) => {
     try {
       const data = c.req.valid('json');
 
@@ -134,5 +134,9 @@ const attendanceRoute = new Hono()
       return c.json({ error: 'Failed to create yearly attendance', statusCode: 500 }, 500);
     }
   });
+
+const attendanceRoute = new Hono()
+  .route('/attendance/monthly', monthlyRoute)
+  .route('/attendance/yearly', yearlyRoute);
 
 export default attendanceRoute;
