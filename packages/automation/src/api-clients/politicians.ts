@@ -13,7 +13,8 @@ type ExistingPolitician = { id: number; name: string };
 
 export interface PoliticianResult {
   success: boolean;
-  successCount: number;
+  createdCount: number;
+  foundCount: number;
   failureCount: number;
   errors: Array<{ name: string; error: string }>;
 }
@@ -29,9 +30,10 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
     const politicians: PoliticianAttendance[] = JSON.parse(fileContent) as PoliticianAttendance[];
 
     // eslint-disable-next-line no-console
-    console.log(`Creating ${politicians.length} politicians...`);
+    console.log(`Processing ${politicians.length} politicians...`);
 
-    let successCount = 0;
+    let createdCount = 0;
+    let foundCount = 0;
     let failureCount = 0;
     const errors: Array<{ name: string; error: string }> = [];
 
@@ -51,6 +53,7 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
         let match = existingPoliticiansData.data.find((epd) => epd.name === name);
 
         // Create politician if doesn't exist
+        let isNewPolitician = false;
         if (!match) {
           const createResponse = await client.api.politicians.$post({
             json: {
@@ -64,6 +67,7 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           match = createData.data;
+          isNewPolitician = true;
           // eslint-disable-next-line no-await-in-loop
           await withDelay(config.delays.politicianCreate);
         }
@@ -94,8 +98,13 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
           );
         }
 
-        successCount++;
-        process.stdout.write('.');
+        if (isNewPolitician) {
+          createdCount++;
+          process.stdout.write('+');
+        } else {
+          foundCount++;
+          process.stdout.write('.');
+        }
       } catch (error) {
         failureCount++;
         errors.push({
@@ -109,12 +118,13 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
       await withDelay(config.delays.politicianCreate);
     }
 
+    const total = createdCount + foundCount;
     // eslint-disable-next-line no-console
-    console.log(`\n\n✓ Successfully created ${successCount} politicians`);
+    console.log(`\n\n✓ Processed ${total}: ${createdCount} created, ${foundCount} found`);
 
     if (failureCount > 0) {
       // eslint-disable-next-line no-console
-      console.error(`✗ Failed to create ${failureCount} politicians:`);
+      console.error(`✗ Failed to process ${failureCount} politicians:`);
       errors.slice(0, 10).forEach(({ name, error }) => {
         // eslint-disable-next-line no-console
         console.error(`  - ${name}: ${error}`);
@@ -123,14 +133,12 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
         // eslint-disable-next-line no-console
         console.error(`  ... and ${errors.length - 10} more`);
       }
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('All politicians created successfully!');
     }
 
     return {
       success: failureCount === 0,
-      successCount,
+      createdCount,
+      foundCount,
       failureCount,
       errors,
     };
@@ -152,9 +160,10 @@ export async function createPoliticiansFromFileYearly(
     const politicians: PoliticianAttendance[] = JSON.parse(fileContent) as PoliticianAttendance[];
 
     // eslint-disable-next-line no-console
-    console.log(`Creating ${politicians.length} politicians (yearly)...`);
+    console.log(`Processing ${politicians.length} politicians (yearly)...`);
 
-    let successCount = 0;
+    let createdCount = 0;
+    let foundCount = 0;
     let failureCount = 0;
     const errors: Array<{ name: string; error: string }> = [];
 
@@ -181,6 +190,7 @@ export async function createPoliticiansFromFileYearly(
       try {
         let match = existingPoliticiansData.data.find((epd) => epd.name === name);
 
+        let isNewPolitician = false;
         if (!match) {
           const createResponse = await client.api.politicians.$post({
             json: { name, partySlug },
@@ -192,6 +202,7 @@ export async function createPoliticiansFromFileYearly(
             throw new Error(String(createData.error));
           }
           match = createData.data;
+          isNewPolitician = true;
           // eslint-disable-next-line no-await-in-loop
           await withDelay(config.delays.politicianCreate);
         }
@@ -221,8 +232,13 @@ export async function createPoliticiansFromFileYearly(
           );
         }
 
-        successCount++;
-        process.stdout.write('.');
+        if (isNewPolitician) {
+          createdCount++;
+          process.stdout.write('+');
+        } else {
+          foundCount++;
+          process.stdout.write('.');
+        }
       } catch (error) {
         failureCount++;
         errors.push({ name, error: String(error) });
@@ -233,12 +249,13 @@ export async function createPoliticiansFromFileYearly(
       await withDelay(config.delays.politicianCreate);
     }
 
+    const total = createdCount + foundCount;
     // eslint-disable-next-line no-console
-    console.log(`\n\n✓ Successfully created ${successCount} politicians (yearly)`);
+    console.log(`\n\n✓ Processed ${total} (yearly): ${createdCount} created, ${foundCount} found`);
 
     if (failureCount > 0) {
       // eslint-disable-next-line no-console
-      console.error(`✗ Failed to create ${failureCount} politicians:`);
+      console.error(`✗ Failed to process ${failureCount} politicians:`);
       errors.slice(0, 10).forEach(({ name, error }) => {
         // eslint-disable-next-line no-console
         console.error(`  - ${name}: ${error}`);
@@ -247,14 +264,12 @@ export async function createPoliticiansFromFileYearly(
         // eslint-disable-next-line no-console
         console.error(`  ... and ${errors.length - 10} more`);
       }
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('All politicians created successfully!');
     }
 
     return {
       success: failureCount === 0,
-      successCount,
+      createdCount,
+      foundCount,
       failureCount,
       errors,
     };

@@ -39,13 +39,15 @@ export async function syncData(): Promise<SyncResult> {
       },
       partyCreation: {
         success: false,
-        successCount: 0,
+        createdCount: 0,
+        existingCount: 0,
         failureCount: 0,
         errors: [],
       },
       politicianCreation: {
         success: false,
-        successCount: 0,
+        createdCount: 0,
+        foundCount: 0,
         failureCount: 0,
         errors: [],
       },
@@ -77,7 +79,8 @@ export async function syncData(): Promise<SyncResult> {
     console.log('\n\n✅ Step 2: Creating parties...\n');
     const partyResult = await createPartiesFromFile(partiesPath);
     result.steps.partyCreation.success = partyResult.success;
-    result.steps.partyCreation.successCount = partyResult.successCount;
+    result.steps.partyCreation.createdCount = partyResult.createdCount;
+    result.steps.partyCreation.existingCount = partyResult.existingCount;
     result.steps.partyCreation.failureCount = partyResult.failureCount;
     result.steps.partyCreation.errors = partyResult.errors;
 
@@ -86,7 +89,8 @@ export async function syncData(): Promise<SyncResult> {
     console.log('\n\n✅ Step 3: Creating politicians and attendance...\n');
     const politicianResult = await createPoliticiansFromFile(politiciansPath);
     result.steps.politicianCreation.success = politicianResult.success;
-    result.steps.politicianCreation.successCount = politicianResult.successCount;
+    result.steps.politicianCreation.createdCount = politicianResult.createdCount;
+    result.steps.politicianCreation.foundCount = politicianResult.foundCount;
     result.steps.politicianCreation.failureCount = politicianResult.failureCount;
     result.steps.politicianCreation.errors = politicianResult.errors;
 
@@ -150,13 +154,15 @@ export async function syncDataYearly(year: number): Promise<SyncResult> {
       },
       partyCreation: {
         success: false,
-        successCount: 0,
+        createdCount: 0,
+        existingCount: 0,
         failureCount: 0,
         errors: [],
       },
       politicianCreation: {
         success: false,
-        successCount: 0,
+        createdCount: 0,
+        foundCount: 0,
         failureCount: 0,
         errors: [],
       },
@@ -188,7 +194,8 @@ export async function syncDataYearly(year: number): Promise<SyncResult> {
     console.log('\n\n✅ Step 2: Creating parties...\n');
     const partyResult = await createPartiesFromFile(partiesPath);
     result.steps.partyCreation.success = partyResult.success;
-    result.steps.partyCreation.successCount = partyResult.successCount;
+    result.steps.partyCreation.createdCount = partyResult.createdCount;
+    result.steps.partyCreation.existingCount = partyResult.existingCount;
     result.steps.partyCreation.failureCount = partyResult.failureCount;
     result.steps.partyCreation.errors = partyResult.errors;
 
@@ -197,7 +204,8 @@ export async function syncDataYearly(year: number): Promise<SyncResult> {
     console.log('\n\n✅ Step 3: Creating politicians and yearly attendance...\n');
     const politicianResult = await createPoliticiansFromFileYearly(politiciansPath, year);
     result.steps.politicianCreation.success = politicianResult.success;
-    result.steps.politicianCreation.successCount = politicianResult.successCount;
+    result.steps.politicianCreation.createdCount = politicianResult.createdCount;
+    result.steps.politicianCreation.foundCount = politicianResult.foundCount;
     result.steps.politicianCreation.failureCount = politicianResult.failureCount;
     result.steps.politicianCreation.errors = politicianResult.errors;
 

@@ -62,13 +62,15 @@ export const SyncResultSchema = z.object({
     }),
     partyCreation: z.object({
       success: z.boolean(),
-      successCount: z.number(),
+      createdCount: z.number(),
+      existingCount: z.number(),
       failureCount: z.number(),
       errors: z.array(z.object({ slug: z.string(), error: z.string() })),
     }),
     politicianCreation: z.object({
       success: z.boolean(),
-      successCount: z.number(),
+      createdCount: z.number(),
+      foundCount: z.number(),
       failureCount: z.number(),
       errors: z.array(z.object({ name: z.string(), error: z.string() })),
     }),
