@@ -43,7 +43,7 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
 
     const existingPoliticiansData = await politiciansRequest.json();
 
-    for (const { name, partySlug, attended, percentage } of politicians) {
+    for (const { name, partySlug, attended, percentage, absent, justifiedAbsent, unjustifiedAbsent } of politicians) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         let match = existingPoliticiansData.data.find((epd) => epd.name === name);
@@ -71,6 +71,9 @@ export async function createPoliticiansFromFile(filePath: string): Promise<Polit
           json: {
             attendanceAverage: percentage,
             attendanceCount: attended,
+            absentCount: absent,
+            justifiedAbsentCount: justifiedAbsent,
+            unjustifiedAbsentCount: unjustifiedAbsent,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             politicianId: match.id,
             date: getTodayFormatted(),

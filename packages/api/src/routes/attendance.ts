@@ -11,6 +11,9 @@ const createAttendanceRecordSchema = z.object({
   date: z.string().min(1, 'Date is required'),
   attendanceCount: z.number().min(0, 'Attendance value is required'),
   attendanceAverage: z.number().min(0, 'Attendance average is required'),
+  absentCount: z.number().min(0, 'absentCount value is required'),
+  justifiedAbsentCount: z.number().min(0, 'justifiedAbsentCount average is required'),
+  unjustifiedAbsentCount: z.number().min(0, 'unjustifiedAbsentCount average is required'),
 });
 
 const attendanceRoute = new Hono()
@@ -31,7 +34,7 @@ const attendanceRoute = new Hono()
   })
   .post('/attendance', zValidator('json', createAttendanceRecordSchema), async (c) => {
     try {
-      const { attendanceAverage, attendanceCount, date, politicianId } = c.req.valid('json');
+      const { attendanceAverage, attendanceCount, date, politicianId, absentCount, justifiedAbsentCount, unjustifiedAbsentCount } = c.req.valid('json');
 
       // Check existing record
       const existing = await db
@@ -58,7 +61,10 @@ const attendanceRoute = new Hono()
         attendanceAverage,
         date,
         politicianId,
-        attendanceCount
+        attendanceCount,
+        unattendedCount: absentCount,
+        unattendedInvalidCount: justifiedAbsentCount, 
+        unattendedValidCount: unjustifiedAbsentCount,
       }).returning();
 
       return c.json({
