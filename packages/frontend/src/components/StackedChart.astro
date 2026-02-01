@@ -1,9 +1,9 @@
 ---
 import { Attendance } from '@/pages/index.astro';
-import StackedChartReact from './StackedChart.tsx';
+import StackedChartReact from './StackedChart';
 
 export interface ChartData extends Attendance {
-  politicianName: string;
+  politicianName: string | number;
 }
 
 interface Props {

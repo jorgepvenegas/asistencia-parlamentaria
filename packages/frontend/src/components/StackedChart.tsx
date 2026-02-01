@@ -8,10 +8,16 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { ChartData } from './StackedChart.astro';
+
+interface AttendanceRecord {
+  politicianName: string;
+  attendanceCount: number;
+  justifiedAbsentCount: number;
+  unjustifiedAbsentCount: number;
+}
 
 interface Props {
-  data: ChartData[];
+  data: AttendanceRecord[];
   title?: string;
 }
 
@@ -22,17 +28,17 @@ const colors = {
 };
 
 export default function StackedChart({ data, title = 'Attendance Distribution' }: Props) {
-  console.log('StackedChart data:', data);
+  // console.log('StackedChart data:', data);
 
   // Aggregate by politician name
   const aggregated = data.reduce<Record<string, { attended: number; validAbsent: number; invalidAbsent: number }>>((acc, item) => {
-    const name = String(item.politicianName);
+    const name = item.politicianName;
     if (!acc[name]) {
       acc[name] = { attended: 0, validAbsent: 0, invalidAbsent: 0 };
     }
     acc[name].attended += item.attendanceCount;
-    acc[name].validAbsent += item.unattendedValidCount;
-    acc[name].invalidAbsent += item.unattendedInvalidCount;
+    acc[name].validAbsent += item.justifiedAbsentCount;
+    acc[name].invalidAbsent += item.unjustifiedAbsentCount;
     return acc;
   }, {});
 
