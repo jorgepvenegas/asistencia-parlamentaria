@@ -27,9 +27,9 @@ interface Party {
 export interface Attendance {
   politicianId: number;
   attendanceCount: number;
-  unattendedCount: number;
-  unattendedValidCount: number;
-  unattendedInvalidCount: number;
+  absentCount: number;
+  justifiedAbsentCount: number;
+  unjustifiedAbsentCount: number;
 }
 
 // Fetch data from API
@@ -72,11 +72,11 @@ try {
   }
 
   // Fetch attendance
-  const attendanceRes = await fetch(`${API_URL}/api/attendance`);
+  const attendanceRes = await fetch(`${API_URL}/api/attendance/yearly?year=2025`);
   if (attendanceRes.ok) {
     const data = await attendanceRes.json();
     attendance = data.data || [];
-    console.log(attendance[0])
+    // console.log(attendance[0])
   }
 
 } catch (err) {
@@ -98,13 +98,13 @@ const totalParties = parties.length;
 // const bottomPerformers = sorted.slice(-5).reverse();
 
 // Prepare chart data
-const chartData = attendance.map(({unattendedCount, attendanceCount, unattendedInvalidCount, politicianId, unattendedValidCount}) => ({
+const chartData = attendance.map(({absentCount, attendanceCount, justifiedAbsentCount, politicianId, unjustifiedAbsentCount}) => ({
   politicianId,
   politicianName: getPoliticianName(politicianId),
   attendanceCount,
-  unattendedCount,
-  unattendedInvalidCount,
-  unattendedValidCount
+  absentCount,
+  justifiedAbsentCount,
+  unjustifiedAbsentCount
   // name: p.name.split(' ')[0], // First name only for space
   // attended: p.attended_count,
   // unattended: p.unattended_count,
