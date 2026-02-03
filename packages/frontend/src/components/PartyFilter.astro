@@ -6,92 +6,44 @@ interface Props {
     color: string;
     slug: string;
   }>;
-  selectedParties?: string[];
-  onFilterChange?: (partyIds: string[]) => void;
+  selectedParty?: string;
 }
 
-const { parties, selectedParties = [] } = Astro.props;
+const { parties, selectedParty } = Astro.props;
+const selectedPartyName = parties.find((p) => p.id === selectedParty)?.name;
 ---
 
-<div class="bg-white rounded-lg border border-gray-200 p-4">
-  <div class="flex items-center justify-between mb-4">
-    <label class="text-sm font-semibold text-gray-900">Filtrar por partido</label>
-    <button
-      id="clear-filters-btn"
-      class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
-      onclick="clearFilters()"
-    >
-      Limpiar filtros
-    </button>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-    {parties.map(party => (
-      <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors" style={`border-left: 4px solid ${party.color}`}>
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded text-brand-600"
-          value={party.id}
-          checked={selectedParties.includes(party.id)}
-          onchange="handlePartyChange()"
-        />
-        <div>
-          <p class="text-sm font-medium text-gray-900">{party.name}</p>
-        </div>
-      </label>
-    ))}
-  </div>
-
-  <div id="filter-summary" class="mt-4 text-xs text-gray-600">
-    {selectedParties.length === 0
-      ? 'Mostrando todos los partidos'
-      : `Mostrando ${selectedParties.length} partido(s) seleccionado(s)`}
-  </div>
+<div class="party-filter flex items-center gap-3">
+  <label for="party-select" class="text-sm font-semibold text-gray-900">
+    Filtrar por partido:
+  </label>
+  <select
+    id="party-select"
+    class="party-select px-3 py-2 border border-gray-300 rounded-lg text-sm"
+  >
+    <option value="">Todos los partidos</option>
+    {
+      parties.map((party) => (
+        <option value={party.id} selected={selectedParty === party.id}>
+          {party.name}
+        </option>
+      ))
+    }
+  </select>
 </div>
 
 <script>
-  function handlePartyChange() {
-    const checkboxes = document.querySelectorAll(
-      '[id^="party-filter"] input[type="checkbox"]'
-    );
-    const selected: string[] = [];
-
-    // Try to find checkboxes in the filter section
-    const filterDiv = document.querySelector('[id="party-filter-container"]') || document.currentScript?.parentElement;
-    if (filterDiv) {
-      const inputs = filterDiv.querySelectorAll('input[type="checkbox"]:checked');
-      inputs.forEach((input) => {
-        selected.push((input as HTMLInputElement).value);
-      });
-    }
-
-    // Update URL with filter params
-    const params = new URLSearchParams();
-    if (selected.length > 0) {
-      params.set('parties', selected.join(','));
-    }
-
-    const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
-    window.history.replaceState({}, '', newUrl);
-
-    // Trigger data reload
-    location.reload();
-  }
-
-  function clearFilters() {
-    // Reset all checkboxes
-    const checkboxes = document.querySelectorAll(
-      'input[type="checkbox"]'
-    );
-    checkboxes.forEach((checkbox) => {
-      (checkbox as HTMLInputElement).checked = false;
+  const select = document.querySelector<HTMLSelectElement>('.party-filter .party-select');
+  if (select) {
+    select.addEventListener('change', () => {
+      const value = select.value;
+      if (value) {
+        const params = new URLSearchParams();
+        params.set('party', value);
+        window.location.href = `${window.location.pathname}?${params}`;
+      } else {
+        window.location.href = window.location.pathname;
+      }
     });
-
-    // Clear URL params and reload
-    window.location.href = window.location.pathname;
   }
-
-  // Expose functions to window
-  (window as any).handlePartyChange = handlePartyChange;
-  (window as any).clearFilters = clearFilters;
 </script>

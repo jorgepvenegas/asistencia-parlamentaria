@@ -5,7 +5,12 @@
       "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
       "Bash(tree:*)",
       "Bash(pnpm lint:*)",
-      "Bash(pnpm type-check:*)"
+      "Bash(pnpm type-check:*)",
+      "Bash(pnpm --filter @quienatiende/automation exec tsc:*)",
+      "Bash(pnpm --filter @quienatiende/automation lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(uvx:*)"
     ]
   }
 }
