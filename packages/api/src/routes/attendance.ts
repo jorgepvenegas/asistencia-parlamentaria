@@ -1,50 +1,34 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
 import { and, eq, sum, sql } from 'drizzle-orm';
 import 'dotenv/config';
 import { attendanceMonthlyTable, attendanceYearlyTable, politiciansTable, partiesTable } from '../db/schema.js';
 import { db } from '../db/index.js';
-
-const monthlySchema = z.object({
-  politicianId: z.number().min(1),
-  year: z.number().min(2000).max(2100),
-  month: z.number().min(1).max(12),
-  attendanceCount: z.number().min(0),
-  absentCount: z.number().min(0),
-  justifiedAbsentCount: z.number().min(0),
-  unjustifiedAbsentCount: z.number().min(0),
-  attendanceAverage: z.number().min(0).max(100),
-});
-
-const yearlySchema = z.object({
-  politicianId: z.number().min(1),
-  year: z.number().min(2000).max(2100),
-  attendanceCount: z.number().min(0),
-  absentCount: z.number().min(0),
-  justifiedAbsentCount: z.number().min(0),
-  unjustifiedAbsentCount: z.number().min(0),
-  attendanceAverage: z.number().min(0).max(100),
-});
+import {
+  createAttendanceMonthlySchema,
+  createAttendanceYearlySchema,
+  attendanceMonthlyQuerySchema,
+  attendanceYearlyQuerySchema,
+  partyAttendanceQuerySchema,
+} from '../schemas/index.js';
 
 const monthlyRoute = new Hono()
-  .get('/', async (c) => {
+  .get('/', zValidator('query', attendanceMonthlyQuerySchema), async (c) => {
     try {
-      const year = c.req.query('year');
-      const month = c.req.query('month');
+      const { year, month } = c.req.valid('query');
 
       if (year && month) {
         const records = await db.select().from(attendanceMonthlyTable)
           .where(and(
-            eq(attendanceMonthlyTable.year, parseInt(year)),
-            eq(attendanceMonthlyTable.month, parseInt(month))
+            eq(attendanceMonthlyTable.year, year),
+            eq(attendanceMonthlyTable.month, month)
           ));
         return c.json({ data: records, statusCode: 200 });
       }
 
       if (year) {
         const records = await db.select().from(attendanceMonthlyTable)
-          .where(eq(attendanceMonthlyTable.year, parseInt(year)));
+          .where(eq(attendanceMonthlyTable.year, year));
         return c.json({ data: records, statusCode: 200 });
       }
 
@@ -55,7 +39,7 @@ const monthlyRoute = new Hono()
       return c.json({ error: 'Failed to fetch monthly attendance', statusCode: 500 }, 500);
     }
   })
-  .post('/', zValidator('json', monthlySchema), async (c) => {
+  .post('/', zValidator('json', createAttendanceMonthlySchema), async (c) => {
     try {
       const data = c.req.valid('json');
 
@@ -88,13 +72,13 @@ const monthlyRoute = new Hono()
   });
 
 const yearlyRoute = new Hono()
-  .get('/', async (c) => {
+  .get('/', zValidator('query', attendanceYearlyQuerySchema), async (c) => {
     try {
-      const year = c.req.query('year');
+      const { year } = c.req.valid('query');
 
       if (year) {
         const records = await db.select().from(attendanceYearlyTable)
-          .where(eq(attendanceYearlyTable.year, parseInt(year)));
+          .where(eq(attendanceYearlyTable.year, year));
         return c.json({ data: records, statusCode: 200 });
       }
 
@@ -105,7 +89,7 @@ const yearlyRoute = new Hono()
       return c.json({ error: 'Failed to fetch yearly attendance', statusCode: 500 }, 500);
     }
   })
-  .post('/', zValidator('json', yearlySchema), async (c) => {
+  .post('/', zValidator('json', createAttendanceYearlySchema), async (c) => {
     try {
       const data = c.req.valid('json');
 
@@ -136,11 +120,10 @@ const yearlyRoute = new Hono()
   });
 
 const partyMonthlyRoute = new Hono()
-  .get('/:partyId', async (c) => {
+  .get('/:partyId', zValidator('query', partyAttendanceQuerySchema), async (c) => {
     try {
       const partyId = parseInt(c.req.param('partyId'));
-      const year = c.req.query('year');
-      const month = c.req.query('month');
+      const { year, month } = c.req.valid('query');
 
       const baseQuery = db
         .select({
@@ -175,8 +158,8 @@ const partyMonthlyRoute = new Hono()
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .where(and(
             eq(politiciansTable.partyId, partyId),
-            eq(attendanceMonthlyTable.year, parseInt(year)),
-            eq(attendanceMonthlyTable.month, parseInt(month))
+            eq(attendanceMonthlyTable.year, year),
+            eq(attendanceMonthlyTable.month, month)
           ))
           .groupBy(politiciansTable.partyId, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
       } else if (year) {
@@ -195,7 +178,7 @@ const partyMonthlyRoute = new Hono()
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .where(and(
             eq(politiciansTable.partyId, partyId),
-            eq(attendanceMonthlyTable.year, parseInt(year))
+            eq(attendanceMonthlyTable.year, year)
           ))
           .groupBy(politiciansTable.partyId, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
       } else {
@@ -210,12 +193,10 @@ const partyMonthlyRoute = new Hono()
   });
 
 const partyYearlyRoute = new Hono()
-  .get('/:partyId', async (c) => {
+  .get('/:partyId', zValidator('query', attendanceYearlyQuerySchema), async (c) => {
     try {
       const partyId = parseInt(c.req.param('partyId'));
-      const year = c.req.query('year');
-
-      console.log(year)
+      const { year } = c.req.valid('query');
       let records;
       if (year) {
         records = await db
@@ -232,7 +213,7 @@ const partyYearlyRoute = new Hono()
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
           .where(and(
             eq(politiciansTable.partyId, partyId),
-            eq(attendanceYearlyTable.year, parseInt(year))
+            eq(attendanceYearlyTable.year, year)
           ))
           .groupBy(politiciansTable.partyId, attendanceYearlyTable.year);
       } else {
@@ -260,10 +241,9 @@ const partyYearlyRoute = new Hono()
   });
 
 const partiesMonthlyRoute = new Hono()
-  .get('/', async (c) => {
+  .get('/', zValidator('query', partyAttendanceQuerySchema), async (c) => {
     try {
-      const year = c.req.query('year');
-      const month = c.req.query('month');
+      const { year, month } = c.req.valid('query');
 
       let records;
       if (year && month) {
@@ -283,8 +263,8 @@ const partiesMonthlyRoute = new Hono()
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
           .where(and(
-            eq(attendanceMonthlyTable.year, parseInt(year)),
-            eq(attendanceMonthlyTable.month, parseInt(month))
+            eq(attendanceMonthlyTable.year, year),
+            eq(attendanceMonthlyTable.month, month)
           ))
           .groupBy(politiciansTable.partyId, partiesTable.name, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
       } else if (year) {
@@ -303,7 +283,7 @@ const partiesMonthlyRoute = new Hono()
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
-          .where(eq(attendanceMonthlyTable.year, parseInt(year)))
+          .where(eq(attendanceMonthlyTable.year, year))
           .groupBy(politiciansTable.partyId, partiesTable.name, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
       } else {
         records = await db
@@ -332,9 +312,9 @@ const partiesMonthlyRoute = new Hono()
   });
 
 const partiesYearlyRoute = new Hono()
-  .get('/', async (c) => {
+  .get('/', zValidator('query', attendanceYearlyQuerySchema), async (c) => {
     try {
-      const year = c.req.query('year');
+      const { year } = c.req.valid('query');
 
       let records;
       if (year) {
@@ -352,7 +332,7 @@ const partiesYearlyRoute = new Hono()
           .from(attendanceYearlyTable)
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
-          .where(eq(attendanceYearlyTable.year, parseInt(year)))
+          .where(eq(attendanceYearlyTable.year, year))
           .groupBy(politiciansTable.partyId, partiesTable.name, attendanceYearlyTable.year);
       } else {
         records = await db

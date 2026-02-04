@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 config();
 
 await esbuild.build({
-  entryPoints: ['src/index.ts'],
+  entryPoints: ['src/index.ts', 'src/schemas.ts'],
   bundle: false, // Don't bundle dependencies
   outdir: 'dist',
   format: 'esm',
