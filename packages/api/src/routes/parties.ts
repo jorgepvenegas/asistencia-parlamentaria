@@ -1,16 +1,10 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
 import { eq, or } from 'drizzle-orm';
 import 'dotenv/config';
 import { partiesTable } from '../db/schema.js';
 import { db } from '../db/index.js';
-
-const createPartySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  slug: z.string().min(1, 'Slug is required'),
-  abbreviation: z.string().min(1, 'Abbreviation is required'),
-});
+import { createPartySchema } from '../schemas/index.js';
 
 const partiesRoute = new Hono()
   .get('/parties', async (c) => {

@@ -1,15 +1,10 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import 'dotenv/config';
 import { partiesTable, politiciansTable } from '../db/schema.js';
 import { db } from '../db/index.js';
-
-const createPoliticianSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  partySlug: z.string().min(1, 'Party slug is required'),
-});
+import { createPoliticianSchema } from '../schemas/index.js';
 
 const politiciansRoute = new Hono()
   .get('/politicians', async (c) => {
