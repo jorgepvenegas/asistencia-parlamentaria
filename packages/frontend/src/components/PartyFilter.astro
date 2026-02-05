@@ -1,11 +1,8 @@
 ---
+import type { PartyWithColor } from '../types/extended';
+
 interface Props {
-  parties: Array<{
-    id: string;
-    name: string;
-    color: string;
-    slug: string;
-  }>;
+  parties: PartyWithColor[];
   selectedParty?: string;
 }
 

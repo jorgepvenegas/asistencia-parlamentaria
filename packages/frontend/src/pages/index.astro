@@ -2,6 +2,18 @@
 import DashboardLayout from '../layouts/DashboardLayout.astro';
 import Dashboard from '../components/Dashboard';
 import type { PoliticianAttendance, PartyData, PartyAttendance } from '../types/dashboard';
+import {
+  politicianResponseSchema,
+  partyResponseSchema,
+  attendanceYearlyResponseSchema,
+  partyAttendanceYearlyResponseSchema,
+  type PoliticianResponse,
+  type PartyResponse,
+  type AttendanceYearlyResponse,
+  type PartyAttendanceYearlyResponse,
+} from '@quienatiende/shared/schemas';
+import { z } from 'zod';
+import { PARTY_COLORS } from '../constants/colors';
 
 export function getStaticPaths() {
   return [
@@ -18,40 +30,17 @@ const yearNum = parseInt(year, 10);
 
 const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
 
-interface ApiPolitician {
-  id: number;
-  name: string;
-  partyId: number;
-}
+// Array schemas for validation
+const politiciansArraySchema = z.array(politicianResponseSchema);
+const partiesArraySchema = z.array(partyResponseSchema);
+const attendanceArraySchema = z.array(attendanceYearlyResponseSchema);
+const partyAttendanceArraySchema = z.array(partyAttendanceYearlyResponseSchema);
 
-interface ApiParty {
-  id: number;
-  name: string;
-  slug: string;
-  color: string;
-  abbreviation?: string;
-}
-
-interface ApiAttendance {
-  politicianId: number;
-  year: number;
-  attendanceCount: number;
-  absentCount: number;
-  justifiedAbsentCount: number;
-  unjustifiedAbsentCount: number;
-  attendanceAverage: number;
-}
-
-interface ApiPartyAttendance {
-  partyId: number;
-  partyName: string;
-  year: number;
-  attendanceCount: number;
-  absentCount: number;
-  justifiedAbsentCount: number;
-  unjustifiedAbsentCount: number;
-  attendanceAverage: number;
-}
+// Types from schemas
+type ApiPolitician = PoliticianResponse;
+type ApiParty = PartyResponse;
+type ApiAttendance = AttendanceYearlyResponse;
+type ApiPartyAttendance = PartyAttendanceYearlyResponse;
 
 let politicians: PoliticianAttendance[] = [];
 let partyAttendance: PartyAttendance[] = [];
@@ -75,22 +64,42 @@ try {
 
   if (politiciansRes.ok) {
     const data = await politiciansRes.json();
-    apiPoliticians = data.data || [];
+    const parseResult = politiciansArraySchema.safeParse(data.data);
+    if (parseResult.success) {
+      apiPoliticians = parseResult.data;
+    } else {
+      console.error('Politicians validation failed:', parseResult.error);
+    }
   }
 
   if (partiesRes.ok) {
     const data = await partiesRes.json();
-    apiParties = data.data || [];
+    const parseResult = partiesArraySchema.safeParse(data.data);
+    if (parseResult.success) {
+      apiParties = parseResult.data;
+    } else {
+      console.error('Parties validation failed:', parseResult.error);
+    }
   }
 
   if (attendanceRes.ok) {
     const data = await attendanceRes.json();
-    apiAttendance = data.data || [];
+    const parseResult = attendanceArraySchema.safeParse(data.data);
+    if (parseResult.success) {
+      apiAttendance = parseResult.data;
+    } else {
+      console.error('Attendance validation failed:', parseResult.error);
+    }
   }
 
   if (partyAttendanceRes.ok) {
     const data = await partyAttendanceRes.json();
-    apiPartyAttendance = data.data || [];
+    const parseResult = partyAttendanceArraySchema.safeParse(data.data);
+    if (parseResult.success) {
+      apiPartyAttendance = parseResult.data;
+    } else {
+      console.error('Party attendance validation failed:', parseResult.error);
+    }
   }
 
   // Create lookup maps
@@ -121,13 +130,13 @@ try {
     })
     .filter((p): p is PoliticianAttendance => p !== null);
 
-  // Transform parties
+  // Transform parties with color from constants
   parties = apiParties.map((p) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,
-    color: p.color,
     abbreviation: p.abbreviation,
+    color: PARTY_COLORS[p.name] || '#999',
   }));
 
   // Transform party attendance
