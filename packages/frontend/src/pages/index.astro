@@ -28,7 +28,7 @@ const year = Astro.params.year || '2025';
 console.log('year', year);
 const yearNum = parseInt(year, 10);
 
-const API_URL = import.meta.env.API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
 
 // Array schemas for validation
 const politiciansArraySchema = z.array(politicianResponseSchema);

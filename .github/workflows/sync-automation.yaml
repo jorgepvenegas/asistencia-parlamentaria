@@ -1,0 +1,53 @@
+name: Daily Sync Automation
+
+on:
+  # workflow_dispatch: # Allow manual trigger
+  schedule:
+    - cron: '0 20 * * *' # 12:00 PST = 20:00 UTC
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check environment variables
+        env:
+          BASE_URL_API: ${{ secrets.BASE_URL_API }}
+        run: |
+          if [ -z "$BASE_URL_API" ]; then
+            echo "ERROR: BASE_URL_API secret is not set"
+            exit 1
+          fi
+          echo "BASE_URL_API is set (length: ${#BASE_URL_API})"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install
+
+
+      - name: Build shared
+        run: pnpm -F @quienatiende/shared run build
+        env:
+          BASE_URL_API: ${{ secrets.BASE_URL_API }}
+
+      - name: Build automation
+        run: pnpm -F @quienatiende/automation run build
+
+      - name: Install Playwright browsers
+        run: pnpm -F @quienatiende/automation exec playwright install --with-deps chromium
+
+      - name: Run sync year script
+        working-directory: ./packages/automation
+        run: node ./dist/scripts/sync-year.js 2026
