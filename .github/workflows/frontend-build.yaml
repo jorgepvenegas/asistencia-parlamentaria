@@ -1,8 +1,9 @@
 name: Frontend build
 
 on:
-  pull_request:
-    types: [opened]
+  push:
+    branches:
+      - main
 
 jobs:
   build-frontend:
