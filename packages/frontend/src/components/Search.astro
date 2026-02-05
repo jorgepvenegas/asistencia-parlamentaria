@@ -63,9 +63,9 @@ const { placeholder = 'Buscar diputado...' } = Astro.props;
 
           results.forEach(
             (politician: {
-              id: string;
+              id: number;
               name: string;
-              party_id?: string;
+              partyId: number;
               position?: string;
             }) => {
               const item = document.createElement('a');

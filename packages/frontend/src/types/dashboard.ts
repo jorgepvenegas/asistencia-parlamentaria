@@ -1,6 +1,7 @@
+import type { PartyAttendanceYearlyResponse } from '@quienatiende/shared/schemas';
+import type { PartyWithColor } from './extended';
 
-
-
+// Frontend-specific computed type for politician attendance display
 export interface PoliticianAttendance {
   id: number;
   name: string;
@@ -13,24 +14,9 @@ export interface PoliticianAttendance {
   pct: number;
 }
 
-export interface PartyData {
-  id: number;
-  name: string;
-  slug: string;
-  color: string;
-  abbreviation?: string;
-}
-
-export interface PartyAttendance {
-  partyId: number;
-  partyName: string;
-  year: number;
-  attendanceCount: number;
-  absentCount: number;
-  justifiedAbsentCount: number;
-  unjustifiedAbsentCount: number;
-  attendanceAverage: number;
-}
+// Use shared types
+export type PartyData = PartyWithColor;
+export type PartyAttendance = PartyAttendanceYearlyResponse;
 
 export interface DashboardProps {
   politicians: PoliticianAttendance[];
