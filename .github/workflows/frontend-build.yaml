@@ -1,0 +1,49 @@
+name: Frontend build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check environment variables
+        env:
+          PUBLIC_BASE_URL_API: ${{ secrets.PUBLIC_BASE_URL_API }}
+          BASE_URL_API: ${{ secrets.BASE_URL_API }}
+        run: |
+          if [ -z "$PUBLIC_BASE_URL_API" ]; then
+            echo "ERROR: PUBLIC_BASE_URL_API secret is not set"
+            exit 1
+          fi
+          echo "PUBLIC_BASE_URL_API is set (length: ${#PUBLIC_BASE_URL_API})"
+          if [ -z "$BASE_URL_API" ]; then
+            echo "ERROR: BASE_URL_API secret is not set"
+            exit 1
+          fi
+          echo "BASE_URL_API is set (length: ${#BASE_URL_API})"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          cache: true
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build shared
+        run: pnpm -F @quienatiende/shared run build
+        env:
+          BASE_URL_API: ${{ secrets.BASE_URL_API }}
+
+      - name: Build frontend
+        run: pnpm -F frontend run build
+        env:
+          PUBLIC_BASE_URL_API: ${{ secrets.PUBLIC_BASE_URL_API }}
