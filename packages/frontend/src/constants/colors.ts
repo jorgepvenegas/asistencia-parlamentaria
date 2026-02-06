@@ -17,3 +17,31 @@ export const PARTY_COLORS: Record<string, string> = {
 export function getPartyColor(party: string): string {
   return PARTY_COLORS[party] || '#999';
 }
+
+export const PARTY_ABBREV: Record<string, string> = {
+  "Partido Ecologista Verde": "PEV",
+  "Movimiento Amarillos por Chile": "AMA",
+  "Evolución Política": "EVOP",
+  "Partido Socialista": "PS",
+  "Partido Demócratas Chile": "DEM",
+  "Partido Demócrata Cristiano": "PC",
+  "Renovación Nacional": "RN",
+  "Unión Demócrata Independiente": "UDI",
+  "Partido Radical de Chile": "PR",
+  "Partido Republicano": "PREP",
+  "Partido Comunista": "PC",
+  "Partido Por la Democracia": "PPD",
+  "Partido Humanista": "PH",
+  "Partido Social Cristiano": "PSC",
+  "Partido Liberal de Chile": "LIBERAL",
+  "Frente Amplio": "FA",
+  "Partido Nacional Libertario": "PNL",
+  "Partido Acción Humanista": "PAH",
+  "Independientes": "IND",
+  "Federación Regionalista Verde Social": "FRVS",
+};
+
+export function getPartyAbbrev(party: string): string {
+  console.log(party)
+  return PARTY_ABBREV[party] || party;
+}

@@ -9,6 +9,7 @@ import {
   LabelList,
   Cell,
 } from "recharts";
+import { getPartyAbbrev } from "../constants/colors";
 
 interface PartyAggregate {
   party: string;
@@ -141,13 +142,13 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 0, right: 60, left: 8, bottom: 0 }}
+            margin={{ top: 0, right: activeCategories.size > 0 && activeCategories.size < CATEGORIES.length ? 60 : 8, left: 8, bottom: 0 }}
           >
             <XAxis type="number" domain={[0, 100]} hide />
             <YAxis
               type="category"
               dataKey="name"
-              width={selectedParty ? 0 : 160}
+              width={selectedParty ? 0 : 60}
               hide={!!selectedParty}
               tick={(props: { x: number; y: number; payload: { value: string } }) => {
                 const { x, y, payload } = props;
@@ -164,9 +165,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                         : "text-slate-400 dark:text-slate-600"
                     }`}
                   >
-                    {payload.value.length > 22
-                      ? payload.value.slice(0, 20) + "…"
-                      : payload.value}
+                    {getPartyAbbrev(payload.value)}
                   </text>
                 );
               }}
@@ -227,7 +226,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                       }
                     />
                   ))}
-                  {isLast && (
+                  {isLast && activeCategories.size > 0 && activeCategories.size < CATEGORIES.length && (
                     <LabelList
                       dataKey="visiblePct"
                       position="right"
