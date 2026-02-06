@@ -86,7 +86,7 @@ export default function Dashboard({
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-slate-700/50 pb-6">
           <div className="flex justify-between items-start">

@@ -24,9 +24,9 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
 
   return (
     <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
-      <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
+      <div className="flex flex-row items-start gap-4 sm:gap-8">
         {/* Header + Donut */}
-        <div className="flex flex-col items-center sm:items-start gap-4">
+        <div className="flex flex-col items-center sm:items-start gap-4 shrink-0">
           <div
             className="border-l-4 pl-3"
             style={{ borderColor: partyColor }}
@@ -39,7 +39,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
             </p>
           </div>
 
-          <div className="w-[240px] h-[240px]" role="img" aria-label={`Gráfico circular de asistencia para ${party}`}>
+          <div className="w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]" role="img" aria-label={`Gráfico circular de asistencia para ${party}`}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -47,8 +47,8 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
                   dataKey="value"
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={90}
+                  innerRadius="40%"
+                  outerRadius="70%"
                   paddingAngle={0}
                 >
                   {pieData.map((entry, i) => (
@@ -76,7 +76,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
         </div>
 
         {/* Legend */}
-        <div className="flex flex-col gap-3 sm:mt-16 min-w-[180px]">
+        <div className="flex flex-col gap-2 sm:gap-3 sm:mt-16 min-w-0 sm:min-w-[180px]">
           {pieData.map((d) => {
             const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
             return (

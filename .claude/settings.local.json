@@ -10,7 +10,11 @@
       "Bash(pnpm --filter @quienatiende/automation lint:*)",
       "Bash(pnpm typecheck:*)",
       "Bash(npx tsc --noEmit)",
-      "Bash(uvx:*)"
+      "Bash(uvx:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
     ]
   }
 }

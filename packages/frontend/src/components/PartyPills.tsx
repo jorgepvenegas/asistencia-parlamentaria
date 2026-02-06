@@ -1,4 +1,7 @@
+import { useMemo, useState } from "react";
 import { getPartyColor } from "../constants/colors";
+
+const MOBILE_LIMIT = 6;
 
 interface PartyInfo {
   party: string;
@@ -12,47 +15,103 @@ interface PartyPillsProps {
 }
 
 export default function PartyPills({ parties, selectedParty, onSelect }: PartyPillsProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  const visibleParties = useMemo(() => {
+    if (expanded) return parties;
+    const first = parties.slice(0, MOBILE_LIMIT);
+    if (selectedParty && !first.some(p => p.party === selectedParty)) {
+      const selected = parties.find(p => p.party === selectedParty);
+      if (selected) first.push(selected);
+    }
+    return first;
+  }, [parties, expanded, selectedParty]);
+
+  const hiddenCount = parties.length - visibleParties.length;
+
   return (
-    <div className="flex gap-2 overflow-x-auto sm:flex-wrap p-2 -m-2 scrollbar-hide">
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+          Filtrar por partido
+        </span>
+        {selectedParty && (
+          <button
+            onClick={() => onSelect(null)}
+            className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500
+              hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Limpiar
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
       {parties.map((p) => {
         const color = getPartyColor(p.party);
         const isActive = selectedParty === p.party;
+        const isHiddenOnMobile = !visibleParties.includes(p);
         return (
-          <button
+          <label
             key={p.party}
-            aria-pressed={isActive}
-            onClick={() => onSelect(isActive ? null : p.party)}
             className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
-              whitespace-nowrap shrink-0 sm:shrink
-              transition-all duration-200
-              hover:-translate-y-0.5 hover:shadow-md
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-              ${isActive
-                ? "ring-2 ring-offset-2 ring-offset-slate-50 dark:ring-offset-[#0f0f1a]"
-                : ""
-              }
+              flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
+              cursor-pointer border transition-all duration-200
+              hover:shadow-md
+              focus-within:ring-2 focus-within:ring-offset-2
+              ${isHiddenOnMobile ? "hidden sm:flex" : ""}
             `}
             style={{
-              backgroundColor: color + "22",
-              borderColor: color + "55",
-              color: color,
-              borderWidth: 1,
-              ...(isActive ? { ringColor: color } : {}),
-              // ring-color can't be set via style; handled via inline --tw var below
+              backgroundColor: isActive ? color + "22" : undefined,
+              borderColor: isActive ? color : color + "44",
             }}
           >
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={() => onSelect(isActive ? null : p.party)}
+              className="sr-only"
+            />
+            <span
+              className="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors duration-200"
+              style={{
+                borderColor: color,
+                backgroundColor: isActive ? color : "transparent",
+              }}
+            >
+              {isActive && (
+                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </span>
             <span
               className="w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: color }}
             />
-            {p.party.replace("Partido ", "")}
-            <span style={{ color: color + "aa" }}>
-              ({p.count})
+            <span className="truncate" style={{ color: isActive ? color : undefined }}>
+              {p.party.replace("Partido ", "")}
             </span>
-          </button>
+            <span className="ml-auto text-xs text-slate-400 shrink-0">
+              {p.count}
+            </span>
+          </label>
         );
       })}
+      {(hiddenCount > 0 || expanded) && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="sm:hidden flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium
+            border border-slate-300 dark:border-slate-600
+            bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300
+            transition-all duration-200 hover:shadow-md"
+        >
+          {expanded ? "Ver menos" : `Ver más (${hiddenCount})`}
+        </button>
+      )}
+      </div>
     </div>
   );
 }

@@ -1,4 +1,16 @@
+import { useState } from "react";
 import type { PoliticianAttendance } from "../types/dashboard";
+
+type SortKey = "name" | "attendance" | "validJust" | "invalidJust" | "noJust" | "pct";
+
+const COLUMNS: { key: SortKey; label: string }[] = [
+  { key: "name", label: "Nombre" },
+  { key: "attendance", label: "Asistencia" },
+  { key: "validJust", label: "Just. válida" },
+  { key: "invalidJust", label: "No justificado" },
+  { key: "noJust", label: "Sin just." },
+  { key: "pct", label: "% Asist." },
+];
 
 interface MembersTableProps {
   members: PoliticianAttendance[];
@@ -6,7 +18,27 @@ interface MembersTableProps {
 }
 
 export default function MembersTable({ members, party }: MembersTableProps) {
-  const sorted = [...members].sort((a, b) => b.pct - a.pct);
+  const [sortKey, setSortKey] = useState<SortKey>("pct");
+  const [sortAsc, setSortAsc] = useState(false);
+
+  const handleSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortAsc((prev) => !prev);
+    } else {
+      setSortKey(key);
+      setSortAsc(key === "name");
+    }
+  };
+
+  const sorted = [...members].sort((a, b) => {
+    let cmp: number;
+    if (sortKey === "name") {
+      cmp = a.name.localeCompare(b.name, "es");
+    } else {
+      cmp = a[sortKey] - b[sortKey];
+    }
+    return sortAsc ? cmp : -cmp;
+  });
 
   return (
     <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
@@ -20,12 +52,20 @@ export default function MembersTable({ members, party }: MembersTableProps) {
           <caption className="sr-only">Tabla de asistencia de miembros del partido {party}</caption>
           <thead>
             <tr className="border-b border-slate-200 dark:border-white/[0.06]">
-              {["Nombre", "Asistencia", "Just. válida", "No justificado", "Sin just.", "% Asist."].map((h) => (
+              {COLUMNS.map((col) => (
                 <th
-                  key={h}
-                  className="text-left text-slate-500 dark:text-slate-400 font-medium px-4 py-3 text-xs uppercase tracking-wider"
+                  key={col.key}
+                  onClick={() => handleSort(col.key)}
+                  className="text-left text-slate-500 dark:text-slate-400 font-medium px-4 py-3 text-xs uppercase tracking-wider cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                 >
-                  {h}
+                  <span className="inline-flex items-center gap-1">
+                    {col.label}
+                    {sortKey === col.key && (
+                      <span className="text-slate-400 dark:text-slate-500">
+                        {sortAsc ? "↑" : "↓"}
+                      </span>
+                    )}
+                  </span>
                 </th>
               ))}
             </tr>

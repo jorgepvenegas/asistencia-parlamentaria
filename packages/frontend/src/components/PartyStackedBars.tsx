@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -32,35 +33,92 @@ const CATEGORIES = [
   { key: "pctNoJust", rawKey: "totalNoJust", name: "Sin justificación", color: "#991b1b" },
 ] as const;
 
-export default function PartyStackedBars({ data, selectedParty, onSelectParty }: PartyStackedBarsProps) {
-  const chartHeight = Math.max(300, data.length * 48);
+type CategoryKey = typeof CATEGORIES[number]["key"];
 
-  const chartData = data.map((p) => {
-    const total = p.totalAttendance + p.totalValid + p.totalInvalid + p.totalNoJust;
-    return {
-      name: p.party,
-      pctAttendance: total > 0 ? (p.totalAttendance / total) * 100 : 0,
-      pctValid: total > 0 ? (p.totalValid / total) * 100 : 0,
-      pctInvalid: total > 0 ? (p.totalInvalid / total) * 100 : 0,
-      pctNoJust: total > 0 ? (p.totalNoJust / total) * 100 : 0,
-      // keep raw values for tooltip
-      totalAttendance: p.totalAttendance,
-      totalValid: p.totalValid,
-      totalInvalid: p.totalInvalid,
-      totalNoJust: p.totalNoJust,
-      avgPct: p.avgPct,
-      count: p.count,
-    };
-  });
+export default function PartyStackedBars({ data, selectedParty, onSelectParty }: PartyStackedBarsProps) {
+  const [activeCategories, setActiveCategories] = useState<Set<CategoryKey>>(new Set());
+
+  const toggleCategory = (key: CategoryKey) => {
+    setActiveCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const visibleCategories = activeCategories.size === 0
+    ? CATEGORIES
+    : CATEGORIES.filter((c) => activeCategories.has(c.key));
+
+  const chartData = [...data]
+    .map((p) => {
+      const total = p.totalAttendance + p.totalValid + p.totalInvalid + p.totalNoJust;
+      return {
+        name: p.party,
+        pctAttendance: total > 0 ? (p.totalAttendance / total) * 100 : 0,
+        pctValid: total > 0 ? (p.totalValid / total) * 100 : 0,
+        pctInvalid: total > 0 ? (p.totalInvalid / total) * 100 : 0,
+        pctNoJust: total > 0 ? (p.totalNoJust / total) * 100 : 0,
+        totalAttendance: p.totalAttendance,
+        totalValid: p.totalValid,
+        totalInvalid: p.totalInvalid,
+        totalNoJust: p.totalNoJust,
+        avgPct: p.avgPct,
+        count: p.count,
+      };
+    })
+    .map((row) => ({
+      ...row,
+      visiblePct: parseFloat(
+        visibleCategories.map((c) => row[c.key] as number).reduce((a, b) => a + b, 0).toFixed(1)
+      ),
+    }))
+    .sort((a, b) => {
+      const attendanceVisible = activeCategories.size === 0 || activeCategories.has("pctAttendance");
+      if (attendanceVisible) return b.pctAttendance - a.pctAttendance;
+      return b.visiblePct - a.visiblePct;
+    })
+    .filter((d) => !selectedParty || d.name === selectedParty);
+
+  const chartHeight = Math.max(chartData.length * 48, 80);
 
   return (
     <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
       <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white mb-1">
-        Asistencia por Partido
+        {selectedParty ? `Asistencia — ${selectedParty}` : "Asistencia por Partido"}
       </h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
         Distribución de días por categoría · Ordenado por % asistencia
       </p>
+
+      {/* Category toggles */}
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
+        {CATEGORIES.map((cat) => {
+          const isActive = activeCategories.size === 0 || activeCategories.has(cat.key);
+          return (
+            <button
+              key={cat.key}
+              aria-pressed={isActive}
+              onClick={() => toggleCategory(cat.key)}
+              className={`
+                flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border transition-all
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400
+                ${isActive
+                  ? "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-white/[0.05]"
+                  : "border-slate-200 dark:border-white/[0.06] text-slate-400 dark:text-slate-500 opacity-60"
+                }
+              `}
+            >
+              <span
+                className="w-3 h-3 rounded-sm shrink-0 transition-opacity"
+                style={{ backgroundColor: cat.color, opacity: isActive ? 1 : 0.4 }}
+              />
+              {cat.name}
+            </button>
+          );
+        })}
+      </div>
 
       <div role="img" aria-label="Gráfico de barras horizontales apiladas mostrando asistencia por partido">
         <ResponsiveContainer width="100%" height={chartHeight}>
@@ -73,7 +131,8 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
             <YAxis
               type="category"
               dataKey="name"
-              width={160}
+              width={selectedParty ? 0 : 160}
+              hide={!!selectedParty}
               tick={(props: any) => {
                 const { x, y, payload } = props;
                 const isSelected = !selectedParty || selectedParty === payload.value;
@@ -108,7 +167,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                     <div className="text-slate-500 dark:text-slate-400 text-xs mb-2">
                       {d.count} miembro{d.count > 1 ? "s" : ""} · {d.avgPct}% asistencia
                     </div>
-                    {CATEGORIES.map((cat) => (
+                    {visibleCategories.map((cat) => (
                       <div key={cat.key} className="flex items-center gap-2 py-0.5">
                         <span
                           className="w-2.5 h-2.5 rounded-sm shrink-0"
@@ -128,60 +187,45 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
               }}
               cursor={{ fill: "rgba(0,0,0,0.04)" }}
             />
-            {CATEGORIES.map((cat) => (
-              <Bar
-                key={cat.key}
-                dataKey={cat.key}
-                stackId="a"
-                fill={cat.color}
-                radius={
-                  cat.key === "pctAttendance"
-                    ? [0, 0, 0, 0]
-                    : cat.key === "pctNoJust"
-                      ? [0, 4, 4, 0]
-                      : [0, 0, 0, 0]
-                }
-                onClick={(data: any) => {
-                  if (data?.name) {
-                    onSelectParty(selectedParty === data.name ? null : data.name);
-                  }
-                }}
-                className="cursor-pointer"
-              >
-                {chartData.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fillOpacity={
-                      selectedParty && selectedParty !== entry.name ? 0.3 : 0.85
+            {visibleCategories.map((cat, idx) => {
+              const isLast = idx === visibleCategories.length - 1;
+              return (
+                <Bar
+                  key={cat.key}
+                  dataKey={cat.key}
+                  stackId="a"
+                  fill={cat.color}
+                  radius={isLast ? [0, 4, 4, 0] : [0, 0, 0, 0]}
+                  onClick={(data: any) => {
+                    if (data?.name) {
+                      onSelectParty(selectedParty === data.name ? null : data.name);
                     }
-                  />
-                ))}
-                {cat.key === "pctNoJust" && (
-                  <LabelList
-                    dataKey="avgPct"
-                    position="right"
-                    formatter={(val: number) => `${val}%`}
-                    className="fill-slate-600 dark:fill-slate-300 text-xs font-medium"
-                  />
-                )}
-              </Bar>
-            ))}
+                  }}
+                  className="cursor-pointer"
+                >
+                  {chartData.map((entry, i) => (
+                    <Cell
+                      key={i}
+                      fillOpacity={
+                        selectedParty && selectedParty !== entry.name ? 0.3 : 0.85
+                      }
+                    />
+                  ))}
+                  {isLast && (
+                    <LabelList
+                      dataKey="visiblePct"
+                      position="right"
+                      formatter={(val: number) => `${val}%`}
+                      className="fill-slate-600 dark:fill-slate-300 text-xs font-medium"
+                    />
+                  )}
+                </Bar>
+              );
+            })}
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 sm:gap-6 mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.06]">
-        {CATEGORIES.map((cat) => (
-          <div key={cat.key} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <span
-              className="w-3 h-3 rounded-sm shrink-0"
-              style={{ backgroundColor: cat.color }}
-            />
-            {cat.name}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
