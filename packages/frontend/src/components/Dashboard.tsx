@@ -109,7 +109,7 @@ export default function Dashboard({
         </div>
 
         {/* View Tabs */}
-        <div className="inline-flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        {/* <div className="inline-flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           {([
             ["party", "Por Partido"],
             ["individual", "Por Diputado/a"],
@@ -129,7 +129,7 @@ export default function Dashboard({
               {label}
             </button>
           ))}
-        </div>
+        </div> */}
 
         {/* Party View */}
         {view === "party" && (
