@@ -4,14 +4,12 @@ interface Props {
   description?: string;
 }
 
-const {
-  title = 'QuienAtiende',
-  description = 'Transparencia de Asistencia Parlamentaria',
-} = Astro.props;
+const { title = 'QuienAtiende', description = 'Transparencia de Asistencia Parlamentaria' } =
+  Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -26,7 +24,9 @@ const {
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body
+    class="font-body antialiased bg-slate-50 dark:bg-[#0f0f1a] text-slate-900 dark:text-slate-200 transition-colors"
+  >
     <slot />
   </body>
 </html>
