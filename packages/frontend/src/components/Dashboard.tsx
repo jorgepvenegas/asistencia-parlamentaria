@@ -37,7 +37,7 @@ export default function Dashboard({
   const membersByPartyId = useMemo(() => {
     const map: Record<number, PoliticianAttendance[]> = {};
     politicians.forEach((d) => {
-      if (!map[d.partyId]) map[d.partyId] = [];
+      if (!map[d.partyId]) { map[d.partyId] = []; }
       map[d.partyId].push(d);
     });
     return map;
@@ -68,9 +68,9 @@ export default function Dashboard({
   }, [selectedParty, sortBy, politicians]);
 
   const pieData = useMemo(() => {
-    if (!selectedParty) return [];
+    if (!selectedParty) { return []; }
     const p = partyAggregates.find((p) => p.party === selectedParty);
-    if (!p) return [];
+    if (!p) { return []; }
     return [
       { name: "Asistencia", value: p.totalAttendance, color: "#22c55e" },
       { name: "Justificado", value: p.totalValid, color: "#f59e0b" },
@@ -80,7 +80,7 @@ export default function Dashboard({
   }, [selectedParty, partyAggregates]);
 
   const selectedPartyMembers = useMemo(() => {
-    if (!selectedParty) return [];
+    if (!selectedParty) { return []; }
     return individualData;
   }, [selectedParty, individualData]);
 

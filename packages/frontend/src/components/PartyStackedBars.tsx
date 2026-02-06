@@ -34,6 +34,22 @@ const CATEGORIES = [
 ] as const;
 
 type CategoryKey = typeof CATEGORIES[number]["key"];
+type RawKey = typeof CATEGORIES[number]["rawKey"];
+
+interface ChartRow {
+  name: string;
+  pctAttendance: number;
+  pctValid: number;
+  pctInvalid: number;
+  pctNoJust: number;
+  totalAttendance: number;
+  totalValid: number;
+  totalInvalid: number;
+  totalNoJust: number;
+  avgPct: number;
+  count: number;
+  visiblePct: number;
+}
 
 export default function PartyStackedBars({ data, selectedParty, onSelectParty }: PartyStackedBarsProps) {
   const [activeCategories, setActiveCategories] = useState<Set<CategoryKey>>(new Set());
@@ -41,8 +57,8 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
   const toggleCategory = (key: CategoryKey) => {
     setActiveCategories((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
+      if (next.has(key)) { next.delete(key); }
+      else { next.add(key); }
       return next;
     });
   };
@@ -71,12 +87,12 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
     .map((row) => ({
       ...row,
       visiblePct: parseFloat(
-        visibleCategories.map((c) => row[c.key] as number).reduce((a, b) => a + b, 0).toFixed(1)
+        visibleCategories.map((c) => row[c.key]).reduce((a, b) => a + b, 0).toFixed(1)
       ),
     }))
     .sort((a, b) => {
       const attendanceVisible = activeCategories.size === 0 || activeCategories.has("pctAttendance");
-      if (attendanceVisible) return b.pctAttendance - a.pctAttendance;
+      if (attendanceVisible) { return b.pctAttendance - a.pctAttendance; }
       return b.visiblePct - a.visiblePct;
     })
     .filter((d) => !selectedParty || d.name === selectedParty);
@@ -133,7 +149,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
               dataKey="name"
               width={selectedParty ? 0 : 160}
               hide={!!selectedParty}
-              tick={(props: any) => {
+              tick={(props: { x: number; y: number; payload: { value: string } }) => {
                 const { x, y, payload } = props;
                 const isSelected = !selectedParty || selectedParty === payload.value;
                 return (
@@ -157,8 +173,8 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
             />
             <Tooltip
               content={({ active, payload }) => {
-                if (!active || !payload || !payload.length) return null;
-                const d = payload[0].payload;
+                if (!active || !payload || !payload.length) { return null; }
+                const d = payload[0].payload as ChartRow;
                 return (
                   <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
                     <div className="font-semibold text-slate-900 dark:text-white mb-1">
@@ -175,10 +191,10 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                         />
                         <span className="text-slate-600 dark:text-slate-300">{cat.name}:</span>
                         <span className="font-semibold tabular-nums text-slate-900 dark:text-white">
-                          {d[cat.rawKey]}
+                          {d[cat.rawKey as RawKey]}
                         </span>
                         <span className="text-slate-400 dark:text-slate-500 text-xs">
-                          ({d[cat.key].toFixed(1)}%)
+                          ({d[cat.key as CategoryKey].toFixed(1)}%)
                         </span>
                       </div>
                     ))}
@@ -196,7 +212,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                   stackId="a"
                   fill={cat.color}
                   radius={isLast ? [0, 4, 4, 0] : [0, 0, 0, 0]}
-                  onClick={(data: any) => {
+                  onClick={(data: { name?: string }) => {
                     if (data?.name) {
                       onSelectParty(selectedParty === data.name ? null : data.name);
                     }

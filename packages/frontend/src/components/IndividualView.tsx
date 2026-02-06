@@ -103,7 +103,7 @@ export default function IndividualView({
                 type="category"
                 dataKey="name"
                 width={140}
-                tick={(props: any) => {
+                tick={(props: { x: number; y: number; payload: { value: string } }) => {
                   const { x, y, payload } = props;
                   return (
                     <text
@@ -122,8 +122,10 @@ export default function IndividualView({
               />
               <Tooltip
                 content={({ active, payload }) => {
-                  if (!active || !payload || !payload.length) return null;
-                  const d = payload[0].payload;
+                  if (!active || !payload || !payload.length) {
+                    return null;
+                  }
+                  const d = payload[0].payload as PoliticianAttendance;
                   return (
                     <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
                       <div className="font-semibold text-slate-900 dark:text-white text-sm">{d.name}</div>

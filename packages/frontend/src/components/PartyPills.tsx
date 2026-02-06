@@ -18,11 +18,11 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
   const [expanded, setExpanded] = useState(false);
 
   const visibleParties = useMemo(() => {
-    if (expanded) return parties;
+    if (expanded) { return parties; }
     const first = parties.slice(0, MOBILE_LIMIT);
     if (selectedParty && !first.some(p => p.party === selectedParty)) {
       const selected = parties.find(p => p.party === selectedParty);
-      if (selected) first.push(selected);
+      if (selected) { first.push(selected); }
     }
     return first;
   }, [parties, expanded, selectedParty]);

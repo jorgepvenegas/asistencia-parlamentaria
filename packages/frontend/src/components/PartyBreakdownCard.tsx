@@ -60,7 +60,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
                     if (!active || !payload || !payload.length) {
                       return null
                     }
-                    const d = payload[0].payload;
+                    const d = payload[0].payload as PieEntry;
                     const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
                     return (
                       <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-lg p-2.5 shadow-lg text-sm">
