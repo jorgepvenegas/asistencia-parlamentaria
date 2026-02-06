@@ -1,4 +1,4 @@
-name: Frontend build
+name: Frontend deploy
 
 on:
   push:
@@ -47,3 +47,10 @@ jobs:
         run: pnpm -F frontend run build
         env:
           PUBLIC_BASE_URL_API: ${{ secrets.PUBLIC_BASE_URL_API }}
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/frontend/dist --project-name=asistencia-camara
