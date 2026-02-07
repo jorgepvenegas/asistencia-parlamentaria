@@ -218,6 +218,9 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                   onClick={(data: { name?: string }) => {
                     if (data?.name) {
                       onSelectParty(selectedParty === data.name ? null : data.name);
+                      if (isMobile) {
+                        setActiveCategories(new Set());
+                      }
                     }
                   }}
                   className="cursor-pointer"
