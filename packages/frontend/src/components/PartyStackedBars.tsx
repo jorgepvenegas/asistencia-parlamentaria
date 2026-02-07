@@ -10,6 +10,7 @@ import {
   Cell,
 } from "recharts";
 import { getPartyAbbrev } from "../constants/colors";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface PartyAggregate {
   party: string;
@@ -53,6 +54,7 @@ interface ChartRow {
 }
 
 export default function PartyStackedBars({ data, selectedParty, onSelectParty }: PartyStackedBarsProps) {
+  const isMobile = useIsMobile();
   const [activeCategories, setActiveCategories] = useState<Set<CategoryKey>>(new Set());
 
   const toggleCategory = (key: CategoryKey) => {
@@ -170,38 +172,40 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                 );
               }}
             />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload || !payload.length) { return null; }
-                const d = payload[0].payload as ChartRow;
-                return (
-                  <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
-                    <div className="font-semibold text-slate-900 dark:text-white mb-1">
-                      {d.name}
-                    </div>
-                    <div className="text-slate-500 dark:text-slate-400 text-xs mb-2">
-                      {d.count} miembro{d.count > 1 ? "s" : ""} · {d.avgPct}% asistencia
-                    </div>
-                    {visibleCategories.map((cat) => (
-                      <div key={cat.key} className="flex items-center gap-2 py-0.5">
-                        <span
-                          className="w-2.5 h-2.5 rounded-sm shrink-0"
-                          style={{ backgroundColor: cat.color }}
-                        />
-                        <span className="text-slate-600 dark:text-slate-300">{cat.name}:</span>
-                        <span className="font-semibold tabular-nums text-slate-900 dark:text-white">
-                          {d[cat.rawKey as RawKey]}
-                        </span>
-                        <span className="text-slate-400 dark:text-slate-500 text-xs">
-                          ({d[cat.key as CategoryKey].toFixed(1)}%)
-                        </span>
+            {!isMobile && (
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload || !payload.length) { return null; }
+                  const d = payload[0].payload as ChartRow;
+                  return (
+                    <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
+                      <div className="font-semibold text-slate-900 dark:text-white mb-1">
+                        {d.name}
                       </div>
-                    ))}
-                  </div>
-                );
-              }}
-              cursor={{ fill: "rgba(0,0,0,0.04)" }}
-            />
+                      <div className="text-slate-500 dark:text-slate-400 text-xs mb-2">
+                        {d.count} miembro{d.count > 1 ? "s" : ""} · {d.avgPct}% asistencia
+                      </div>
+                      {visibleCategories.map((cat) => (
+                        <div key={cat.key} className="flex items-center gap-2 py-0.5">
+                          <span
+                            className="w-2.5 h-2.5 rounded-sm shrink-0"
+                            style={{ backgroundColor: cat.color }}
+                          />
+                          <span className="text-slate-600 dark:text-slate-300">{cat.name}:</span>
+                          <span className="font-semibold tabular-nums text-slate-900 dark:text-white">
+                            {d[cat.rawKey as RawKey]}
+                          </span>
+                          <span className="text-slate-400 dark:text-slate-500 text-xs">
+                            ({d[cat.key as CategoryKey].toFixed(1)}%)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }}
+                cursor={{ fill: "rgba(0,0,0,0.04)" }}
+              />
+            )}
             {visibleCategories.map((cat, idx) => {
               const isLast = idx === visibleCategories.length - 1;
               return (
@@ -214,6 +218,9 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                   onClick={(data: { name?: string }) => {
                     if (data?.name) {
                       onSelectParty(selectedParty === data.name ? null : data.name);
+                      if (isMobile) {
+                        setActiveCategories(new Set());
+                      }
                     }
                   }}
                   className="cursor-pointer"
