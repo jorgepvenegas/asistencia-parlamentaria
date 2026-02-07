@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import type { PoliticianAttendance } from "../types/dashboard";
 import { getPartyColor } from "../constants/colors";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface PartyInfo {
   party: string;
@@ -31,6 +32,7 @@ export default function IndividualView({
   sortBy,
   onSortChange,
 }: IndividualViewProps) {
+  const isMobile = useIsMobile();
   const chartHeight = Math.max(300, data.length * 30);
 
   return (
@@ -120,25 +122,27 @@ export default function IndividualView({
                   );
                 }}
               />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload || !payload.length) {
-                    return null;
-                  }
-                  const d = payload[0].payload as PoliticianAttendance;
-                  return (
-                    <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
-                      <div className="font-semibold text-slate-900 dark:text-white text-sm">{d.name}</div>
-                      <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{d.party}</div>
-                      <div className="flex gap-3 mt-1">
-                        <span className="text-green-600 dark:text-green-400">Asist: {d.attendance}</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{d.pct}%</span>
+              {!isMobile && (
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload || !payload.length) {
+                      return null;
+                    }
+                    const d = payload[0].payload as PoliticianAttendance;
+                    return (
+                      <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
+                        <div className="font-semibold text-slate-900 dark:text-white text-sm">{d.name}</div>
+                        <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">{d.party}</div>
+                        <div className="flex gap-3 mt-1">
+                          <span className="text-green-600 dark:text-green-400">Asist: {d.attendance}</span>
+                          <span className="font-semibold text-slate-900 dark:text-white">{d.pct}%</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                }}
-                cursor={{ fill: "rgba(0,0,0,0.04)" }}
-              />
+                    );
+                  }}
+                  cursor={{ fill: "rgba(0,0,0,0.04)" }}
+                />
+              )}
               <Bar dataKey="pct" radius={[0, 5, 5, 0]} barSize={16}>
                 {data.map((entry, i) => (
                   <Cell
