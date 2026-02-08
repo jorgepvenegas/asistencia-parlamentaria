@@ -1,7 +1,7 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
 import Dashboard from '../components/Dashboard';
-import type { PoliticianAttendance, PartyData, PartyAttendance } from '../types/dashboard';
+import type { PoliticianAttendance, PartyAttendance } from '../types/dashboard';
 import {
   politicianResponseSchema,
   partyResponseSchema,
@@ -13,7 +13,6 @@ import {
   type PartyAttendanceYearlyResponse,
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
-import { PARTY_COLORS } from '../constants/colors';
 
 export function getStaticPaths() {
   return [
@@ -25,7 +24,6 @@ export function getStaticPaths() {
 }
 
 const year = Astro.params.year || '2025';
-console.log('year', year);
 const yearNum = parseInt(year, 10);
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
@@ -42,10 +40,17 @@ type ApiParty = PartyResponse;
 type ApiAttendance = AttendanceYearlyResponse;
 type ApiPartyAttendance = PartyAttendanceYearlyResponse;
 
+async function fetchAndParse<T>(res: Response, schema: z.ZodType<T>, label: string): Promise<T | null> {
+  if (!res.ok) return null;
+  const { data } = await res.json();
+  const result = schema.safeParse(data);
+  if (result.success) return result.data;
+  console.error(`${label} validation failed:`, result.error);
+  return null;
+}
+
 let politicians: PoliticianAttendance[] = [];
 let partyAttendance: PartyAttendance[] = [];
-let parties: PartyData[] = [];
-let years: number[] = [2025, 2024, 2023, 2022];
 let error: string | null = null;
 
 try {
@@ -57,50 +62,10 @@ try {
     fetch(`${API_URL}/api/attendance/parties/yearly?year=${yearNum}`),
   ]);
 
-  let apiPoliticians: ApiPolitician[] = [];
-  let apiParties: ApiParty[] = [];
-  let apiAttendance: ApiAttendance[] = [];
-  let apiPartyAttendance: ApiPartyAttendance[] = [];
-
-  if (politiciansRes.ok) {
-    const data = await politiciansRes.json();
-    const parseResult = politiciansArraySchema.safeParse(data.data);
-    if (parseResult.success) {
-      apiPoliticians = parseResult.data;
-    } else {
-      console.error('Politicians validation failed:', parseResult.error);
-    }
-  }
-
-  if (partiesRes.ok) {
-    const data = await partiesRes.json();
-    const parseResult = partiesArraySchema.safeParse(data.data);
-    if (parseResult.success) {
-      apiParties = parseResult.data;
-    } else {
-      console.error('Parties validation failed:', parseResult.error);
-    }
-  }
-
-  if (attendanceRes.ok) {
-    const data = await attendanceRes.json();
-    const parseResult = attendanceArraySchema.safeParse(data.data);
-    if (parseResult.success) {
-      apiAttendance = parseResult.data;
-    } else {
-      console.error('Attendance validation failed:', parseResult.error);
-    }
-  }
-
-  if (partyAttendanceRes.ok) {
-    const data = await partyAttendanceRes.json();
-    const parseResult = partyAttendanceArraySchema.safeParse(data.data);
-    if (parseResult.success) {
-      apiPartyAttendance = parseResult.data;
-    } else {
-      console.error('Party attendance validation failed:', parseResult.error);
-    }
-  }
+  const apiPoliticians = await fetchAndParse<ApiPolitician[]>(politiciansRes, politiciansArraySchema, 'Politicians') ?? [];
+  const apiParties = await fetchAndParse<ApiParty[]>(partiesRes, partiesArraySchema, 'Parties') ?? [];
+  const apiAttendance = await fetchAndParse<ApiAttendance[]>(attendanceRes, attendanceArraySchema, 'Attendance') ?? [];
+  const apiPartyAttendance = await fetchAndParse<ApiPartyAttendance[]>(partyAttendanceRes, partyAttendanceArraySchema, 'Party attendance') ?? [];
 
   // Create lookup maps
   const politicianMap = new Map(apiPoliticians.map((p) => [p.id, p]));
@@ -113,7 +78,6 @@ try {
       if (!pol) return null;
       const party = partyMap.get(pol.partyId);
 
-      const totalDays = att.attendanceCount + att.justifiedAbsentCount + att.unjustifiedAbsentCount;
       const noJust = att.absentCount - att.justifiedAbsentCount;
 
       return {
@@ -129,15 +93,6 @@ try {
       } as PoliticianAttendance;
     })
     .filter((p): p is PoliticianAttendance => p !== null);
-
-  // Transform parties with color from constants
-  parties = apiParties.map((p) => ({
-    id: p.id,
-    name: p.name,
-    slug: p.slug,
-    abbreviation: p.abbreviation,
-    color: PARTY_COLORS[p.name] || '#999',
-  }));
 
   // Transform party attendance
   partyAttendance = apiPartyAttendance;
@@ -209,8 +164,6 @@ try {
         client:load
         politicians={politicians}
         partyAttendance={partyAttendance}
-        parties={parties}
-        years={years}
         initialYear={yearNum}
       />
     )

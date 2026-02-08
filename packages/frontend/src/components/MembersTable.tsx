@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PoliticianAttendance } from "../types/dashboard";
+import { CARD_CLASS } from "../constants/styles";
 
 type SortKey = "name" | "attendance" | "validJust" | "invalidJust" | "noJust" | "pct";
 
@@ -41,7 +42,7 @@ export default function MembersTable({ members, party }: MembersTableProps) {
   });
 
   return (
-    <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
+    <div className={CARD_CLASS}>
       <h3 className="font-display text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4">
         Miembros
       </h3>
