@@ -4,7 +4,7 @@ import PartyPills from "./PartyPills";
 import PartyStackedBars from "./PartyStackedBars";
 import PartyBreakdownCard from "./PartyBreakdownCard";
 import MembersTable from "./MembersTable";
-import IndividualView from "./IndividualView";
+import { ATTENDANCE_CATEGORIES } from "../constants/colors";
 
 export default function Dashboard({
   politicians,
@@ -12,9 +12,7 @@ export default function Dashboard({
   initialYear,
 }: DashboardProps) {
   const [isDark, setIsDark] = useState(true);
-  const [view, setView] = useState<"party" | "individual">("party");
   const [selectedParty, setSelectedParty] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<"pct" | "attendance">("pct");
 
   // Sync dark class on <html>
   useEffect(() => {
@@ -58,31 +56,20 @@ export default function Dashboard({
       .sort((a, b) => b.avgPct - a.avgPct);
   }, [partyAttendance, membersByPartyId]);
 
-  const individualData = useMemo(() => {
-    const filtered = selectedParty
-      ? politicians.filter((d) => d.party === selectedParty)
-      : politicians;
-    return [...filtered].sort((a, b) =>
-      sortBy === "pct" ? b.pct - a.pct : b.attendance - a.attendance
-    );
-  }, [selectedParty, sortBy, politicians]);
-
   const pieData = useMemo(() => {
     if (!selectedParty) { return []; }
     const p = partyAggregates.find((p) => p.party === selectedParty);
     if (!p) { return []; }
-    return [
-      { name: "Asistencia", value: p.totalAttendance, color: "#22c55e" },
-      { name: "Justificado", value: p.totalValid, color: "#f59e0b" },
-      { name: "No justificado", value: p.totalInvalid, color: "#ef4444" },
-      { name: "Sin justificación", value: p.totalNoJust, color: "#991b1b" },
-    ];
+    return ATTENDANCE_CATEGORIES.map((cat) => {
+      const valueMap: Record<string, number> = {
+        attendance: p.totalAttendance,
+        justified: p.totalValid,
+        unjustified: p.totalInvalid,
+        noJustification: p.totalNoJust,
+      };
+      return { name: cat.name, value: valueMap[cat.key], color: cat.color };
+    });
   }, [selectedParty, partyAggregates]);
-
-  const selectedPartyMembers = useMemo(() => {
-    if (!selectedParty) { return []; }
-    return individualData;
-  }, [selectedParty, individualData]);
 
   return (
     <div className="min-h-screen">
@@ -108,65 +95,30 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* View Tabs */}
-        {/* <div className="inline-flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-          {([
-            ["party", "Por Partido"],
-            ["individual", "Por Diputado/a"],
-          ] as const).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              className={`
-                px-4 py-2.5 rounded-md text-sm font-medium transition-all
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400
-                ${view === key
-                  ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-                }
-              `}
-            >
-              {label}
-            </button>
-          ))}
-        </div> */}
+        <div className="space-y-6">
+          <PartyPills
+            parties={partyAggregates.map((p) => ({ party: p.party, count: p.count }))}
+            selectedParty={selectedParty}
+            onSelect={setSelectedParty}
+          />
 
-        {/* Party View */}
-        {view === "party" && (
-          <div className="space-y-6">
-            <PartyPills
-              parties={partyAggregates.map((p) => ({ party: p.party, count: p.count }))}
-              selectedParty={selectedParty}
-              onSelect={setSelectedParty}
-            />
-
-            <PartyStackedBars
-              data={partyAggregates}
-              selectedParty={selectedParty}
-              onSelectParty={setSelectedParty}
-            />
-
-            {selectedParty && pieData.length > 0 && (
-              <PartyBreakdownCard party={selectedParty} pieData={pieData} />
-            )}
-
-            {selectedParty && selectedPartyMembers.length > 0 && (
-              <MembersTable members={selectedPartyMembers} party={selectedParty} />
-            )}
-          </div>
-        )}
-
-        {/* Individual View */}
-        {view === "individual" && (
-          <IndividualView
-            data={individualData}
-            parties={partyAggregates.map((p) => ({ party: p.party }))}
+          <PartyStackedBars
+            data={partyAggregates}
             selectedParty={selectedParty}
             onSelectParty={setSelectedParty}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
           />
-        )}
+
+          {selectedParty && pieData.length > 0 && (
+            <PartyBreakdownCard party={selectedParty} pieData={pieData} />
+          )}
+
+          {selectedParty && (
+            <MembersTable
+              members={politicians.filter((d) => d.party === selectedParty)}
+              party={selectedParty}
+            />
+          )}
+        </div>
 
         {/* Footer */}
         <footer className="text-center text-xs text-slate-400 dark:text-slate-500 pt-4 border-t border-slate-100 dark:border-white/[0.04] space-y-1">

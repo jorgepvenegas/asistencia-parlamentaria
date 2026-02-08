@@ -9,7 +9,8 @@ import {
   LabelList,
   Cell,
 } from "recharts";
-import { getPartyAbbrev } from "../constants/colors";
+import { getPartyAbbrev, ATTENDANCE_CATEGORIES } from "../constants/colors";
+import { CARD_CLASS, TOOLTIP_CLASS } from "../constants/styles";
 import { useIsMobile } from "../hooks/useIsMobile";
 
 interface PartyAggregate {
@@ -28,15 +29,29 @@ interface PartyStackedBarsProps {
   onSelectParty: (party: string | null) => void;
 }
 
-const CATEGORIES = [
-  { key: "pctAttendance", rawKey: "totalAttendance", name: "Asistencia", color: "#22c55e" },
-  { key: "pctValid", rawKey: "totalValid", name: "Justificado", color: "#f59e0b" },
-  { key: "pctInvalid", rawKey: "totalInvalid", name: "No justificado", color: "#ef4444" },
-  { key: "pctNoJust", rawKey: "totalNoJust", name: "Sin justificación", color: "#991b1b" },
-] as const;
+type CategoryKey = "pctAttendance" | "pctValid" | "pctInvalid" | "pctNoJust";
+type RawKey = "totalAttendance" | "totalValid" | "totalInvalid" | "totalNoJust";
 
-type CategoryKey = typeof CATEGORIES[number]["key"];
-type RawKey = typeof CATEGORIES[number]["rawKey"];
+const RAW_KEY_MAP: Record<typeof ATTENDANCE_CATEGORIES[number]["key"], RawKey> = {
+  attendance: "totalAttendance",
+  justified: "totalValid",
+  unjustified: "totalInvalid",
+  noJustification: "totalNoJust",
+};
+
+const PCT_KEY_MAP: Record<typeof ATTENDANCE_CATEGORIES[number]["key"], CategoryKey> = {
+  attendance: "pctAttendance",
+  justified: "pctValid",
+  unjustified: "pctInvalid",
+  noJustification: "pctNoJust",
+};
+
+const CATEGORIES = ATTENDANCE_CATEGORIES.map((cat) => ({
+  key: PCT_KEY_MAP[cat.key],
+  rawKey: RAW_KEY_MAP[cat.key],
+  name: cat.name,
+  color: cat.color,
+}));
 
 interface ChartRow {
   name: string;
@@ -103,7 +118,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
   const chartHeight = Math.max(chartData.length * 48, 80);
 
   return (
-    <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
+    <div className={CARD_CLASS}>
       <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white mb-1">
         {selectedParty ? `Asistencia — ${selectedParty}` : "Asistencia por Partido"}
       </h2>
@@ -178,7 +193,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                   if (!active || !payload || !payload.length) { return null; }
                   const d = payload[0].payload as ChartRow;
                   return (
-                    <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-xl p-3 shadow-lg text-sm">
+                    <div className={TOOLTIP_CLASS}>
                       <div className="font-semibold text-slate-900 dark:text-white mb-1">
                         {d.name}
                       </div>

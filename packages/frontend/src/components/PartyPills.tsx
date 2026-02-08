@@ -1,4 +1,5 @@
 import { getPartyColor } from "../constants/colors";
+import { CARD_CLASS } from "../constants/styles";
 
 interface PartyInfo {
   party: string;
@@ -13,7 +14,7 @@ interface PartyPillsProps {
 
 export default function PartyPills({ parties, selectedParty, onSelect }: PartyPillsProps) {
   return (
-    <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06] space-y-2">
+    <div className={`${CARD_CLASS} space-y-2`}>
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
           Filtrar por partido

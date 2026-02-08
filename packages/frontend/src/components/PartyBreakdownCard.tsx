@@ -6,6 +6,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getPartyColor } from "../constants/colors";
+import { CARD_CLASS, TOOLTIP_CLASS } from "../constants/styles";
 
 interface PieEntry {
   name: string;
@@ -23,7 +24,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
   const partyColor = getPartyColor(party);
 
   return (
-    <div className="bg-white dark:bg-[#16162a] rounded-2xl p-5 sm:p-8 border border-slate-200 dark:border-white/[0.06]">
+    <div className={CARD_CLASS}>
       {/* Header */}
       <div
         className="border-l-4 pl-3 mb-4 sm:mb-6"
@@ -64,7 +65,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
                     const d = payload[0].payload as PieEntry;
                     const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
                     return (
-                      <div className="bg-white dark:bg-[#16162a] border border-slate-200 dark:border-white/[0.06] rounded-lg p-2.5 shadow-lg text-sm">
+                      <div className={TOOLTIP_CLASS}>
                         <span className="font-semibold text-slate-900 dark:text-white">{d.name}</span>
                         <span className="text-slate-500 dark:text-slate-400 ml-2">{d.value} ({pct}%)</span>
                       </div>

@@ -24,7 +24,7 @@ export const PARTY_ABBREV: Record<string, string> = {
   "Evolución Política": "EVOP",
   "Partido Socialista": "PS",
   "Partido Demócratas Chile": "DEM",
-  "Partido Demócrata Cristiano": "PC",
+  "Partido Demócrata Cristiano": "PDC",
   "Renovación Nacional": "RN",
   "Unión Demócrata Independiente": "UDI",
   "Partido Radical de Chile": "PR",
@@ -42,6 +42,12 @@ export const PARTY_ABBREV: Record<string, string> = {
 };
 
 export function getPartyAbbrev(party: string): string {
-  console.log(party)
   return PARTY_ABBREV[party] || party;
 }
+
+export const ATTENDANCE_CATEGORIES = [
+  { key: "attendance", name: "Asistencia", color: "#22c55e" },
+  { key: "justified", name: "Justificado", color: "#f59e0b" },
+  { key: "unjustified", name: "No justificado", color: "#ef4444" },
+  { key: "noJustification", name: "Sin justificación", color: "#991b1b" },
+] as const;
