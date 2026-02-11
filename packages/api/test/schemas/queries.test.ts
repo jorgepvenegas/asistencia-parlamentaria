@@ -49,7 +49,9 @@ describe('attendanceYearlyQuerySchema', () => {
   it('accepts valid year', () => {
     const result = attendanceYearlyQuerySchema.safeParse({ year: '2024' });
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data.year).toBe(2024);
+    if (result.success) {
+      expect(result.data.year).toBe(2024)
+    }
   });
 
   it('accepts optional year', () => {

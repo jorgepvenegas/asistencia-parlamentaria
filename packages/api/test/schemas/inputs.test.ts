@@ -50,12 +50,12 @@ describe('createAttendanceMonthlySchema', () => {
     expect(createAttendanceMonthlySchema.safeParse(valid).success).toBe(true);
   });
 
-  it('rejects year < 2000', () => {
+  it('rejects year < 2022', () => {
     expect(createAttendanceMonthlySchema.safeParse({ ...valid, year: 1999 }).success).toBe(false);
   });
 
-  it('rejects year > 2100', () => {
-    expect(createAttendanceMonthlySchema.safeParse({ ...valid, year: 2101 }).success).toBe(false);
+  it('rejects year > 2027', () => {
+    expect(createAttendanceMonthlySchema.safeParse({ ...valid, year: 2027 }).success).toBe(false);
   });
 
   it('rejects month 0', () => {
@@ -72,6 +72,10 @@ describe('createAttendanceMonthlySchema', () => {
 
   it('rejects average > 100', () => {
     expect(createAttendanceMonthlySchema.safeParse({ ...valid, attendanceAverage: 101 }).success).toBe(false);
+  });
+
+  it('rejects average < 0', () => {
+    expect(createAttendanceMonthlySchema.safeParse({ ...valid, attendanceAverage: -0.1 }).success).toBe(false);
   });
 });
 

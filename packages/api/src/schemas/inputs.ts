@@ -18,7 +18,7 @@ export type CreatePartyInput = z.infer<typeof createPartySchema>;
 // Attendance Monthly
 export const createAttendanceMonthlySchema = z.object({
   politicianId: z.number().min(1),
-  year: z.number().min(2000).max(2100),
+  year: z.number().min(2022).max(2026),
   month: z.number().min(1).max(12),
   attendanceCount: z.number().min(0),
   absentCount: z.number().min(0),
