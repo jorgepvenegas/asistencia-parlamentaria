@@ -1,7 +1,3 @@
-# AGENTS.md
-
-This file is the entrypoint for coding agents working in this repository.
-
 ## Purpose
 
 - Keep changes correct, minimal, and verifiable.
@@ -20,7 +16,77 @@ This file is the entrypoint for coding agents working in this repository.
 - `packages/frontend`: pages, UI components, client-side tests, Playwright E2E
 - `packages/api`: API routes, data access, schema/migration tooling
 - `packages/shared`: shared types and schemas used across frontend/api
+- `packages/automation`: scraping scripts, sync pipeline, data ingestion
 - `.github/workflows`: CI pipelines and automation
+
+```
+.
+├── packages/
+│   ├── frontend/
+│   │   └── src/
+│   │       ├── pages/
+│   │       │   └── index.astro          # single-page entry
+│   │       ├── components/
+│   │       │   ├── Dashboard.tsx        # top-level dashboard
+│   │       │   ├── MembersTable.tsx
+│   │       │   ├── PartyBreakdownCard.tsx
+│   │       │   ├── PartyPills.tsx
+│   │       │   └── PartyStackedBars.tsx
+│   │       ├── constants/
+│   │       │   ├── colors.ts
+│   │       │   └── styles.ts
+│   │       ├── hooks/
+│   │       │   └── useIsMobile.ts
+│   │       └── types/
+│   │           └── dashboard.ts
+│   ├── api/
+│   │   └── src/
+│   │       ├── index.ts                 # Hono app entry
+│   │       ├── routes/
+│   │       │   ├── attendance.ts
+│   │       │   ├── parties.ts
+│   │       │   └── politicians.ts
+│   │       ├── schemas/
+│   │       │   ├── inputs.ts
+│   │       │   ├── queries.ts
+│   │       │   ├── responses.ts
+│   │       │   └── tables.ts
+│   │       ├── db/
+│   │       │   ├── index.ts             # Drizzle client
+│   │       │   └── schema.ts            # table definitions
+│   │       └── lib/
+│   │           └── index.ts
+│   ├── shared/
+│   │   └── src/
+│   │       ├── index.ts
+│   │       └── schemas.ts               # shared Zod schemas/types
+│   └── automation/
+│       ├── scripts/                     # runnable entry points
+│       │   ├── sync-data.ts
+│       │   ├── sync-year.ts
+│       │   ├── scrape-attendance.ts
+│       │   ├── create-parties.ts
+│       │   └── create-politicians.ts
+│       └── src/
+│           ├── scrapers/
+│           │   └── attendance.ts
+│           ├── api-clients/
+│           │   ├── parties.ts
+│           │   ├── politicians.ts
+│           │   └── shared.ts
+│           ├── orchestration/
+│           │   └── sync-pipeline.ts
+│           └── utils/
+│               ├── dates.ts
+│               ├── http.ts
+│               ├── parse.ts
+│               └── slugs.ts
+└── .github/
+    └── workflows/
+        ├── frontend-build.yaml
+        ├── sync-automation.yaml
+        └── lighthouse.yaml
+```
 
 ## Core Commands
 
@@ -44,10 +110,9 @@ Package-specific commands:
 
 ## Agent Workflow
 
-1. Read context first (`README.md`, relevant package files, touched modules).
-2. Make the smallest change that satisfies the request.
-3. Validate with targeted checks first, then broader checks if needed.
-4. Report exactly what changed and what was verified.
+1. Make the smallest change that satisfies the request.
+2. Validate with targeted checks first, then broader checks if needed.
+3. Report exactly what changed and what was verified.
 
 ## Coding Guardrails
 
@@ -65,12 +130,6 @@ Minimum validation before handing off:
 - For API-only changes: run API-related checks relevant to the scope.
 - For shared contract changes: run checks for both frontend and API consumers.
 - If full test suite is too expensive, run focused checks and clearly state what was not run.
-
-Recommended baseline for substantial changes:
-
-- `pnpm lint`
-- `pnpm test`
-- `pnpm build`
 
 ## Safety and Operations
 
