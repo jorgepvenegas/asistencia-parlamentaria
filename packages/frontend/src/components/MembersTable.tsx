@@ -1,16 +1,22 @@
-import { useState } from "react";
-import type { PoliticianAttendance } from "../types/dashboard";
-import { CARD_CLASS } from "../constants/styles";
+import { useState } from 'react';
+import type { PoliticianAttendance } from '../types/dashboard';
+import { CARD_CLASS } from '../constants/styles';
 
-type SortKey = "name" | "attendance" | "validJust" | "invalidJust" | "noJust" | "pct";
+type SortKey =
+  | 'name'
+  | 'attendanceCount'
+  | 'justifiedAbsentCount'
+  | 'unjustifiedAbsentCount'
+  | 'absentCount'
+  | 'pct';
 
 const COLUMNS: { key: SortKey; label: string }[] = [
-  { key: "name", label: "Nombre" },
-  { key: "attendance", label: "Asistencia" },
-  { key: "validJust", label: "Just. válida" },
-  { key: "invalidJust", label: "No justificado" },
-  { key: "noJust", label: "Sin just." },
-  { key: "pct", label: "% Asist." },
+  { key: 'name', label: 'Nombre' },
+  { key: 'attendanceCount', label: 'Asistencia' },
+  { key: 'justifiedAbsentCount', label: 'Just. válida' },
+  { key: 'unjustifiedAbsentCount', label: 'No justificado' },
+  { key: 'absentCount', label: 'Sin just.' },
+  { key: 'pct', label: '% Asist.' },
 ];
 
 interface MembersTableProps {
@@ -19,7 +25,7 @@ interface MembersTableProps {
 }
 
 export default function MembersTable({ members, party }: MembersTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey>("pct");
+  const [sortKey, setSortKey] = useState<SortKey>('pct');
   const [sortAsc, setSortAsc] = useState(false);
 
   const handleSort = (key: SortKey) => {
@@ -27,14 +33,14 @@ export default function MembersTable({ members, party }: MembersTableProps) {
       setSortAsc((prev) => !prev);
     } else {
       setSortKey(key);
-      setSortAsc(key === "name");
+      setSortAsc(key === 'name');
     }
   };
 
   const sorted = [...members].sort((a, b) => {
     let cmp: number;
-    if (sortKey === "name") {
-      cmp = a.name.localeCompare(b.name, "es");
+    if (sortKey === 'name') {
+      cmp = a.name.localeCompare(b.name, 'es');
     } else {
       cmp = a[sortKey] - b[sortKey];
     }
@@ -63,7 +69,7 @@ export default function MembersTable({ members, party }: MembersTableProps) {
                     {col.label}
                     {sortKey === col.key && (
                       <span className="text-slate-400 dark:text-slate-500">
-                        {sortAsc ? "↑" : "↓"}
+                        {sortAsc ? '↑' : '↓'}
                       </span>
                     )}
                   </span>
@@ -77,12 +83,24 @@ export default function MembersTable({ members, party }: MembersTableProps) {
                 key={d.id}
                 className="border-b border-slate-100 dark:border-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
-                <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{d.name}</td>
-                <td className="px-4 py-3 tabular-nums text-slate-900 dark:text-white">{d.attendance}</td>
-                <td className="px-4 py-3 tabular-nums text-green-600 dark:text-green-400">{d.validJust}</td>
-                <td className="px-4 py-3 tabular-nums text-amber-600 dark:text-amber-400">{d.invalidJust}</td>
-                <td className="px-4 py-3 tabular-nums text-red-600 dark:text-red-400">{d.noJust}</td>
-                <td className="px-4 py-3 tabular-nums font-semibold text-slate-900 dark:text-white">{d.pct}%</td>
+                <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">
+                  {d.name}
+                </td>
+                <td className="px-4 py-3 tabular-nums text-slate-900 dark:text-white">
+                  {d.attendanceCount}
+                </td>
+                <td className="px-4 py-3 tabular-nums text-green-600 dark:text-green-400">
+                  {d.justifiedAbsentCount}
+                </td>
+                <td className="px-4 py-3 tabular-nums text-amber-600 dark:text-amber-400">
+                  {d.unjustifiedAbsentCount}
+                </td>
+                <td className="px-4 py-3 tabular-nums text-red-600 dark:text-red-400">
+                  {d.absentCount}
+                </td>
+                <td className="px-4 py-3 tabular-nums font-semibold text-slate-900 dark:text-white">
+                  {d.pct}%
+                </td>
               </tr>
             ))}
           </tbody>
@@ -97,8 +115,12 @@ export default function MembersTable({ members, party }: MembersTableProps) {
             className="bg-slate-50 dark:bg-white/[0.04] rounded-xl p-4 border border-slate-100 dark:border-white/[0.06]"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">{d.name}</span>
-              <span className="font-semibold tabular-nums text-slate-900 dark:text-white">{d.pct}%</span>
+              <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">
+                {d.name}
+              </span>
+              <span className="font-semibold tabular-nums text-slate-900 dark:text-white">
+                {d.pct}%
+              </span>
             </div>
             {/* Attendance mini bar */}
             <div className="h-1.5 bg-slate-200 dark:bg-white/[0.08] rounded-full mb-3 overflow-hidden">
@@ -110,19 +132,27 @@ export default function MembersTable({ members, party }: MembersTableProps) {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-500 dark:text-slate-400">Asistencia</span>
-                <span className="tabular-nums font-medium text-slate-700 dark:text-slate-200">{d.attendance}</span>
+                <span className="tabular-nums font-medium text-slate-700 dark:text-slate-200">
+                  {d.attendanceCount}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500 dark:text-slate-400">Just. válida</span>
-                <span className="tabular-nums font-medium text-green-600 dark:text-green-400">{d.validJust}</span>
+                <span className="tabular-nums font-medium text-green-600 dark:text-green-400">
+                  {d.justifiedAbsentCount}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500 dark:text-slate-400">No justif.</span>
-                <span className="tabular-nums font-medium text-amber-600 dark:text-amber-400">{d.invalidJust}</span>
+                <span className="tabular-nums font-medium text-amber-600 dark:text-amber-400">
+                  {d.unjustifiedAbsentCount}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500 dark:text-slate-400">Sin just.</span>
-                <span className="tabular-nums font-medium text-red-600 dark:text-red-400">{d.noJust}</span>
+                <span className="tabular-nums font-medium text-red-600 dark:text-red-400">
+                  {d.absentCount}
+                </span>
               </div>
             </div>
           </div>

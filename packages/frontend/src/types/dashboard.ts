@@ -6,13 +6,13 @@ export interface PoliticianAttendance {
   name: string;
   party: string;
   partyId: number;
-  attendance: number;
+  attendanceCount: number;
   avgAttendance: number;
-  validJust: number;
+  justifiedAbsentCount: number;
   avgValidJust: number;
-  invalidJust: number;
+  unjustifiedAbsentCount: number;
   avgInvalidJust: number;
-  noJust: number;
+  absentCount: number;
   avgNoJust: number;
   pct: number;
 }
