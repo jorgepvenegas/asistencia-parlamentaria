@@ -9,24 +9,22 @@ const { title = 'QuienAtiende', description = 'Transparencia de Asistencia Parla
 ---
 
 <!doctype html>
-<html lang="es" class="dark">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
-    <meta name="theme-color" content="#0f0f1a" />
+    <meta name="theme-color" content="#000000" />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body
-    class="font-body antialiased bg-slate-50 dark:bg-[#0f0f1a] text-slate-900 dark:text-slate-200 transition-colors"
-  >
+  <body style="margin:0;padding:0;background:#FAFAFA;">
     <slot />
   </body>
 </html>
