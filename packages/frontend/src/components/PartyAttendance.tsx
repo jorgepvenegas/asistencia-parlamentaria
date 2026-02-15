@@ -1,49 +1,54 @@
-import { useState, useMemo } from "react";
-import type { PartyAttendanceProps, PoliticianAttendance } from "../types/dashboard";
-import type { PartyAttendance as PartyAttendanceType } from "../types/dashboard";
-import { ATTENDANCE_COLORS } from "../constants/colors";
-import AttendanceLegend from "./AttendanceLegend";
-import StatCards from "./StatCards";
-import DistributionBar from "./DistributionBar";
+import { useState, useMemo } from 'react';
+import type { PartyAttendanceProps, PoliticianAttendance } from '../types/dashboard';
+import type { PartyAttendance as PartyAttendanceType } from '../types/dashboard';
+import { ATTENDANCE_COLORS } from '../constants/colors';
+import AttendanceLegend from './AttendanceLegend';
+import StatCards from './StatCards';
+import DistributionBar from './DistributionBar';
 
 const C = ATTENDANCE_COLORS;
 
 function politicianBarSegments(p: PoliticianAttendance) {
-  const total = p.attendance + p.validJust + p.invalidJust + p.noJust;
-  if (total === 0) { return { a: 0, b: 0, c: 0, d: 0 }; }
+  const total =
+    p.attendanceCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount + p.absentCount;
+  if (total === 0) {
+    return { a: 0, b: 0, c: 0, d: 0 };
+  }
   return {
-    a: (p.attendance / total) * 100,
-    b: (p.validJust / total) * 100,
-    c: (p.invalidJust / total) * 100,
-    d: (p.noJust / total) * 100,
+    a: (p.attendanceCount / total) * 100,
+    b: (p.justifiedAbsentCount / total) * 100,
+    c: (p.unjustifiedAbsentCount / total) * 100,
+    d: (p.absentCount / total) * 100,
   };
 }
 
 function partyStatCards(party: PartyAttendanceType) {
   const total = party.attendanceCount + party.absentCount;
-  if (total === 0) { return null; }
+  if (total === 0) {
+    return null;
+  }
   const noJust = Math.max(0, party.absentCount - party.justifiedAbsentCount);
   return [
     {
-      label: "DÍAS ASISTIDOS",
+      label: 'DÍAS ASISTIDOS',
       pct: ((party.attendanceCount / total) * 100).toFixed(1),
       frac: party.attendanceCount / total,
       color: C.attendance,
     },
     {
-      label: "FALTAS JUSTIFICADAS",
+      label: 'FALTAS JUSTIFICADAS',
       pct: ((party.justifiedAbsentCount / total) * 100).toFixed(1),
       frac: party.justifiedAbsentCount / total,
       color: C.justified,
     },
     {
-      label: "FALTAS SIN JUSTIFICACIÓN VÁLIDA",
+      label: 'FALTAS SIN JUSTIFICACIÓN VÁLIDA',
       pct: ((party.unjustifiedAbsentCount / total) * 100).toFixed(1),
       frac: party.unjustifiedAbsentCount / total,
       color: C.unjustified,
     },
     {
-      label: "FALTAS SIN JUSTIFICACIÓN",
+      label: 'FALTAS SIN JUSTIFICACIÓN',
       pct: ((noJust / total) * 100).toFixed(1),
       frac: noJust / total,
       color: C.noJust,
@@ -61,7 +66,9 @@ export default function PartyAttendance({
   const membersByParty = useMemo(() => {
     const map: Record<string, PoliticianAttendance[]> = {};
     politicians.forEach((p) => {
-      if (!map[p.party]) { map[p.party] = []; }
+      if (!map[p.party]) {
+        map[p.party] = [];
+      }
       map[p.party].push(p);
     });
     return map;
@@ -71,10 +78,9 @@ export default function PartyAttendance({
     () =>
       [...partyAttendance].sort(
         (a, b) =>
-          (membersByParty[b.partyName] || []).length -
-          (membersByParty[a.partyName] || []).length,
+          (membersByParty[b.partyName] || []).length - (membersByParty[a.partyName] || []).length
       ),
-    [partyAttendance, membersByParty],
+    [partyAttendance, membersByParty]
   );
 
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -82,7 +88,7 @@ export default function PartyAttendance({
 
   const selectedParty = sortedParties[selectedIdx];
   const members: PoliticianAttendance[] = selectedParty
-    ? (membersByParty[selectedParty.partyName] || [])
+    ? membersByParty[selectedParty.partyName] || []
     : [];
   const totalPages = Math.ceil(members.length / PER_PAGE);
   const pageMembers = members.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -94,32 +100,32 @@ export default function PartyAttendance({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Section header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <h2
             style={{
               fontSize: 32,
               fontWeight: 600,
               letterSpacing: -2,
-              color: "#000",
-              margin: "0 0 8px",
+              color: '#000',
+              margin: '0 0 8px',
             }}
           >
             Asistencia por partido
           </h2>
-          <p style={{ fontSize: 14, color: "#5E5E5E", margin: 0 }}>
+          <p style={{ fontSize: 14, color: '#5E5E5E', margin: 0 }}>
             Selecciona un partido para ver la asistencia desglosada de cada congresista
           </p>
         </div>
         <div
           style={{
-            display: "inline-flex",
-            alignItems: "center",
+            display: 'inline-flex',
+            alignItems: 'center',
             gap: 8,
-            padding: "10px 16px",
-            border: "1px solid #E5E5E5",
+            padding: '10px 16px',
+            border: '1px solid #E5E5E5',
           }}
         >
           <span style={{ fontSize: 12, fontWeight: 500 }}>{initialYear}</span>
@@ -127,27 +133,27 @@ export default function PartyAttendance({
       </div>
 
       {/* Party tabs */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {sortedParties.map((party, i) => (
           <button
             key={party.partyId}
             onClick={() => selectParty(i)}
             style={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 8,
-              padding: "10px 20px",
-              background: i === selectedIdx ? "#000" : "transparent",
-              border: i === selectedIdx ? "none" : "1px solid #E5E5E5",
-              cursor: "pointer",
-              color: i === selectedIdx ? "#FAFAFA" : "#5E5E5E",
+              padding: '10px 20px',
+              background: i === selectedIdx ? '#000' : 'transparent',
+              border: i === selectedIdx ? 'none' : '1px solid #E5E5E5',
+              cursor: 'pointer',
+              color: i === selectedIdx ? '#FAFAFA' : '#5E5E5E',
               fontSize: 12,
               fontWeight: i === selectedIdx ? 600 : 500,
               fontFamily: "'Sora', sans-serif",
             }}
           >
             {party.partyName}
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#999" }}>
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#999' }}>
               {(membersByParty[party.partyName] || []).length}
             </span>
           </button>
@@ -161,23 +167,23 @@ export default function PartyAttendance({
       <AttendanceLegend />
 
       {/* Table */}
-      <div style={{ border: "1px solid #E5E5E5" }}>
+      <div style={{ border: '1px solid #E5E5E5' }}>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            background: "#F5F5F5",
-            padding: "14px 20px",
-            borderBottom: "1px solid #E5E5E5",
+            display: 'flex',
+            alignItems: 'center',
+            background: '#F5F5F5',
+            padding: '14px 20px',
+            borderBottom: '1px solid #E5E5E5',
           }}
         >
           {(
             [
-              ["CONGRESISTA", 220],
-              ["ASIST.", 80],
-              ["F. JUST.", 80],
-              ["F. S/V.", 80],
-              ["F. S/J.", 80],
+              ['CONGRESISTA', 220],
+              ['ASIST.', 80],
+              ['F. JUST.', 80],
+              ['F. S/V.', 80],
+              ['F. S/J.', 80],
             ] as [string, number][]
           ).map(([label, w]) => (
             <div key={label} style={{ width: w, flexShrink: 0 }}>
@@ -209,16 +215,15 @@ export default function PartyAttendance({
 
         {pageMembers.map((p) => {
           const seg = politicianBarSegments(p);
-          const attendColor =
-            p.pct >= 80 ? C.attendance : p.pct >= 60 ? C.unjustified : C.noJust;
+          const attendColor = p.pct >= 80 ? C.attendance : p.pct >= 60 ? C.unjustified : C.noJust;
           return (
             <div
               key={p.id}
               style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "14px 20px",
-                borderBottom: "1px solid #E5E5E5",
+                display: 'flex',
+                alignItems: 'center',
+                padding: '14px 20px',
+                borderBottom: '1px solid #E5E5E5',
               }}
             >
               <div style={{ width: 220, flexShrink: 0 }}>
@@ -238,21 +243,33 @@ export default function PartyAttendance({
               </div>
               <div style={{ width: 80, flexShrink: 0 }}>
                 <span
-                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.justified }}
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 13,
+                    color: C.justified,
+                  }}
                 >
                   {seg.b.toFixed(1)}%
                 </span>
               </div>
               <div style={{ width: 80, flexShrink: 0 }}>
                 <span
-                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.unjustified }}
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 13,
+                    color: C.unjustified,
+                  }}
                 >
                   {seg.c.toFixed(1)}%
                 </span>
               </div>
               <div style={{ width: 80, flexShrink: 0 }}>
                 <span
-                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.noJust }}
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 13,
+                    color: C.noJust,
+                  }}
                 >
                   {seg.d.toFixed(1)}%
                 </span>
@@ -267,16 +284,16 @@ export default function PartyAttendance({
       {totalPages > 1 && (
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#999" }}>
-            Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, members.length)} de{" "}
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#999' }}>
+            Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, members.length)} de{' '}
             {members.length} congresistas
           </span>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
@@ -284,16 +301,16 @@ export default function PartyAttendance({
                 style={{
                   width: 36,
                   height: 36,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: i + 1 === page ? "#000" : "transparent",
-                  border: i + 1 === page ? "none" : "1px solid #E5E5E5",
-                  color: i + 1 === page ? "#FAFAFA" : "#5E5E5E",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: i + 1 === page ? '#000' : 'transparent',
+                  border: i + 1 === page ? 'none' : '1px solid #E5E5E5',
+                  color: i + 1 === page ? '#FAFAFA' : '#5E5E5E',
                   fontSize: 12,
                   fontFamily: "'Sora', sans-serif",
                   fontWeight: i + 1 === page ? 600 : 500,
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 }}
               >
                 {i + 1}
