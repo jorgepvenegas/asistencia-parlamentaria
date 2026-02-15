@@ -51,3 +51,10 @@ export const ATTENDANCE_CATEGORIES = [
   { key: "unjustified", name: "No justificado", color: "#ef4444" },
   { key: "noJustification", name: "Sin justificación", color: "#991b1b" },
 ] as const;
+
+export const ATTENDANCE_COLORS = {
+  attendance: "#22C55E",
+  justified: "#3B82F6",
+  unjustified: "#F59E0B",
+  noJust: "#DC2626",
+};

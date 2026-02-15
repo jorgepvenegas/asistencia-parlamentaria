@@ -7,16 +7,25 @@ export interface PoliticianAttendance {
   party: string;
   partyId: number;
   attendance: number;
+  avgAttendance: number;
   validJust: number;
+  avgValidJust: number;
   invalidJust: number;
+  avgInvalidJust: number;
   noJust: number;
+  avgNoJust: number;
   pct: number;
 }
 
-// Use shared types
-export type PartyAttendance = PartyAttendanceYearlyResponse;
+// PartyAttendanceYearlyResponse extended with computed percentage fields
+export interface PartyAttendance extends PartyAttendanceYearlyResponse {
+  avgAttendance: number;
+  avgValidJust: number;
+  avgInvalidJust: number;
+  avgNoJust: number;
+}
 
-export interface DashboardProps {
+export interface PartyAttendanceProps {
   politicians: PoliticianAttendance[];
   partyAttendance: PartyAttendance[];
   initialYear: number;

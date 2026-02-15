@@ -1,6 +1,6 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
-import Dashboard from '../components/Dashboard';
+import LandingPage from '../components/LandingPage';
 import type { PoliticianAttendance, PartyAttendance } from '../types/dashboard';
 import {
   politicianResponseSchema,
@@ -40,7 +40,11 @@ type ApiParty = PartyResponse;
 type ApiAttendance = AttendanceYearlyResponse;
 type ApiPartyAttendance = PartyAttendanceYearlyResponse;
 
-async function fetchAndParse<T>(res: Response, schema: z.ZodType<T>, label: string): Promise<T | null> {
+async function parseResponse<T>(
+  res: Response,
+  schema: z.ZodType<T>,
+  label: string
+): Promise<T | null> {
   if (!res.ok) return null;
   const { data } = await res.json();
   const result = schema.safeParse(data);
@@ -62,40 +66,77 @@ try {
     fetch(`${API_URL}/api/attendance/parties/yearly?year=${yearNum}`),
   ]);
 
-  const apiPoliticians = await fetchAndParse<ApiPolitician[]>(politiciansRes, politiciansArraySchema, 'Politicians') ?? [];
-  const apiParties = await fetchAndParse<ApiParty[]>(partiesRes, partiesArraySchema, 'Parties') ?? [];
-  const apiAttendance = await fetchAndParse<ApiAttendance[]>(attendanceRes, attendanceArraySchema, 'Attendance') ?? [];
-  const apiPartyAttendance = await fetchAndParse<ApiPartyAttendance[]>(partyAttendanceRes, partyAttendanceArraySchema, 'Party attendance') ?? [];
+  const politiciansData =
+    (await parseResponse<ApiPolitician[]>(politiciansRes, politiciansArraySchema, 'Politicians')) ??
+    [];
+  const partiesData =
+    (await parseResponse<ApiParty[]>(partiesRes, partiesArraySchema, 'Parties')) ?? [];
+  const attendanceData =
+    (await parseResponse<ApiAttendance[]>(attendanceRes, attendanceArraySchema, 'Attendance')) ??
+    [];
+  const partyAttendanceData =
+    (await parseResponse<ApiPartyAttendance[]>(
+      partyAttendanceRes,
+      partyAttendanceArraySchema,
+      'Party attendance'
+    )) ?? [];
 
   // Create lookup maps
-  const politicianMap = new Map(apiPoliticians.map((p) => [p.id, p]));
-  const partyMap = new Map(apiParties.map((p) => [p.id, p]));
+  const politicianMap = new Map(politiciansData.map((p) => [p.id, p]));
+  const partyMap = new Map(partiesData.map((p) => [p.id, p]));
 
   // Transform data for Dashboard
-  politicians = apiAttendance
+  politicians = attendanceData
     .map((att) => {
-      const pol = politicianMap.get(att.politicianId);
-      if (!pol) return null;
-      const party = partyMap.get(pol.partyId);
+      const politician = politicianMap.get(att.politicianId);
+      if (!politician) return null;
+      const party = partyMap.get(politician.partyId);
 
-      const noJust = att.absentCount - att.justifiedAbsentCount;
+      // const totalSessions = att.attendanceCount + att.unjustifiedAbsentCount + att.
 
-      return {
+      const adjustedTotalSessions =
+        att.attendanceCount + att.unjustifiedAbsentCount + att.absentCount;
+
+      const avgAttendance = ((att.attendanceCount / adjustedTotalSessions) * 100).toFixed(2);
+      const avgValidJust = ((att.justifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2);
+      const avgInvalidJust = ((att.unjustifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(
+        2
+      );
+      const avgNoJust = ((att.absentCount / adjustedTotalSessions) * 100).toFixed(2);
+
+      const val = {
         id: att.politicianId,
-        name: pol.name,
+        name: politician.name,
         party: party?.name || 'Sin partido',
-        partyId: pol.partyId,
+        partyId: politician.partyId,
         attendance: att.attendanceCount,
+        avgAttendance: parseFloat(avgAttendance),
         validJust: att.justifiedAbsentCount,
+        avgValidJust: parseFloat(avgValidJust),
         invalidJust: att.unjustifiedAbsentCount,
-        noJust: Math.max(0, noJust),
+        avgInvalidJust: parseFloat(avgInvalidJust),
+        noJust: att.absentCount,
+        avgNoJust: parseFloat(avgNoJust),
         pct: parseFloat(att.attendanceAverage.toFixed(2)),
       } as PoliticianAttendance;
+
+      return val;
     })
     .filter((p): p is PoliticianAttendance => p !== null);
 
-  // Transform party attendance
-  partyAttendance = apiPartyAttendance;
+  partyAttendance = partyAttendanceData.map((p) => {
+    const adjustedTotalSessions = p.attendanceCount + p.unjustifiedAbsentCount + p.absentCount;
+
+    return {
+      ...p,
+      avgAttendance: parseFloat(((p.attendanceCount / adjustedTotalSessions) * 100).toFixed(2)),
+      avgValidJust: parseFloat(((p.justifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2)),
+      avgInvalidJust: parseFloat(
+        ((p.unjustifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2)
+      ),
+      avgNoJust: parseFloat(((p.absentCount / adjustedTotalSessions) * 100).toFixed(2)),
+    };
+  });
 } catch (err) {
   error = 'Error connecting to server';
   console.error(err);
@@ -160,7 +201,7 @@ try {
         </div>
       </div>
     ) : (
-      <Dashboard
+      <LandingPage
         client:load
         politicians={politicians}
         partyAttendance={partyAttendance}
