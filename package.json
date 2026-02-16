@@ -25,6 +25,9 @@
     "lint-staged": "^15.0.0"
   },
   "lint-staged": {
-    "packages/frontend/src/**/*.{ts,tsx,astro}": "eslint --fix"
+    "packages/frontend/src/**/*.{ts,tsx,astro}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
