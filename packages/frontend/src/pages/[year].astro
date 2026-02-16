@@ -14,8 +14,19 @@ import {
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
 
-const year = '2025';
-const yearNum = 2025;
+export function getStaticPaths() {
+  return [
+    { params: { year: '2022' } },
+    { params: { year: '2023' } },
+    { params: { year: '2024' } },
+    { params: { year: '2025' } },
+  ];
+}
+
+const yearNum = parseInt(Astro.params.year, 10);
+if (yearNum < 2022) {
+  return Astro.redirect('/2025');
+}
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
 
