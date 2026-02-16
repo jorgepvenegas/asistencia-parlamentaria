@@ -9,7 +9,7 @@
     "analyze:bundle": "node scripts/analyze-bundle.js",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "lint": "eslint src",
+    "lint": "eslint src --ext .ts,.tsx,.astro",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "deploy": "wrangler pages deploy dist --project-name=asistencia-camara"
@@ -39,6 +39,11 @@
     "prettier": "^3.1.0",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^1.0.4",
+    "eslint-plugin-astro": "^0.31.0",
+    "astro-eslint-parser": "^0.16.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier-plugin-astro": "^0.13.0"
   }
 }

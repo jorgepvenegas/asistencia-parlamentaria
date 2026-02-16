@@ -10,7 +10,8 @@
     "dev": "pnpm -r  --parallel --filter='!./packages/automation' run dev",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
-    "format:check": "pnpm -r run format:check"
+    "format:check": "pnpm -r run format:check",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -19,6 +20,14 @@
   "packageManager": "pnpm@9.0.0",
   "devDependencies": {
     "eslint": "^8.55.0",
-    "eslint-plugin-import": "^2.29.0"
+    "eslint-plugin-import": "^2.29.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "packages/frontend/src/**/*.{ts,tsx,astro}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
