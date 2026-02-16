@@ -22,24 +22,20 @@ export default function GeneralAttendance({
 
   const overall = useMemo(() => {
     const totalAttend = partyAttendance.reduce((s, p) => s + p.attendanceCount, 0);
-    const totalAbsent = partyAttendance.reduce((s, p) => s + p.absentCount, 0);
     const totalJust   = partyAttendance.reduce((s, p) => s + p.justifiedAbsentCount, 0);
     const totalUnjust = partyAttendance.reduce((s, p) => s + p.unjustifiedAbsentCount, 0);
-    const totalNoJust = partyAttendance.reduce(
-      (s, p) => s + Math.max(0, p.absentCount - p.justifiedAbsentCount),
-      0,
-    );
-    const total = totalAttend + totalAbsent;
-    if (total === 0) { return null; }
+    const totalAbsent = partyAttendance.reduce((s, p) => s + p.absentCount, 0);
+    const adjustedTotal = totalAttend + totalUnjust + totalAbsent;
+    if (adjustedTotal === 0) { return null; }
     return {
-      attendPct: ((totalAttend / total) * 100).toFixed(1),
-      attendFrac: totalAttend / total,
-      justPct: ((totalJust / total) * 100).toFixed(1),
-      justFrac: totalJust / total,
-      unjustPct: ((totalUnjust / total) * 100).toFixed(1),
-      unjustFrac: totalUnjust / total,
-      noJustPct: ((totalNoJust / total) * 100).toFixed(1),
-      noJustFrac: totalNoJust / total,
+      attendPct: ((totalAttend / adjustedTotal) * 100).toFixed(1),
+      attendFrac: totalAttend / adjustedTotal,
+      justPct: ((totalJust / adjustedTotal) * 100).toFixed(1),
+      justFrac: totalJust / adjustedTotal,
+      unjustPct: ((totalUnjust / adjustedTotal) * 100).toFixed(1),
+      unjustFrac: totalUnjust / adjustedTotal,
+      noJustPct: ((totalAbsent / adjustedTotal) * 100).toFixed(1),
+      noJustFrac: totalAbsent / adjustedTotal,
     };
   }, [partyAttendance]);
 
