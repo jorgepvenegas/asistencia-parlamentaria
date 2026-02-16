@@ -8,10 +8,11 @@ interface HoverTooltipProps {
   x: number;
   y: number;
   title: string;
+  subheader: string;
   rows: TooltipRow[];
 }
 
-export default function HoverTooltip({ x, y, title, rows }: HoverTooltipProps) {
+export default function HoverTooltip({ x, y, title, subheader, rows }: HoverTooltipProps) {
   return (
     <div
       style={{
@@ -31,6 +32,18 @@ export default function HoverTooltip({ x, y, title, rows }: HoverTooltipProps) {
         gap: 8,
       }}
     >
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span
+        style={{
+          fontFamily: "'Sora', sans-serif",
+          fontSize: 12,
+          fontWeight: 600,
+          paddingBottom: 2,
+          color: "#000",
+        }}
+      >
+        {title}
+      </span>
       <span
         style={{
           fontFamily: "'Sora', sans-serif",
@@ -39,11 +52,12 @@ export default function HoverTooltip({ x, y, title, rows }: HoverTooltipProps) {
           marginBottom: 4,
           borderBottom: "1px solid #E5E5E5",
           paddingBottom: 8,
-          color: "#000",
+          color: "#5E5E5E",
         }}
       >
-        {title}
+        {subheader}
       </span>
+      </div>
       {rows.map(({ label, value, color }) => (
         <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 24, alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

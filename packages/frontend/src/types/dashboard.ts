@@ -23,6 +23,7 @@ export interface PartyAttendance extends PartyAttendanceYearlyResponse {
   avgValidJust: number;
   avgInvalidJust: number;
   avgNoJust: number;
+  memberCount: number;
 }
 
 export interface PartyAttendanceProps {
