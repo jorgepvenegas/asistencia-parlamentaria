@@ -54,7 +54,7 @@ export const ATTENDANCE_CATEGORIES = [
 
 export const ATTENDANCE_COLORS = {
   attendance: '#22C55E',
-  justified: '#3B82F6',
-  unjustified: '#F59E0B',
-  noJust: '#DC2626',
+  justified: '#F59E0B',
+  unjustified: '#EF4444',
+  noJust: '#991B1B',
 };

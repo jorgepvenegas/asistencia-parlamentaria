@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ATTENDANCE_COLORS } from '../constants/colors';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { toPartySlug } from '../utils/partySlug';
 import AttendanceLegend from './AttendanceLegend';
 import HoverTooltip from './HoverTooltip';
 import SectionHeader from './SectionHeader';
@@ -40,6 +41,7 @@ interface Party {
 
 interface PartyComparisonChartProps {
   parties: Party[];
+  initialYear: number;
 }
 
 function partySegments(p: Party) {
@@ -65,7 +67,7 @@ const TOOLTIP_ROWS: { label: string; key: keyof Party; color: string }[] = [
   { label: 'Falta sin justificación', key: 'absentCount', color: C.noJust },
 ];
 
-export default function PartyComparisonChart({ parties }: PartyComparisonChartProps) {
+export default function PartyComparisonChart({ parties, initialYear }: PartyComparisonChartProps) {
   const isMobile = useIsMobile();
   const [tooltip, setTooltip] = useState<{ party: Party; x: number; y: number } | null>(null);
   const [asc, setAsc] = useState(false);
@@ -95,7 +97,7 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <SectionHeader
           title="Asistencia por partidos"
-          description="Días de asistencias, ausentes con y sin justificación de todos miembros por partido político:"
+          description="Distribución de asistencias y faltas por partido. Porcentajes sobre el total de sesiones registradas."
         />
         <button
           onClick={() => setAsc((v) => !v)}
@@ -133,7 +135,21 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
             <div
               key={party.partyId}
               className="chart-row"
-              style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'default' }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Ver detalle del partido ${party.partyName}`}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+              onClick={() => {
+                const partySlug = toPartySlug(party.partyName) || String(party.partyId);
+                window.location.href = `/${initialYear}/${partySlug}`;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const partySlug = toPartySlug(party.partyName) || String(party.partyId);
+                  window.location.href = `/${initialYear}/${partySlug}`;
+                }
+              }}
               onMouseMove={(e) => {
                 setTooltip({ party, x: e.clientX, y: e.clientY });
               }}
@@ -151,6 +167,7 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}
+                title={party.partyName}
               >
                 {party.partyName}
               </span>

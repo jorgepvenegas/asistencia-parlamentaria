@@ -23,7 +23,7 @@ export default function GeneralAttendance({
     const totalJust = partyAttendance.reduce((s, p) => s + p.justifiedAbsentCount, 0);
     const totalUnjust = partyAttendance.reduce((s, p) => s + p.unjustifiedAbsentCount, 0);
     const totalAbsent = partyAttendance.reduce((s, p) => s + p.absentCount, 0);
-    const adjustedTotal = totalAttend + totalUnjust + totalAbsent;
+    const adjustedTotal = totalAttend + totalJust + totalUnjust + totalAbsent;
     if (adjustedTotal === 0) {
       return null;
     }
@@ -107,10 +107,7 @@ export default function GeneralAttendance({
       )}
 
       {/* Party comparison chart */}
-      <PartyComparisonChart parties={partyAttendance} />
-
-      {/* Party table */}
-      {/* <PartyTable parties={sorted} memberCounts={memberCounts} /> */}
+      <PartyComparisonChart parties={partyAttendance} initialYear={initialYear} />
 
       {/* Pagination footer
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

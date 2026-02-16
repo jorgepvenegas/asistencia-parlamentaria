@@ -93,16 +93,16 @@ const COLS: Col[] = [
 ];
 
 function partySegments(p: Party): Segments {
-  const total = p.attendanceCount + p.absentCount;
+  const total =
+    p.attendanceCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount + p.absentCount;
   if (total === 0) {
     return { a: 0, b: 0, c: 0, d: 0 };
   }
-  const noJust = Math.max(0, p.absentCount - p.justifiedAbsentCount);
   return {
     a: (p.attendanceCount / total) * 100,
     b: (p.justifiedAbsentCount / total) * 100,
     c: (p.unjustifiedAbsentCount / total) * 100,
-    d: (noJust / total) * 100,
+    d: (p.absentCount / total) * 100,
   };
 }
 
