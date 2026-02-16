@@ -23,34 +23,33 @@ function politicianBarSegments(p: PoliticianAttendance) {
 }
 
 function partyStatCards(party: PartyAttendanceType) {
-  const total = party.attendanceCount + party.absentCount;
-  if (total === 0) {
+  const adjustedTotal = party.attendanceCount + party.unjustifiedAbsentCount + party.absentCount;
+  if (adjustedTotal === 0) {
     return null;
   }
-  const noJust = Math.max(0, party.absentCount - party.justifiedAbsentCount);
   return [
     {
       label: 'DÍAS ASISTIDOS',
-      pct: ((party.attendanceCount / total) * 100).toFixed(1),
-      frac: party.attendanceCount / total,
+      pct: party.avgAttendance.toFixed(1),
+      frac: party.avgAttendance / 100,
       color: C.attendance,
     },
     {
       label: 'FALTAS JUSTIFICADAS',
-      pct: ((party.justifiedAbsentCount / total) * 100).toFixed(1),
-      frac: party.justifiedAbsentCount / total,
+      pct: party.avgValidJust.toFixed(1),
+      frac: party.avgValidJust / 100,
       color: C.justified,
     },
     {
       label: 'FALTAS SIN JUSTIFICACIÓN VÁLIDA',
-      pct: ((party.unjustifiedAbsentCount / total) * 100).toFixed(1),
-      frac: party.unjustifiedAbsentCount / total,
+      pct: party.avgInvalidJust.toFixed(1),
+      frac: party.avgInvalidJust / 100,
       color: C.unjustified,
     },
     {
       label: 'FALTAS SIN JUSTIFICACIÓN',
-      pct: ((noJust / total) * 100).toFixed(1),
-      frac: noJust / total,
+      pct: party.avgNoJust.toFixed(1),
+      frac: party.avgNoJust / 100,
       color: C.noJust,
     },
   ];
