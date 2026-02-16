@@ -49,6 +49,7 @@ export default function GeneralAttendance({
         />
         <select
           value={initialYear}
+          aria-label="Seleccionar año"
           onChange={(e) => {
             window.location.href = `/${e.target.value}`;
           }}

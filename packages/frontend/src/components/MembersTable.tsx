@@ -63,6 +63,9 @@ export default function MembersTable({ members, party }: MembersTableProps) {
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
+                  aria-sort={
+                    sortKey === col.key ? (sortAsc ? 'ascending' : 'descending') : undefined
+                  }
                   className="text-left text-slate-500 dark:text-slate-400 font-medium px-4 py-3 text-xs uppercase tracking-wider cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                 >
                   <span className="inline-flex items-center gap-1">

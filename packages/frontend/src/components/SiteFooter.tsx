@@ -49,7 +49,7 @@ export default function SiteFooter({ year }: SiteFooterProps) {
                   CongresoAbierto
                 </span>
               </div>
-              <p style={{ color: '#666', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+              <p style={{ color: '#9a9a9a', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
                 Plataforma ciudadana de transparencia parlamentaria. Datos públicos para una
                 democracia informada.
               </p>
@@ -72,7 +72,7 @@ export default function SiteFooter({ year }: SiteFooterProps) {
                     <a
                       key={link}
                       href="#"
-                      style={{ color: '#666', fontSize: 13, textDecoration: 'none' }}
+                      style={{ color: '#9a9a9a', fontSize: 13, textDecoration: 'none' }}
                     >
                       {link}
                     </a>
@@ -82,10 +82,14 @@ export default function SiteFooter({ year }: SiteFooterProps) {
             </div>
           </div>
           <div className="footer-bottom" style={{ borderTop: '1px solid #333', paddingTop: 24 }}>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#666' }}>
+            <span
+              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#9a9a9a' }}
+            >
               © {year} CongresoAbierto. Datos de dominio público.
             </span>
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#666' }}>
+            <span
+              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#9a9a9a' }}
+            >
               Hecho con datos del Congreso de la República
             </span>
           </div>
