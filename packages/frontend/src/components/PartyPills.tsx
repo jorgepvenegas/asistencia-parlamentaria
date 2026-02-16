@@ -44,6 +44,7 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
         <select
           value={selectedParty || ''}
           onChange={(e) => onSelect(e.target.value || null)}
+          aria-label="Filtrar por partido"
           className="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600
             bg-slate-50 dark:bg-white/[0.05] text-sm text-slate-900 dark:text-slate-200
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"

@@ -108,57 +108,63 @@ function partySegments(p: Party): Segments {
 
 export default function PartyTable({ parties, memberCounts }: PartyTableProps) {
   return (
-    <div style={{ border: '1px solid #E5E5E5' }}>
+    <div role="table" aria-label="Asistencia por partido" style={{ border: '1px solid #E5E5E5' }}>
       {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: '#F5F5F5',
-          padding: '14px 20px',
-          borderBottom: '1px solid #E5E5E5',
-          gap: 10,
-        }}
-      >
-        {COLS.map(({ label, width }) => (
-          <div key={label} style={{ width, flexShrink: 0 }}>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 1,
-              }}
-            >
-              {label}
-            </span>
-          </div>
-        ))}
+      <div role="rowgroup">
+        <div
+          role="row"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#F5F5F5',
+            padding: '14px 20px',
+            borderBottom: '1px solid #E5E5E5',
+            gap: 10,
+          }}
+        >
+          {COLS.map(({ label, width }) => (
+            <div key={label} role="columnheader" style={{ width, flexShrink: 0 }}>
+              <span
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  letterSpacing: 1,
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Rows */}
-      {parties.map((party) => {
-        const seg = partySegments(party);
-        const attendColor = seg.a >= 80 ? C.attendance : seg.a >= 60 ? C.unjustified : C.noJust;
-        return (
-          <div
-            key={party.partyId}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '14px 20px',
-              borderBottom: '1px solid #E5E5E5',
-              gap: 10,
-            }}
-          >
-            {COLS.map((col) => (
-              <div key={col.label} style={{ width: col.width, flexShrink: 0 }}>
-                {col.render(party, seg, memberCounts, attendColor)}
-              </div>
-            ))}
-          </div>
-        );
-      })}
+      <div role="rowgroup">
+        {parties.map((party) => {
+          const seg = partySegments(party);
+          const attendColor = seg.a >= 80 ? C.attendance : seg.a >= 60 ? C.unjustified : C.noJust;
+          return (
+            <div
+              key={party.partyId}
+              role="row"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '14px 20px',
+                borderBottom: '1px solid #E5E5E5',
+                gap: 10,
+              }}
+            >
+              {COLS.map((col) => (
+                <div key={col.label} role="cell" style={{ width: col.width, flexShrink: 0 }}>
+                  {col.render(party, seg, memberCounts, attendColor)}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
