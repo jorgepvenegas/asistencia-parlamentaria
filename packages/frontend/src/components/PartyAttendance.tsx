@@ -23,7 +23,11 @@ function politicianBarSegments(p: PoliticianAttendance) {
 }
 
 function partyStatCards(party: PartyAttendanceType) {
-  const adjustedTotal = party.attendanceCount + party.unjustifiedAbsentCount + party.absentCount;
+  const adjustedTotal =
+    party.attendanceCount +
+    party.justifiedAbsentCount +
+    party.unjustifiedAbsentCount +
+    party.absentCount;
   if (adjustedTotal === 0) {
     return null;
   }

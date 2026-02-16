@@ -1,7 +1,13 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import LandingPage from '../components/LandingPage';
-import type { PoliticianAttendance, PartyAttendance } from '../types/dashboard';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import SiteHeader from '../../components/SiteHeader';
+import SiteFooter from '../../components/SiteFooter';
+import StatCards from '../../components/StatCards';
+import AttendanceLegend from '../../components/AttendanceLegend';
+import MembersTable from '../../components/MembersTable';
+import { ATTENDANCE_COLORS, PARTY_ABBREV, PARTY_COLORS } from '../../constants/colors';
+import { toPartySlug } from '../../utils/partySlug';
+import type { PoliticianAttendance, PartyAttendance } from '../../types/dashboard';
 import {
   politicianResponseSchema,
   partyResponseSchema,
@@ -14,17 +20,34 @@ import {
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
 
-const yearNum = 2025;
+export function getStaticPaths() {
+  const years = ['2022', '2023', '2024', '2025'];
+  const partySlugs = Array.from(
+    new Set(
+      [...Object.keys(PARTY_ABBREV), ...Object.keys(PARTY_COLORS), 'Sin partido']
+        .map((name) => toPartySlug(name))
+        .filter(Boolean)
+    )
+  );
+
+  return years.flatMap((year) => partySlugs.map((partySlug) => ({ params: { year, partySlug } })));
+}
+
+const yearNum = parseInt(Astro.params.year ?? '', 10);
+const partySlugParam = Astro.params.partySlug ?? '';
+
+if (!Number.isFinite(yearNum) || yearNum < 2022 || !partySlugParam) {
+  return Astro.redirect('/2025');
+}
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
+const C = ATTENDANCE_COLORS;
 
-// Array schemas for validation
 const politiciansArraySchema = z.array(politicianResponseSchema);
 const partiesArraySchema = z.array(partyResponseSchema);
 const attendanceArraySchema = z.array(attendanceYearlyResponseSchema);
 const partyAttendanceArraySchema = z.array(partyAttendanceYearlyResponseSchema);
 
-// Types from schemas
 type ApiPolitician = PoliticianResponse;
 type ApiParty = PartyResponse;
 type ApiAttendance = AttendanceYearlyResponse;
@@ -48,7 +71,6 @@ let partyAttendance: PartyAttendance[] = [];
 let error: string | null = null;
 
 try {
-  // Fetch all data in parallel
   const [politiciansRes, partiesRes, attendanceRes, partyAttendanceRes] = await Promise.all([
     fetch(`${API_URL}/api/politicians`),
     fetch(`${API_URL}/api/parties`),
@@ -71,18 +93,14 @@ try {
       'Party attendance'
     )) ?? [];
 
-  // Create lookup maps
   const politicianMap = new Map(politiciansData.map((p) => [p.id, p]));
   const partyMap = new Map(partiesData.map((p) => [p.id, p]));
 
-  // Transform data for Dashboard
   politicians = attendanceData
     .map((att) => {
       const politician = politicianMap.get(att.politicianId);
       if (!politician) return null;
       const party = partyMap.get(politician.partyId);
-
-      // const totalSessions = att.attendanceCount + att.unjustifiedAbsentCount + att.
 
       const adjustedTotalSessions =
         att.attendanceCount +
@@ -107,7 +125,7 @@ try {
           ? ((att.absentCount / adjustedTotalSessions) * 100).toFixed(2)
           : '0.00';
 
-      const val = {
+      return {
         id: att.politicianId,
         name: politician.name,
         party: party?.name || 'Sin partido',
@@ -122,8 +140,6 @@ try {
         avgNoJust: parseFloat(avgNoJust),
         pct: parseFloat(att.attendanceAverage.toFixed(2)),
       } as PoliticianAttendance;
-
-      return val;
     })
     .filter((p): p is PoliticianAttendance => p !== null);
 
@@ -161,12 +177,36 @@ try {
   error = 'Error connecting to server';
   console.error(err);
 }
+
+const selectedParty =
+  partyAttendance.find((party) => toPartySlug(party.partyName) === partySlugParam) ?? null;
+
+if (!error && !selectedParty) {
+  return Astro.redirect(`/${yearNum}`);
+}
+
+const selectedPartyMembers = selectedParty
+  ? politicians.filter((politician) => politician.partyId === selectedParty.partyId)
+  : [];
+const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
 ---
 
 <DashboardLayout
-  title="QuienAtiende - Asistencia Parlamentaria"
-  description="Transparencia sobre la asistencia de diputados a sesiones parlamentarias"
+  title={`QuienAtiende - ${selectedParty?.partyName ?? 'Detalle partido'}`}
+  description="Detalle de asistencia por partido político"
 >
+  <style>
+    .party-detail-main {
+      max-width: 1536px;
+      margin: 0 auto;
+      padding: 48px 64px;
+    }
+    @media (max-width: 767px) {
+      .party-detail-main {
+        padding: 32px 20px;
+      }
+    }
+  </style>
   {
     error ? (
       <div
@@ -195,38 +235,111 @@ try {
           <p style={{ color: '#777' }}>{error}</p>
         </div>
       </div>
-    ) : politicians.length === 0 ? (
+    ) : (
       <div
         style={{
+          fontFamily: "'Sora', sans-serif",
+          background: '#FAFAFA',
+          color: '#000',
           minHeight: '100vh',
-          background: '#0f0f1a',
-          color: '#e0e0e0',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: "'Source Sans 3', sans-serif",
+          flexDirection: 'column',
         }}
       >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#F4A261', fontWeight: 600 }}>No hay datos disponibles</p>
-          <p style={{ color: '#777' }}>Verifica que el servidor API esté ejecutándose.</p>
-        </div>
+        <SiteHeader client:load />
+
+        <main class="party-detail-main" style={{ flex: 1 }}>
+          <a
+            href={`/${yearNum}`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              border: '1px solid #E5E5E5',
+              padding: '8px 12px',
+              textDecoration: 'none',
+              color: '#5E5E5E',
+              marginBottom: 24,
+              fontSize: 12,
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            ← Volver al resumen anual
+          </a>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <h1 style={{ fontSize: 40, margin: 0, letterSpacing: -2 }}>
+                {selectedParty?.partyName}
+              </h1>
+              <p style={{ margin: '8px 0 0', color: '#5E5E5E', fontSize: 14 }}>
+                Detalle por congresista del partido seleccionado
+              </p>
+            </div>
+            <select
+              aria-label="Seleccionar año"
+              onchange={`window.location.href='/' + this.value + '/${partySlugParam}'`}
+              style={{
+                padding: '10px 16px',
+                border: '1px solid #E5E5E5',
+                background: 'transparent',
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: 'pointer',
+                appearance: 'auto',
+              }}
+            >
+              {AVAILABLE_YEARS.map((y) => (
+                <option key={y} value={y} selected={y === yearNum}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedParty && (
+            <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+              <StatCards
+                cards={[
+                  {
+                    label: 'ASISTENCIA PROMEDIO',
+                    pct: selectedParty.avgAttendance.toFixed(1),
+                    frac: selectedParty.avgAttendance / 100,
+                    color: C.attendance,
+                  },
+                  {
+                    label: 'FALTAS JUSTIFICADAS',
+                    pct: selectedParty.avgValidJust.toFixed(1),
+                    frac: selectedParty.avgValidJust / 100,
+                    color: C.justified,
+                  },
+                  {
+                    label: 'FALTAS SIN JUSTIFICACIÓN VÁLIDA',
+                    pct: selectedParty.avgInvalidJust.toFixed(1),
+                    frac: selectedParty.avgInvalidJust / 100,
+                    color: C.unjustified,
+                  },
+                  {
+                    label: 'FALTAS SIN JUSTIFICACIÓN',
+                    pct: selectedParty.avgNoJust.toFixed(1),
+                    frac: selectedParty.avgNoJust / 100,
+                    color: C.noJust,
+                  },
+                ]}
+              />
+
+              <AttendanceLegend />
+              <MembersTable
+                client:load
+                members={selectedPartyMembers}
+                party={selectedParty.partyName}
+              />
+            </div>
+          )}
+        </main>
+
+        <SiteFooter year={yearNum} />
       </div>
-    ) : (
-      <LandingPage
-        client:load
-        politicians={politicians}
-        partyAttendance={partyAttendance}
-        initialYear={yearNum}
-      />
     )
   }
 </DashboardLayout>
