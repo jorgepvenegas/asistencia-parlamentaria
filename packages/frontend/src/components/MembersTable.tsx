@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PoliticianAttendance } from '../types/dashboard';
 import { CARD_CLASS } from '../constants/styles';
+import { formatName } from '@/utils/formatName';
 
 type SortKey =
   | 'name'
@@ -87,7 +88,7 @@ export default function MembersTable({ members, party }: MembersTableProps) {
                 className="border-b border-slate-100 dark:border-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
               >
                 <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">
-                  {d.name}
+                  {formatName(d.name)}
                 </td>
                 <td className="px-4 py-3 tabular-nums text-slate-900 dark:text-white">
                   {d.attendanceCount}
