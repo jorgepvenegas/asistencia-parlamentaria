@@ -3,8 +3,6 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import StatCards from '../../components/StatCards';
-import AttendanceLegend from '../../components/AttendanceLegend';
-import MembersTable from '../../components/MembersTable';
 import { ATTENDANCE_COLORS, PARTY_ABBREV, PARTY_COLORS } from '../../constants/colors';
 import { toPartySlug } from '../../utils/partySlug';
 import type { PoliticianAttendance, PartyAttendance } from '../../types/dashboard';
@@ -19,6 +17,8 @@ import {
   type PartyAttendanceYearlyResponse,
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
+import MembersTableV2 from '@/components/MembersTableV2';
+import SectionHeader from '@/components/SectionHeader';
 
 export function getStaticPaths() {
   const years = ['2022', '2023', '2024', '2025'];
@@ -267,14 +267,19 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
             ← Volver al resumen anual
           </a>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '20px',
+              alignItems: 'flex-start',
+              padding: '30px 0 40px',
+            }}
+          >
             <div>
-              <h1 style={{ fontSize: 40, margin: 0, letterSpacing: -2 }}>
-                {selectedParty?.partyName}
-              </h1>
-              <p style={{ margin: '8px 0 0', color: '#5E5E5E', fontSize: 14 }}>
-                Detalle por congresista del partido seleccionado
-              </p>
+              <SectionHeader
+                title={selectedParty?.partyName ?? ''}
+                description={`Totales de asistencia anual por miembro de partido`}
+              />
             </div>
             <select
               aria-label="Seleccionar año"
@@ -328,12 +333,18 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
                 ]}
               />
 
-              <AttendanceLegend />
-              <MembersTable
+              {/* <AttendanceLegend /> */}
+              <MembersTableV2
                 client:load
                 members={selectedPartyMembers}
                 party={selectedParty.partyName}
+                showPct={false}
               />
+              {/* <MembersTable
+                client:load
+                members={selectedPartyMembers}
+                party={selectedParty.partyName}
+              /> */}
             </div>
           )}
         </main>
