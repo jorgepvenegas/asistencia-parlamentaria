@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import type { PartyAttendance } from "../types/dashboard";
-import { ATTENDANCE_COLORS } from "../constants/colors";
-import StatCards from "./StatCards";
-import PartyComparisonChart from "./PartyComparisonChart";
-import SectionHeader from "./SectionHeader";
+import { useMemo } from 'react';
+import type { PartyAttendance } from '../types/dashboard';
+import { ATTENDANCE_COLORS } from '../constants/colors';
+import StatCards from './StatCards';
+import PartyComparisonChart from './PartyComparisonChart';
+import SectionHeader from './SectionHeader';
 
 interface GeneralAttendanceProps {
   partyAttendance: PartyAttendance[];
@@ -12,21 +12,21 @@ interface GeneralAttendanceProps {
 
 const C: typeof ATTENDANCE_COLORS = ATTENDANCE_COLORS;
 
-
 export default function GeneralAttendance({
   partyAttendance,
   initialYear,
 }: GeneralAttendanceProps) {
-
   // console.table(sorted[1]);
 
   const overall = useMemo(() => {
     const totalAttend = partyAttendance.reduce((s, p) => s + p.attendanceCount, 0);
-    const totalJust   = partyAttendance.reduce((s, p) => s + p.justifiedAbsentCount, 0);
+    const totalJust = partyAttendance.reduce((s, p) => s + p.justifiedAbsentCount, 0);
     const totalUnjust = partyAttendance.reduce((s, p) => s + p.unjustifiedAbsentCount, 0);
     const totalAbsent = partyAttendance.reduce((s, p) => s + p.absentCount, 0);
     const adjustedTotal = totalAttend + totalUnjust + totalAbsent;
-    if (adjustedTotal === 0) { return null; }
+    if (adjustedTotal === 0) {
+      return null;
+    }
     return {
       attendPct: ((totalAttend / adjustedTotal) * 100).toFixed(1),
       attendFrac: totalAttend / adjustedTotal,
@@ -40,28 +40,32 @@ export default function GeneralAttendance({
   }, [partyAttendance]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Section header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <SectionHeader
           title="Asistencia general"
           description="Resumen de asistencia a sesiones de sala de todos los diputados"
         />
         <select
           value={initialYear}
-          onChange={(e) => { window.location.href = `/${e.target.value}`; }}
+          onChange={(e) => {
+            window.location.href = `/${e.target.value}`;
+          }}
           style={{
-            padding: "10px 16px",
-            border: "1px solid #E5E5E5",
-            background: "transparent",
+            padding: '10px 16px',
+            border: '1px solid #E5E5E5',
+            background: 'transparent',
             fontSize: 12,
             fontWeight: 500,
-            cursor: "pointer",
-            appearance: "auto",
+            cursor: 'pointer',
+            appearance: 'auto',
           }}
         >
           {[2025, 2024, 2023, 2022].map((y) => (
-            <option key={y} value={y}>{y}</option>
+            <option key={y} value={y}>
+              {y}
+            </option>
           ))}
         </select>
       </div>
@@ -73,10 +77,30 @@ export default function GeneralAttendance({
       {overall && (
         <StatCards
           cards={[
-            { label: "ASISTENCIA PROMEDIO", pct: overall.attendPct, frac: overall.attendFrac, color: C.attendance },
-            { label: "FALTAS JUSTIFICADAS", pct: overall.justPct, frac: overall.justFrac, color: C.justified },
-            { label: "FALTAS SIN JUSTIFICACIÓN VÁLIDA", pct: overall.unjustPct, frac: overall.unjustFrac, color: C.unjustified },
-            { label: "FALTAS SIN JUSTIFICACIÓN", pct: overall.noJustPct, frac: overall.noJustFrac, color: C.noJust },
+            {
+              label: 'ASISTENCIA PROMEDIO',
+              pct: overall.attendPct,
+              frac: overall.attendFrac,
+              color: C.attendance,
+            },
+            {
+              label: 'FALTAS JUSTIFICADAS',
+              pct: overall.justPct,
+              frac: overall.justFrac,
+              color: C.justified,
+            },
+            {
+              label: 'FALTAS SIN JUSTIFICACIÓN VÁLIDA',
+              pct: overall.unjustPct,
+              frac: overall.unjustFrac,
+              color: C.unjustified,
+            },
+            {
+              label: 'FALTAS SIN JUSTIFICACIÓN',
+              pct: overall.noJustPct,
+              frac: overall.noJustFrac,
+              color: C.noJust,
+            },
           ]}
         />
       )}

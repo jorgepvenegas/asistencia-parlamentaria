@@ -16,10 +16,13 @@ const partiesRoute = new Hono()
       });
     } catch (error) {
       console.error('Error fetching parties:', error);
-      return c.json({
-        error: 'Failed to fetch parties',
-        statusCode: 500,
-      }, 500);
+      return c.json(
+        {
+          error: 'Failed to fetch parties',
+          statusCode: 500,
+        },
+        500
+      );
     }
   })
   .post('/parties', zValidator('json', createPartySchema), async (c) => {
@@ -34,23 +37,32 @@ const partiesRoute = new Hono()
         .limit(1);
 
       if (existing.length > 0) {
-        return c.json({
-          data: existing[0],
-          statusCode: 200,
-        }, 200);
+        return c.json(
+          {
+            data: existing[0],
+            statusCode: 200,
+          },
+          200
+        );
       }
 
       // Party doesn't exist, create it
-      const result = await db.insert(partiesTable).values({
-        name,
-        slug,
-        abbreviation,
-      }).returning();
+      const result = await db
+        .insert(partiesTable)
+        .values({
+          name,
+          slug,
+          abbreviation,
+        })
+        .returning();
 
-      return c.json({
-        data: result[0],
-        statusCode: 201,
-      }, 201);
+      return c.json(
+        {
+          data: result[0],
+          statusCode: 201,
+        },
+        201
+      );
     } catch (error) {
       console.error('Error creating party:', error);
       throw error;
@@ -67,10 +79,13 @@ const partiesRoute = new Hono()
         .limit(1);
 
       if (party.length === 0) {
-        return c.json({
-          error: 'Party not found',
-          statusCode: 404,
-        }, 404);
+        return c.json(
+          {
+            error: 'Party not found',
+            statusCode: 404,
+          },
+          404
+        );
       }
 
       return c.json({
@@ -81,6 +96,6 @@ const partiesRoute = new Hono()
       console.error('Error fetching party:', error);
       throw error;
     }
-  })
+  });
 
 export default partiesRoute;

@@ -32,8 +32,8 @@ export default function StatCards({ cards }: StatCardsProps) {
             className="stat-card"
             style={{
               padding: 24,
-              display: "flex",
-              flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
               gap: 12,
             }}
           >
@@ -42,16 +42,16 @@ export default function StatCards({ cards }: StatCardsProps) {
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 11,
                 fontWeight: 500,
-                color: "#5E5E5E",
+                color: '#5E5E5E',
                 letterSpacing: 1,
               }}
             >
               {label}
             </span>
-            <span style={{ fontSize: 36, fontWeight: 600, letterSpacing: -2, color: "#000" }}>
+            <span style={{ fontSize: 36, fontWeight: 600, letterSpacing: -2, color: '#000' }}>
               {pct}%
             </span>
-            <div style={{ background: "#E5E5E5", height: 4 }}>
+            <div style={{ background: '#E5E5E5', height: 4 }}>
               <div style={{ background: color, height: 4, width: `${frac * 100}%` }} />
             </div>
           </div>

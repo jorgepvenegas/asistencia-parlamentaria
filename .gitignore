@@ -71,3 +71,5 @@ api/db/data/
 .AppleDouble/
 .LSOverride/
 ._*
+
+*.pen

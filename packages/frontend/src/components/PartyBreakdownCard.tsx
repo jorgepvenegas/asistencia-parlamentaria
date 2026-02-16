@@ -1,12 +1,6 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { getPartyColor } from "../constants/colors";
-import { CARD_CLASS, TOOLTIP_CLASS } from "../constants/styles";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { getPartyColor } from '../constants/colors';
+import { CARD_CLASS, TOOLTIP_CLASS } from '../constants/styles';
 
 interface PieEntry {
   name: string;
@@ -26,22 +20,21 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
   return (
     <div className={CARD_CLASS}>
       {/* Header */}
-      <div
-        className="border-l-4 pl-3 mb-4 sm:mb-6"
-        style={{ borderColor: partyColor }}
-      >
+      <div className="border-l-4 pl-3 mb-4 sm:mb-6" style={{ borderColor: partyColor }}>
         <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
           {party}
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Distribución de días totales
-        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Distribución de días totales</p>
       </div>
 
       <div className="flex flex-row items-start gap-4 sm:gap-8">
         {/* Donut */}
         <div className="shrink-0">
-          <div className="w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]" role="img" aria-label={`Gráfico circular de asistencia para ${party}`}>
+          <div
+            className="w-[140px] h-[140px] sm:w-[240px] sm:h-[240px]"
+            role="img"
+            aria-label={`Gráfico circular de asistencia para ${party}`}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -60,14 +53,18 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload || !payload.length) {
-                      return null
+                      return null;
                     }
                     const d = payload[0].payload as PieEntry;
-                    const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
+                    const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0';
                     return (
                       <div className={TOOLTIP_CLASS}>
-                        <span className="font-semibold text-slate-900 dark:text-white">{d.name}</span>
-                        <span className="text-slate-500 dark:text-slate-400 ml-2">{d.value} ({pct}%)</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          {d.name}
+                        </span>
+                        <span className="text-slate-500 dark:text-slate-400 ml-2">
+                          {d.value} ({pct}%)
+                        </span>
                       </div>
                     );
                   }}
@@ -80,7 +77,7 @@ export default function PartyBreakdownCard({ party, pieData }: PartyBreakdownCar
         {/* Legend */}
         <div className="flex flex-col gap-2 sm:gap-3 min-w-0 sm:min-w-[180px]">
           {pieData.map((d) => {
-            const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : "0";
+            const pct = total > 0 ? ((d.value / total) * 100).toFixed(1) : '0';
             return (
               <div key={d.name} className="flex items-center gap-3">
                 <span

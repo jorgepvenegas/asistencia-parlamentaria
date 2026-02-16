@@ -16,57 +16,74 @@ export default function HoverTooltip({ x, y, title, subheader, rows }: HoverTool
   return (
     <div
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: y + 16,
         left: x + 16,
-        background: "#FFF",
-        color: "#000",
-        border: "1px solid #E5E5E5",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        padding: "12px 16px",
-        pointerEvents: "none",
+        background: '#FFF',
+        color: '#000',
+        border: '1px solid #E5E5E5',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        padding: '12px 16px',
+        pointerEvents: 'none',
         zIndex: 1000,
         minWidth: 200,
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         gap: 8,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <span
-        style={{
-          fontFamily: "'Sora', sans-serif",
-          fontSize: 12,
-          fontWeight: 600,
-          paddingBottom: 2,
-          color: "#000",
-        }}
-      >
-        {title}
-      </span>
-      <span
-        style={{
-          fontFamily: "'Sora', sans-serif",
-          fontSize: 12,
-          fontWeight: 600,
-          marginBottom: 4,
-          borderBottom: "1px solid #E5E5E5",
-          paddingBottom: 8,
-          color: "#5E5E5E",
-        }}
-      >
-        {subheader}
-      </span>
+          style={{
+            fontFamily: "'Sora', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            paddingBottom: 2,
+            color: '#000',
+          }}
+        >
+          {title}
+        </span>
+        <span
+          style={{
+            fontFamily: "'Sora', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            marginBottom: 4,
+            borderBottom: '1px solid #E5E5E5',
+            paddingBottom: 8,
+            color: '#5E5E5E',
+          }}
+        >
+          {subheader}
+        </span>
       </div>
       {rows.map(({ label, value, color }) => (
-        <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 24, alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div
+          key={label}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 24,
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 8, height: 8, background: color, flexShrink: 0 }} />
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: "#5E5E5E" }}>
+            <span
+              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#5E5E5E' }}
+            >
               {label}
             </span>
           </div>
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, fontWeight: 600, color: "#000" }}>
+          <span
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#000',
+            }}
+          >
             {value}
           </span>
         </div>

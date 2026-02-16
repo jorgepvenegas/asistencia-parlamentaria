@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -8,10 +8,10 @@ import {
   ResponsiveContainer,
   LabelList,
   Cell,
-} from "recharts";
-import { getPartyAbbrev, ATTENDANCE_CATEGORIES } from "../constants/colors";
-import { CARD_CLASS, TOOLTIP_CLASS } from "../constants/styles";
-import { useIsMobile } from "../hooks/useIsMobile";
+} from 'recharts';
+import { getPartyAbbrev, ATTENDANCE_CATEGORIES } from '../constants/colors';
+import { CARD_CLASS, TOOLTIP_CLASS } from '../constants/styles';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface PartyAggregate {
   party: string;
@@ -29,21 +29,21 @@ interface PartyStackedBarsProps {
   onSelectParty: (party: string | null) => void;
 }
 
-type CategoryKey = "pctAttendance" | "pctValid" | "pctInvalid" | "pctNoJust";
-type RawKey = "totalAttendance" | "totalValid" | "totalInvalid" | "totalNoJust";
+type CategoryKey = 'pctAttendance' | 'pctValid' | 'pctInvalid' | 'pctNoJust';
+type RawKey = 'totalAttendance' | 'totalValid' | 'totalInvalid' | 'totalNoJust';
 
-const RAW_KEY_MAP: Record<typeof ATTENDANCE_CATEGORIES[number]["key"], RawKey> = {
-  attendance: "totalAttendance",
-  justified: "totalValid",
-  unjustified: "totalInvalid",
-  noJustification: "totalNoJust",
+const RAW_KEY_MAP: Record<(typeof ATTENDANCE_CATEGORIES)[number]['key'], RawKey> = {
+  attendance: 'totalAttendance',
+  justified: 'totalValid',
+  unjustified: 'totalInvalid',
+  noJustification: 'totalNoJust',
 };
 
-const PCT_KEY_MAP: Record<typeof ATTENDANCE_CATEGORIES[number]["key"], CategoryKey> = {
-  attendance: "pctAttendance",
-  justified: "pctValid",
-  unjustified: "pctInvalid",
-  noJustification: "pctNoJust",
+const PCT_KEY_MAP: Record<(typeof ATTENDANCE_CATEGORIES)[number]['key'], CategoryKey> = {
+  attendance: 'pctAttendance',
+  justified: 'pctValid',
+  unjustified: 'pctInvalid',
+  noJustification: 'pctNoJust',
 };
 
 const CATEGORIES = ATTENDANCE_CATEGORIES.map((cat) => ({
@@ -68,22 +68,30 @@ interface ChartRow {
   visiblePct: number;
 }
 
-export default function PartyStackedBars({ data, selectedParty, onSelectParty }: PartyStackedBarsProps) {
+export default function PartyStackedBars({
+  data,
+  selectedParty,
+  onSelectParty,
+}: PartyStackedBarsProps) {
   const isMobile = useIsMobile();
   const [activeCategories, setActiveCategories] = useState<Set<CategoryKey>>(new Set());
 
   const toggleCategory = (key: CategoryKey) => {
     setActiveCategories((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) { next.delete(key); }
-      else { next.add(key); }
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
       return next;
     });
   };
 
-  const visibleCategories = activeCategories.size === 0
-    ? CATEGORIES
-    : CATEGORIES.filter((c) => activeCategories.has(c.key));
+  const visibleCategories =
+    activeCategories.size === 0
+      ? CATEGORIES
+      : CATEGORIES.filter((c) => activeCategories.has(c.key));
 
   const chartData = [...data]
     .map((p) => {
@@ -105,12 +113,18 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
     .map((row) => ({
       ...row,
       visiblePct: parseFloat(
-        visibleCategories.map((c) => row[c.key]).reduce((a, b) => a + b, 0).toFixed(1)
+        visibleCategories
+          .map((c) => row[c.key])
+          .reduce((a, b) => a + b, 0)
+          .toFixed(1)
       ),
     }))
     .sort((a, b) => {
-      const attendanceVisible = activeCategories.size === 0 || activeCategories.has("pctAttendance");
-      if (attendanceVisible) { return b.pctAttendance - a.pctAttendance; }
+      const attendanceVisible =
+        activeCategories.size === 0 || activeCategories.has('pctAttendance');
+      if (attendanceVisible) {
+        return b.pctAttendance - a.pctAttendance;
+      }
       return b.visiblePct - a.visiblePct;
     })
     .filter((d) => !selectedParty || d.name === selectedParty);
@@ -120,7 +134,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
   return (
     <div className={CARD_CLASS}>
       <h2 className="font-display text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white mb-1">
-        {selectedParty ? `Asistencia — ${selectedParty}` : "Asistencia por Partido"}
+        {selectedParty ? `Asistencia — ${selectedParty}` : 'Asistencia por Partido'}
       </h2>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
         Distribución de días por categoría · Ordenado por % asistencia
@@ -138,9 +152,10 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
               className={`
                 flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border transition-all
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400
-                ${isActive
-                  ? "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-white/[0.05]"
-                  : "border-slate-200 dark:border-white/[0.06] text-slate-400 dark:text-slate-500 opacity-60"
+                ${
+                  isActive
+                    ? 'border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-white/[0.05]'
+                    : 'border-slate-200 dark:border-white/[0.06] text-slate-400 dark:text-slate-500 opacity-60'
                 }
               `}
             >
@@ -154,12 +169,21 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
         })}
       </div>
 
-      <div role="img" aria-label="Gráfico de barras horizontales apiladas mostrando asistencia por partido">
+      <div
+        role="img"
+        aria-label="Gráfico de barras horizontales apiladas mostrando asistencia por partido"
+      >
         <ResponsiveContainer width="100%" height={chartHeight}>
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 0, right: activeCategories.size > 0 && activeCategories.size < CATEGORIES.length ? 60 : 8, left: 8, bottom: 0 }}
+            margin={{
+              top: 0,
+              right:
+                activeCategories.size > 0 && activeCategories.size < CATEGORIES.length ? 60 : 8,
+              left: 8,
+              bottom: 0,
+            }}
           >
             <XAxis type="number" domain={[0, 100]} hide />
             <YAxis
@@ -178,8 +202,8 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                     textAnchor="end"
                     className={`text-xs sm:text-sm fill-current ${
                       isSelected
-                        ? "text-slate-700 dark:text-slate-200 font-medium"
-                        : "text-slate-400 dark:text-slate-600"
+                        ? 'text-slate-700 dark:text-slate-200 font-medium'
+                        : 'text-slate-400 dark:text-slate-600'
                     }`}
                   >
                     {getPartyAbbrev(payload.value)}
@@ -190,7 +214,9 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
             {!isMobile && (
               <Tooltip
                 content={({ active, payload }) => {
-                  if (!active || !payload || !payload.length) { return null; }
+                  if (!active || !payload || !payload.length) {
+                    return null;
+                  }
                   const d = payload[0].payload as ChartRow;
                   return (
                     <div className={TOOLTIP_CLASS}>
@@ -198,7 +224,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                         {d.name}
                       </div>
                       <div className="text-slate-500 dark:text-slate-400 text-xs mb-2">
-                        {d.count} miembro{d.count > 1 ? "s" : ""} · {d.avgPct}% asistencia
+                        {d.count} miembro{d.count > 1 ? 's' : ''} · {d.avgPct}% asistencia
                       </div>
                       {visibleCategories.map((cat) => (
                         <div key={cat.key} className="flex items-center gap-2 py-0.5">
@@ -218,7 +244,7 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                     </div>
                   );
                 }}
-                cursor={{ fill: "rgba(0,0,0,0.04)" }}
+                cursor={{ fill: 'rgba(0,0,0,0.04)' }}
               />
             )}
             {visibleCategories.map((cat, idx) => {
@@ -243,26 +269,25 @@ export default function PartyStackedBars({ data, selectedParty, onSelectParty }:
                   {chartData.map((entry, i) => (
                     <Cell
                       key={i}
-                      fillOpacity={
-                        selectedParty && selectedParty !== entry.name ? 0.3 : 0.85
-                      }
+                      fillOpacity={selectedParty && selectedParty !== entry.name ? 0.3 : 0.85}
                     />
                   ))}
-                  {isLast && activeCategories.size > 0 && activeCategories.size < CATEGORIES.length && (
-                    <LabelList
-                      dataKey="visiblePct"
-                      position="right"
-                      formatter={(val: number) => `${val}%`}
-                      className="fill-slate-600 dark:fill-slate-300 text-xs font-medium"
-                    />
-                  )}
+                  {isLast &&
+                    activeCategories.size > 0 &&
+                    activeCategories.size < CATEGORIES.length && (
+                      <LabelList
+                        dataKey="visiblePct"
+                        position="right"
+                        formatter={(val: number) => `${val}%`}
+                        className="fill-slate-600 dark:fill-slate-300 text-xs font-medium"
+                      />
+                    )}
                 </Bar>
               );
             })}
           </BarChart>
         </ResponsiveContainer>
       </div>
-
     </div>
   );
 }

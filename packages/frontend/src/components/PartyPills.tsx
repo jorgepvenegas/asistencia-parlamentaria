@@ -1,5 +1,5 @@
-import { getPartyColor } from "../constants/colors";
-import { CARD_CLASS } from "../constants/styles";
+import { getPartyColor } from '../constants/colors';
+import { CARD_CLASS } from '../constants/styles';
 
 interface PartyInfo {
   party: string;
@@ -25,7 +25,13 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
             className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500
               hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
             Limpiar
@@ -36,7 +42,7 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
       {/* Mobile: dropdown */}
       <div className="sm:hidden">
         <select
-          value={selectedParty || ""}
+          value={selectedParty || ''}
           onChange={(e) => onSelect(e.target.value || null)}
           className="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600
             bg-slate-50 dark:bg-white/[0.05] text-sm text-slate-900 dark:text-slate-200
@@ -66,8 +72,8 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
                 focus-within:ring-2 focus-within:ring-offset-2
               `}
               style={{
-                backgroundColor: isActive ? color + "22" : undefined,
-                borderColor: isActive ? color : color + "44",
+                backgroundColor: isActive ? color + '22' : undefined,
+                borderColor: isActive ? color : color + '44',
               }}
             >
               <input
@@ -80,25 +86,26 @@ export default function PartyPills({ parties, selectedParty, onSelect }: PartyPi
                 className="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors duration-200"
                 style={{
                   borderColor: color,
-                  backgroundColor: isActive ? color : "transparent",
+                  backgroundColor: isActive ? color : 'transparent',
                 }}
               >
                 {isActive && (
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg
+                    className="w-3 h-3 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </span>
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: color }}
-              />
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
               <span className="truncate" style={{ color: isActive ? color : undefined }}>
                 {p.party}
               </span>
-              <span className="ml-auto text-xs text-slate-400 shrink-0">
-                {p.count}
-              </span>
+              <span className="ml-auto text-xs text-slate-400 shrink-0">{p.count}</span>
             </label>
           );
         })}

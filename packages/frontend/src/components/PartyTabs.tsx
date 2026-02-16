@@ -10,16 +10,16 @@ interface PartyTabsProps {
 
 export default function PartyTabs({ parties, memberCounts }: PartyTabsProps) {
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {parties.map((party) => (
         <div
           key={party.partyId}
           style={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 8,
-            padding: "10px 20px",
-            border: "1px solid #E5E5E5",
+            padding: '10px 20px',
+            border: '1px solid #E5E5E5',
           }}
         >
           <span
@@ -27,7 +27,7 @@ export default function PartyTabs({ parties, memberCounts }: PartyTabsProps) {
               fontFamily: "'Sora', sans-serif",
               fontSize: 12,
               fontWeight: 500,
-              color: "#5E5E5E",
+              color: '#5E5E5E',
             }}
           >
             {party.partyName}
@@ -36,7 +36,7 @@ export default function PartyTabs({ parties, memberCounts }: PartyTabsProps) {
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 11,
-              color: "#999",
+              color: '#999',
             }}
           >
             {memberCounts[party.partyName] || 0}

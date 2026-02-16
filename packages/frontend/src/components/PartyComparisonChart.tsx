@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
-import { ATTENDANCE_COLORS } from "../constants/colors";
-import AttendanceLegend from "./AttendanceLegend";
-import HoverTooltip from "./HoverTooltip";
-import SectionHeader from "./SectionHeader";
+import { useMemo, useState } from 'react';
+import { ATTENDANCE_COLORS } from '../constants/colors';
+import AttendanceLegend from './AttendanceLegend';
+import HoverTooltip from './HoverTooltip';
+import SectionHeader from './SectionHeader';
 
 const MOBILE_PREVIEW = 7;
 
@@ -42,8 +42,11 @@ interface PartyComparisonChartProps {
 }
 
 function partySegments(p: Party) {
-  const total = p.attendanceCount + p.absentCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount;
-  if (total === 0) { return { a: 0, b: 0, c: 0, d: 0 }; }
+  const total =
+    p.attendanceCount + p.absentCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount;
+  if (total === 0) {
+    return { a: 0, b: 0, c: 0, d: 0 };
+  }
   return {
     a: (p.attendanceCount / total) * 100,
     b: (p.justifiedAbsentCount / total) * 100,
@@ -55,10 +58,10 @@ function partySegments(p: Party) {
 const C = ATTENDANCE_COLORS;
 
 const TOOLTIP_ROWS: { label: string; key: keyof Party; color: string }[] = [
-  { label: "Asistencia",                    key: "attendanceCount",        color: C.attendance  },
-  { label: "Falta justificada",             key: "justifiedAbsentCount",   color: C.justified   },
-  { label: "Falta sin just. válida",        key: "unjustifiedAbsentCount", color: C.unjustified },
-  { label: "Falta sin justificación",       key: "absentCount",            color: C.noJust      },
+  { label: 'Asistencia', key: 'attendanceCount', color: C.attendance },
+  { label: 'Falta justificada', key: 'justifiedAbsentCount', color: C.justified },
+  { label: 'Falta sin just. válida', key: 'unjustifiedAbsentCount', color: C.unjustified },
+  { label: 'Falta sin justificación', key: 'absentCount', color: C.noJust },
 ];
 
 export default function PartyComparisonChart({ parties }: PartyComparisonChartProps) {
@@ -68,7 +71,8 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
 
   const partiesSorted = useMemo(() => {
     const attendancePct = (p: Party) => {
-      const total = p.attendanceCount + p.absentCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount;
+      const total =
+        p.attendanceCount + p.absentCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount;
       return total === 0 ? 0 : p.attendanceCount / total;
     };
     return [...parties].sort((a, b) =>
@@ -79,7 +83,7 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
   return (
     <>
       <style>{CHART_RESPONSIVE}</style>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <SectionHeader
           title="Asistencia por partidos"
           description="Días de asistencias, ausentes con y sin justificación de todos miembros por partido político:"
@@ -88,29 +92,29 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
           onClick={() => setAsc((v) => !v)}
           style={{
             flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 4,
-            border: "1px solid #E5E5E5",
-            background: "none",
-            cursor: "pointer",
-            padding: "6px 10px",
+            border: '1px solid #E5E5E5',
+            background: 'none',
+            cursor: 'pointer',
+            padding: '6px 10px',
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: 11,
             fontWeight: 500,
-            color: "#5E5E5E",
+            color: '#5E5E5E',
           }}
         >
-          {asc ? "↑ Menor a mayor" : "↓ Mayor a menor"}
+          {asc ? '↑ Menor a mayor' : '↓ Mayor a menor'}
         </button>
       </div>
       <AttendanceLegend />
       <div
         className="chart-container"
         style={{
-          border: "1px solid #E5E5E5",
-          display: "flex",
-          flexDirection: "column",
+          border: '1px solid #E5E5E5',
+          display: 'flex',
+          flexDirection: 'column',
           gap: 16,
         }}
       >
@@ -120,28 +124,32 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
             <div
               key={party.partyId}
               className="chart-row"
-              style={{ display: "flex", alignItems: "center", gap: 12, cursor: "default" }}
-              onMouseMove={(e) => { setTooltip({ party, x: e.clientX, y: e.clientY }); }}
-              onMouseLeave={() => { setTooltip(null); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'default' }}
+              onMouseMove={(e) => {
+                setTooltip({ party, x: e.clientX, y: e.clientY });
+              }}
+              onMouseLeave={() => {
+                setTooltip(null);
+              }}
             >
               <span
                 className="chart-party-name"
                 style={{
                   fontSize: 12,
                   fontWeight: 500,
-                  color: "#000",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  color: '#000',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {party.partyName}
               </span>
               <div className="chart-row-bar">
-                <div style={{ flex: seg.a, background: C.attendance, height: "100%" }} />
-                <div style={{ flex: seg.b, background: C.justified, height: "100%" }} />
-                <div style={{ flex: seg.c, background: C.unjustified, height: "100%" }} />
-                <div style={{ flex: seg.d, background: C.noJust, height: "100%" }} />
+                <div style={{ flex: seg.a, background: C.attendance, height: '100%' }} />
+                <div style={{ flex: seg.b, background: C.justified, height: '100%' }} />
+                <div style={{ flex: seg.c, background: C.unjustified, height: '100%' }} />
+                <div style={{ flex: seg.d, background: C.noJust, height: '100%' }} />
               </div>
               <span
                 className="chart-row-pct"
@@ -161,18 +169,18 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
             className="chart-expand-btn"
             onClick={() => setExpanded(true)}
             style={{
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "14px 16px",
-              background: "none",
-              border: "none",
-              borderTop: "1px solid #E5E5E5",
-              cursor: "pointer",
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '14px 16px',
+              background: 'none',
+              border: 'none',
+              borderTop: '1px solid #E5E5E5',
+              cursor: 'pointer',
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 12,
               fontWeight: 600,
-              color: "#000",
-              width: "100%",
+              color: '#000',
+              width: '100%',
             }}
           >
             Ver todos ({partiesSorted.length - MOBILE_PREVIEW} más)
