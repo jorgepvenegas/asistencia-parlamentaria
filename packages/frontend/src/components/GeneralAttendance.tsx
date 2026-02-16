@@ -51,19 +51,23 @@ export default function GeneralAttendance({
           title="Asistencia general"
           description="Resumen de asistencia a sesiones de sala de todos los diputados"
         />
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "10px 16px",
-              border: "1px solid #E5E5E5",
-            }}
-          >
-            <span style={{ fontSize: 12, fontWeight: 500 }}>{initialYear}</span>
-          </div>
-        </div>
+        <select
+          value={initialYear}
+          onChange={(e) => { window.location.href = `/${e.target.value}`; }}
+          style={{
+            padding: "10px 16px",
+            border: "1px solid #E5E5E5",
+            background: "transparent",
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            appearance: "auto",
+          }}
+        >
+          {[2025, 2024, 2023, 2022].map((y) => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
       </div>
 
       {/* Party tabs (informational, no selection) */}
