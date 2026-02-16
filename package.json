@@ -28,6 +28,10 @@
     "packages/frontend/src/**/*.{ts,tsx,astro}": [
       "prettier --write",
       "eslint --fix"
+    ],
+    "packages/api/src/**/*.ts": [
+      "prettier --write",
+      "eslint --fix"
     ]
   }
 }

@@ -2,7 +2,12 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { and, eq, sum, sql } from 'drizzle-orm';
 import 'dotenv/config';
-import { attendanceMonthlyTable, attendanceYearlyTable, politiciansTable, partiesTable } from '../db/schema.js';
+import {
+  attendanceMonthlyTable,
+  attendanceYearlyTable,
+  politiciansTable,
+  partiesTable,
+} from '../db/schema.js';
 import { db } from '../db/index.js';
 import {
   createAttendanceMonthlySchema,
@@ -18,16 +23,19 @@ const monthlyRoute = new Hono()
       const { year, month } = c.req.valid('query');
 
       if (year && month) {
-        const records = await db.select().from(attendanceMonthlyTable)
-          .where(and(
-            eq(attendanceMonthlyTable.year, year),
-            eq(attendanceMonthlyTable.month, month)
-          ));
+        const records = await db
+          .select()
+          .from(attendanceMonthlyTable)
+          .where(
+            and(eq(attendanceMonthlyTable.year, year), eq(attendanceMonthlyTable.month, month))
+          );
         return c.json({ data: records, statusCode: 200 });
       }
 
       if (year) {
-        const records = await db.select().from(attendanceMonthlyTable)
+        const records = await db
+          .select()
+          .from(attendanceMonthlyTable)
           .where(eq(attendanceMonthlyTable.year, year));
         return c.json({ data: records, statusCode: 200 });
       }
@@ -43,22 +51,29 @@ const monthlyRoute = new Hono()
     try {
       const data = c.req.valid('json');
 
-      const existing = await db.select().from(attendanceMonthlyTable)
-        .where(and(
-          eq(attendanceMonthlyTable.politicianId, data.politicianId),
-          eq(attendanceMonthlyTable.year, data.year),
-          eq(attendanceMonthlyTable.month, data.month)
-        ))
-        .limit(1);
-
-      if (existing.length > 0) {
-        const updated = await db.update(attendanceMonthlyTable)
-          .set(data)
-          .where(and(
+      const existing = await db
+        .select()
+        .from(attendanceMonthlyTable)
+        .where(
+          and(
             eq(attendanceMonthlyTable.politicianId, data.politicianId),
             eq(attendanceMonthlyTable.year, data.year),
             eq(attendanceMonthlyTable.month, data.month)
-          ))
+          )
+        )
+        .limit(1);
+
+      if (existing.length > 0) {
+        const updated = await db
+          .update(attendanceMonthlyTable)
+          .set(data)
+          .where(
+            and(
+              eq(attendanceMonthlyTable.politicianId, data.politicianId),
+              eq(attendanceMonthlyTable.year, data.year),
+              eq(attendanceMonthlyTable.month, data.month)
+            )
+          )
           .returning();
         return c.json({ data: updated[0], statusCode: 200 });
       }
@@ -77,7 +92,9 @@ const yearlyRoute = new Hono()
       const { year } = c.req.valid('query');
 
       if (year) {
-        const records = await db.select().from(attendanceYearlyTable)
+        const records = await db
+          .select()
+          .from(attendanceYearlyTable)
           .where(eq(attendanceYearlyTable.year, year));
         return c.json({ data: records, statusCode: 200 });
       }
@@ -93,20 +110,27 @@ const yearlyRoute = new Hono()
     try {
       const data = c.req.valid('json');
 
-      const existing = await db.select().from(attendanceYearlyTable)
-        .where(and(
-          eq(attendanceYearlyTable.politicianId, data.politicianId),
-          eq(attendanceYearlyTable.year, data.year)
-        ))
+      const existing = await db
+        .select()
+        .from(attendanceYearlyTable)
+        .where(
+          and(
+            eq(attendanceYearlyTable.politicianId, data.politicianId),
+            eq(attendanceYearlyTable.year, data.year)
+          )
+        )
         .limit(1);
 
       if (existing.length > 0) {
-        const updated = await db.update(attendanceYearlyTable)
+        const updated = await db
+          .update(attendanceYearlyTable)
           .set(data)
-          .where(and(
-            eq(attendanceYearlyTable.politicianId, data.politicianId),
-            eq(attendanceYearlyTable.year, data.year)
-          ))
+          .where(
+            and(
+              eq(attendanceYearlyTable.politicianId, data.politicianId),
+              eq(attendanceYearlyTable.year, data.year)
+            )
+          )
           .returning();
         return c.json({ data: updated[0], statusCode: 200 });
       }
@@ -119,8 +143,10 @@ const yearlyRoute = new Hono()
     }
   });
 
-const partyMonthlyRoute = new Hono()
-  .get('/:partyId', zValidator('query', partyAttendanceQuerySchema), async (c) => {
+const partyMonthlyRoute = new Hono().get(
+  '/:partyId',
+  zValidator('query', partyAttendanceQuerySchema),
+  async (c) => {
     try {
       const partyId = parseInt(c.req.param('partyId'));
       const { year, month } = c.req.valid('query');
@@ -133,13 +159,21 @@ const partyMonthlyRoute = new Hono()
           attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
           absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
           justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-          unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-          attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+          unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+            Number
+          ),
+          attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(
+            Number
+          ),
         })
         .from(attendanceMonthlyTable)
         .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
         .where(eq(politiciansTable.partyId, partyId))
-        .groupBy(politiciansTable.partyId, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+        .groupBy(
+          politiciansTable.partyId,
+          attendanceMonthlyTable.year,
+          attendanceMonthlyTable.month
+        );
 
       let records;
       if (year && month) {
@@ -151,17 +185,26 @@ const partyMonthlyRoute = new Hono()
             attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage:
+              sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
           })
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
-          .where(and(
-            eq(politiciansTable.partyId, partyId),
-            eq(attendanceMonthlyTable.year, year),
-            eq(attendanceMonthlyTable.month, month)
-          ))
-          .groupBy(politiciansTable.partyId, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+          .where(
+            and(
+              eq(politiciansTable.partyId, partyId),
+              eq(attendanceMonthlyTable.year, year),
+              eq(attendanceMonthlyTable.month, month)
+            )
+          )
+          .groupBy(
+            politiciansTable.partyId,
+            attendanceMonthlyTable.year,
+            attendanceMonthlyTable.month
+          );
       } else if (year) {
         records = await db
           .select({
@@ -171,16 +214,20 @@ const partyMonthlyRoute = new Hono()
             attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage:
+              sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
           })
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
-          .where(and(
-            eq(politiciansTable.partyId, partyId),
-            eq(attendanceMonthlyTable.year, year)
-          ))
-          .groupBy(politiciansTable.partyId, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+          .where(and(eq(politiciansTable.partyId, partyId), eq(attendanceMonthlyTable.year, year)))
+          .groupBy(
+            politiciansTable.partyId,
+            attendanceMonthlyTable.year,
+            attendanceMonthlyTable.month
+          );
       } else {
         records = await baseQuery;
       }
@@ -190,10 +237,13 @@ const partyMonthlyRoute = new Hono()
       console.error('Error fetching party monthly attendance:', error);
       return c.json({ error: 'Failed to fetch party monthly attendance', statusCode: 500 }, 500);
     }
-  });
+  }
+);
 
-const partyYearlyRoute = new Hono()
-  .get('/:partyId', zValidator('query', attendanceYearlyQuerySchema), async (c) => {
+const partyYearlyRoute = new Hono().get(
+  '/:partyId',
+  zValidator('query', attendanceYearlyQuerySchema),
+  async (c) => {
     try {
       const partyId = parseInt(c.req.param('partyId'));
       const { year } = c.req.valid('query');
@@ -206,15 +256,16 @@ const partyYearlyRoute = new Hono()
             attendanceCount: sum(attendanceYearlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceYearlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceYearlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(
+              Number
+            ),
           })
           .from(attendanceYearlyTable)
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
-          .where(and(
-            eq(politiciansTable.partyId, partyId),
-            eq(attendanceYearlyTable.year, year)
-          ))
+          .where(and(eq(politiciansTable.partyId, partyId), eq(attendanceYearlyTable.year, year)))
           .groupBy(politiciansTable.partyId, attendanceYearlyTable.year);
       } else {
         records = await db
@@ -224,8 +275,12 @@ const partyYearlyRoute = new Hono()
             attendanceCount: sum(attendanceYearlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceYearlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceYearlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(
+              Number
+            ),
           })
           .from(attendanceYearlyTable)
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
@@ -238,10 +293,13 @@ const partyYearlyRoute = new Hono()
       console.error('Error fetching party yearly attendance:', error);
       return c.json({ error: 'Failed to fetch party yearly attendance', statusCode: 500 }, 500);
     }
-  });
+  }
+);
 
-const partiesMonthlyRoute = new Hono()
-  .get('/', zValidator('query', partyAttendanceQuerySchema), async (c) => {
+const partiesMonthlyRoute = new Hono().get(
+  '/',
+  zValidator('query', partyAttendanceQuerySchema),
+  async (c) => {
     try {
       const { year, month } = c.req.valid('query');
 
@@ -256,17 +314,24 @@ const partiesMonthlyRoute = new Hono()
             attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage:
+              sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
           })
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
-          .where(and(
-            eq(attendanceMonthlyTable.year, year),
-            eq(attendanceMonthlyTable.month, month)
-          ))
-          .groupBy(politiciansTable.partyId, partiesTable.name, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+          .where(
+            and(eq(attendanceMonthlyTable.year, year), eq(attendanceMonthlyTable.month, month))
+          )
+          .groupBy(
+            politiciansTable.partyId,
+            partiesTable.name,
+            attendanceMonthlyTable.year,
+            attendanceMonthlyTable.month
+          );
       } else if (year) {
         records = await db
           .select({
@@ -277,14 +342,22 @@ const partiesMonthlyRoute = new Hono()
             attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage:
+              sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
           })
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
           .where(eq(attendanceMonthlyTable.year, year))
-          .groupBy(politiciansTable.partyId, partiesTable.name, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+          .groupBy(
+            politiciansTable.partyId,
+            partiesTable.name,
+            attendanceMonthlyTable.year,
+            attendanceMonthlyTable.month
+          );
       } else {
         records = await db
           .select({
@@ -295,24 +368,38 @@ const partiesMonthlyRoute = new Hono()
             attendanceCount: sum(attendanceMonthlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceMonthlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceMonthlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceMonthlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage:
+              sql<number>`avg(${attendanceMonthlyTable.attendanceAverage})`.mapWith(Number),
           })
           .from(attendanceMonthlyTable)
           .innerJoin(politiciansTable, eq(attendanceMonthlyTable.politicianId, politiciansTable.id))
           .innerJoin(partiesTable, eq(politiciansTable.partyId, partiesTable.id))
-          .groupBy(politiciansTable.partyId, partiesTable.name, attendanceMonthlyTable.year, attendanceMonthlyTable.month);
+          .groupBy(
+            politiciansTable.partyId,
+            partiesTable.name,
+            attendanceMonthlyTable.year,
+            attendanceMonthlyTable.month
+          );
       }
 
       return c.json({ data: records, statusCode: 200 });
     } catch (error) {
       console.error('Error fetching all parties monthly attendance:', error);
-      return c.json({ error: 'Failed to fetch all parties monthly attendance', statusCode: 500 }, 500);
+      return c.json(
+        { error: 'Failed to fetch all parties monthly attendance', statusCode: 500 },
+        500
+      );
     }
-  });
+  }
+);
 
-const partiesYearlyRoute = new Hono()
-  .get('/', zValidator('query', attendanceYearlyQuerySchema), async (c) => {
+const partiesYearlyRoute = new Hono().get(
+  '/',
+  zValidator('query', attendanceYearlyQuerySchema),
+  async (c) => {
     try {
       const { year } = c.req.valid('query');
 
@@ -326,8 +413,12 @@ const partiesYearlyRoute = new Hono()
             attendanceCount: sum(attendanceYearlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceYearlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceYearlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(
+              Number
+            ),
           })
           .from(attendanceYearlyTable)
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
@@ -343,8 +434,12 @@ const partiesYearlyRoute = new Hono()
             attendanceCount: sum(attendanceYearlyTable.attendanceCount).mapWith(Number),
             absentCount: sum(attendanceYearlyTable.absentCount).mapWith(Number),
             justifiedAbsentCount: sum(attendanceYearlyTable.justifiedAbsentCount).mapWith(Number),
-            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(Number),
-            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(Number),
+            unjustifiedAbsentCount: sum(attendanceYearlyTable.unjustifiedAbsentCount).mapWith(
+              Number
+            ),
+            attendanceAverage: sql<number>`avg(${attendanceYearlyTable.attendanceAverage})`.mapWith(
+              Number
+            ),
           })
           .from(attendanceYearlyTable)
           .innerJoin(politiciansTable, eq(attendanceYearlyTable.politicianId, politiciansTable.id))
@@ -355,9 +450,13 @@ const partiesYearlyRoute = new Hono()
       return c.json({ data: records, statusCode: 200 });
     } catch (error) {
       console.error('Error fetching all parties yearly attendance:', error);
-      return c.json({ error: 'Failed to fetch all parties yearly attendance', statusCode: 500 }, 500);
+      return c.json(
+        { error: 'Failed to fetch all parties yearly attendance', statusCode: 500 },
+        500
+      );
     }
-  });
+  }
+);
 
 const attendanceRoute = new Hono()
   .route('/attendance/monthly', monthlyRoute)
