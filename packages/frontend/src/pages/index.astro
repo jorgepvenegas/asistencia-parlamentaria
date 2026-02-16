@@ -124,6 +124,11 @@ try {
     })
     .filter((p): p is PoliticianAttendance => p !== null);
 
+  const memberCountByParty = new Map<number, number>();
+  for (const p of politiciansData) {
+    memberCountByParty.set(p.partyId, (memberCountByParty.get(p.partyId) ?? 0) + 1);
+  }
+
   partyAttendance = partyAttendanceData.map((p) => {
     const adjustedTotalSessions = p.attendanceCount + p.unjustifiedAbsentCount + p.absentCount;
 
@@ -135,6 +140,7 @@ try {
         ((p.unjustifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2)
       ),
       avgNoJust: parseFloat(((p.absentCount / adjustedTotalSessions) * 100).toFixed(2)),
+      memberCount: memberCountByParty.get(p.partyId) ?? 0,
     };
   });
 } catch (err) {
