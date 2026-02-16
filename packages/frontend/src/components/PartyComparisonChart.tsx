@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ATTENDANCE_COLORS } from '../constants/colors';
+import { useIsMobile } from '../hooks/useIsMobile';
 import AttendanceLegend from './AttendanceLegend';
 import HoverTooltip from './HoverTooltip';
 import SectionHeader from './SectionHeader';
@@ -65,6 +66,7 @@ const TOOLTIP_ROWS: { label: string; key: keyof Party; color: string }[] = [
 ];
 
 export default function PartyComparisonChart({ parties }: PartyComparisonChartProps) {
+  const isMobile = useIsMobile();
   const [tooltip, setTooltip] = useState<{ party: Party; x: number; y: number } | null>(null);
   const [asc, setAsc] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -79,6 +81,13 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
       asc ? attendancePct(a) - attendancePct(b) : attendancePct(b) - attendancePct(a)
     );
   }, [parties, asc]);
+
+  const visibleParties = useMemo(() => {
+    if (!isMobile || expanded) {
+      return partiesSorted;
+    }
+    return partiesSorted.slice(0, MOBILE_PREVIEW);
+  }, [isMobile, expanded, partiesSorted]);
 
   return (
     <>
@@ -118,7 +127,7 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
           gap: 16,
         }}
       >
-        {(expanded ? partiesSorted : partiesSorted.slice(0, MOBILE_PREVIEW)).map((party) => {
+        {visibleParties.map((party) => {
           const seg = partySegments(party);
           return (
             <div
@@ -164,7 +173,7 @@ export default function PartyComparisonChart({ parties }: PartyComparisonChartPr
             </div>
           );
         })}
-        {!expanded && partiesSorted.length > MOBILE_PREVIEW && (
+        {isMobile && !expanded && partiesSorted.length > MOBILE_PREVIEW && (
           <button
             className="chart-expand-btn"
             onClick={() => setExpanded(true)}
