@@ -19,7 +19,7 @@ const CHART_RESPONSIVE = `
     .chart-row { flex-wrap: wrap; gap: 0 !important; padding: 14px 16px; border-bottom: 1px solid #E5E5E5; }
     .chart-row:last-child { border-bottom: none; }
     .chart-party-name { order: 1; flex: 1; width: auto !important; font-size: 13px !important; }
-    .chart-row-pct  { order: 2; width: auto !important; color: #22C55E; font-size: 13px !important; font-weight: 600 !important; }
+    .chart-row-pct  { order: 2; width: auto !important; font-size: 13px !important; font-weight: 600 !important; }
     .chart-row-bar  { order: 3; width: 100%; flex: none; height: 8px; margin-top: 10px; gap: 1px; }
     .chart-expand-btn { display: flex; }
   }
