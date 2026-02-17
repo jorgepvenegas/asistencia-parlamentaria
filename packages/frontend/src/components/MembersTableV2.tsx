@@ -57,7 +57,7 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
     <div>
       {/* Desktop Table */}
       <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] rounded-lg overflow-hidden">
+        <table className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] overflow-hidden">
           <caption className="sr-only">Tabla de asistencia de miembros del partido {party}</caption>
           <thead>
             <tr className="bg-[#F5F5F5] dark:bg-white/[0.04] border-b border-[#E5E5E5] dark:border-white/[0.10]">
@@ -120,67 +120,128 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
         </table>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="sm:hidden space-y-3">
-        {sorted.map((d) => {
-          return (
-            <div
-              key={d.id}
-              className="bg-slate-50 dark:bg-white/[0.04] rounded-xl p-4 border border-slate-100 dark:border-white/[0.06]"
+      {/* Mobile Table */}
+      <div className="sm:hidden border border-[#E5E7EB] dark:border-white/[0.06] overflow-hidden">
+        {/* Header */}
+        <div
+          className="dark:bg-white/[0.04] dark:border-white/[0.10]"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: 36,
+            padding: '0 12px',
+            background: '#F9FAFB',
+            borderBottom: '1px solid #E5E7EB',
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              paddingLeft: 4,
+              paddingRight: 4,
+              display: 'flex',
+              alignItems: 'center',
+              height: '100%',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#6B7280',
+              }}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">
-                  {formatName(d.name)}
-                </span>
-                <span className="font-semibold tabular-nums font-mono text-sm text-black dark:text-white">
-                  {fmt(d, 'pct')}
-                </span>
-              </div>
-              {/* Stacked bar (always pct-proportional) */}
-              <div className="flex h-2 gap-[1px] overflow-hidden rounded-full mb-3">
-                <div
-                  className="h-full"
-                  style={{ width: `${d.pct}%`, background: ATTENDANCE_COLORS.attendance }}
-                />
-                <div
-                  className="h-full"
-                  style={{ width: `${d.avgValidJust}%`, background: ATTENDANCE_COLORS.justified }}
-                />
-                <div
-                  className="h-full"
-                  style={{
-                    width: `${d.avgInvalidJust}%`,
-                    background: ATTENDANCE_COLORS.unjustified,
-                  }}
-                />
-                <div
-                  className="h-full"
-                  style={{ width: `${d.avgNoJust}%`, background: ATTENDANCE_COLORS.noJust }}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">F. Just.</span>
-                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
-                    {fmt(d, 'avgValidJust')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">F. S/V.</span>
-                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
-                    {fmt(d, 'avgInvalidJust')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">F. S/J.</span>
-                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
-                    {fmt(d, 'avgNoJust')}
-                  </span>
-                </div>
-              </div>
+              Nombre
+            </span>
+          </div>
+          {[
+            { label: 'P', color: ATTENDANCE_COLORS.attendance },
+            { label: 'L', color: ATTENDANCE_COLORS.justified },
+            { label: 'T', color: ATTENDANCE_COLORS.unjustified },
+            { label: 'F', color: ATTENDANCE_COLORS.noJust },
+          ].map(({ label, color }, i) => (
+            <div
+              key={label}
+              style={{
+                width: i === 3 ? 36 : 40,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color,
+                }}
+              >
+                {label}
+              </span>
             </div>
-          );
-        })}
+          ))}
+        </div>
+        {/* Rows */}
+        {sorted.map((d) => (
+          <div
+            key={d.id}
+            className="border-b border-[#F3F4F6] dark:border-white/[0.06] last:border-b-0"
+            style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px' }}
+          >
+            <div
+              style={{
+                flex: 1,
+                paddingLeft: 4,
+                paddingRight: 4,
+                display: 'flex',
+                alignItems: 'center',
+                height: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'Sora', sans-serif",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#111827',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                className="dark:text-white"
+              >
+                {formatName(d.name)}
+              </span>
+            </div>
+            {(['pct', 'avgValidJust', 'avgInvalidJust', 'avgNoJust'] as const).map((key, i) => (
+              <div
+                key={key}
+                style={{
+                  width: i === 3 ? 36 : 40,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 12,
+                    color: '#374151',
+                  }}
+                  className="dark:text-slate-300 tabular-nums"
+                >
+                  {fmt(d, key)}
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
