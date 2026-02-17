@@ -1,3 +1,6 @@
+/**
+ * Party color mapping for visual identification
+ */
 export const PARTY_COLORS: Record<string, string> = {
   'Partido Comunista': '#E63946',
   'Partido Demócrata Cristiano': '#457B9D',
@@ -18,6 +21,9 @@ export function getPartyColor(party: string): string {
   return PARTY_COLORS[party] || '#999';
 }
 
+/**
+ * Party abbreviations for display
+ */
 export const PARTY_ABBREV: Record<string, string> = {
   'Partido Ecologista Verde': 'PEV',
   'Movimiento Amarillos por Chile': 'AMA',
@@ -45,16 +51,50 @@ export function getPartyAbbrev(party: string): string {
   return PARTY_ABBREV[party] || party;
 }
 
-export const ATTENDANCE_CATEGORIES = [
-  { key: 'attendance', name: 'Asistencia', color: '#22c55e' },
-  { key: 'justified', name: 'Justificado', color: '#f59e0b' },
-  { key: 'unjustified', name: 'No justificado', color: '#ef4444' },
-  { key: 'noJustification', name: 'Sin justificación', color: '#991b1b' },
-] as const;
+/**
+ * Attendance category keys - single source of truth for naming
+ */
+export type AttendanceCategoryKey = 'attendance' | 'justified' | 'unjustified' | 'noJust';
 
-export const ATTENDANCE_COLORS = {
-  attendance: '#22C55E',
+/**
+ * Attendance colors by category key
+ * This is the primary source of truth for attendance-related colors
+ */
+export const ATTENDANCE_COLORS: Record<AttendanceCategoryKey, string> = {
+  attendance: '#4ab170',
   justified: '#F59E0B',
   unjustified: '#EF4444',
   noJust: '#991B1B',
+};
+
+/**
+ * Attendance category metadata including display names
+ * Colors are derived from ATTENDANCE_COLORS for consistency
+ */
+export const ATTENDANCE_CATEGORIES: {
+  key: AttendanceCategoryKey;
+  name: string;
+  color: string;
+}[] = [
+  { key: 'attendance', name: 'Asistencia', color: ATTENDANCE_COLORS.attendance },
+  { key: 'justified', name: 'Justificado', color: ATTENDANCE_COLORS.justified },
+  { key: 'unjustified', name: 'No justificado', color: ATTENDANCE_COLORS.unjustified },
+  { key: 'noJust', name: 'Sin justificación', color: ATTENDANCE_COLORS.noJust },
+];
+
+/**
+ * Helper to get color by attendance category key
+ */
+export function getAttendanceColor(key: AttendanceCategoryKey): string {
+  return ATTENDANCE_COLORS[key];
+}
+
+/**
+ * Attendance category labels for display
+ */
+export const ATTENDANCE_LABELS: Record<AttendanceCategoryKey, string> = {
+  attendance: 'Asistencia',
+  justified: 'Ausente con justificación válida',
+  unjustified: 'Ausente con justificación inválida',
+  noJust: 'Ausente sin justificación',
 };

@@ -1,0 +1,86 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="QuienAtiende - Acerca de"
+  description="Información sobre QuienAtiende, una plataforma de transparencia parlamentaria"
+  year={2025}
+  backLink="/"
+>
+  <style>
+    .about-content {
+      max-width: 800px;
+    }
+    .about-content h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: #000;
+    }
+    .about-content p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #5e5e5e;
+      margin: 0 0 16px;
+    }
+    .about-content a {
+      color: #dc2626;
+      text-decoration: none;
+    }
+    .about-content a:hover {
+      text-decoration: underline;
+    }
+    .about-content ul {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+    .about-content li {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #5e5e5e;
+      margin-bottom: 8px;
+    }
+  </style>
+
+  <div class="about-content">
+    <h2>Acerca de QuienAtiende</h2>
+    <p>
+      QuienAtiende es una plataforma ciudadana de transparencia parlamentaria que busca facilitar el
+      acceso a información sobre la asistencia de diputados a sesiones del Congreso de la República.
+    </p>
+    <p>
+      Creemos que una democracia informada es una democracia más fuerte. Por eso, compilamos datos
+      públicos de asistencia parlamentaria y los presentamos de manera clara y accesible para todos
+      los ciudadanos.
+    </p>
+
+    <h2>¿Qué datos mostramos?</h2>
+    <ul>
+      <li>Asistencia a sesiones de sala por diputado</li>
+      <li>Faltas justificadas y sin justificar</li>
+      <li>Comparativas por partido político</li>
+      <li>Estadísticas históricas por año legislativo</li>
+    </ul>
+
+    <h2>Fuentes de datos</h2>
+    <p>
+      Toda la información presentada en esta plataforma proviene de datos públicos del Congreso de
+      la República. Los datos se actualizan regularmente para mantener la información lo más
+      actualizada posible.
+    </p>
+
+    <h2>Objetivo</h2>
+    <p>
+      Nuestro objetivo es promover la rendición de cuentas y la transparencia en el ejercicio
+      parlamentario. Al hacer accesible esta información, esperamos contribuir a un debate público
+      más informado sobre el trabajo de nuestros representantes.
+    </p>
+
+    <h2>Contacto</h2>
+    <p>
+      Si tienes preguntas, sugerencias o encuentras algún error en los datos, no dudes en
+      contactarnos a través de nuestros canales de comunicación.
+    </p>
+  </div>
+</PageLayout>

@@ -14,6 +14,8 @@ const CHART_RESPONSIVE = `
   .chart-row-pct  { width: 50px; flex-shrink: 0; text-align: right; }
   .chart-container { padding: 24px; }
   .chart-expand-btn { display: none; }
+  .chart-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+  .chart-sort-btn { flex-shrink: 0; }
   @media (max-width: 767px) {
     .chart-container { padding: 0 !important; }
     .chart-row { flex-wrap: wrap; gap: 0 !important; padding: 14px 16px; border-bottom: 1px solid #E5E5E5; }
@@ -22,6 +24,8 @@ const CHART_RESPONSIVE = `
     .chart-row-pct  { order: 2; width: auto !important; font-size: 13px !important; font-weight: 600 !important; }
     .chart-row-bar  { order: 3; width: 100%; flex: none; height: 8px; margin-top: 10px; gap: 1px; }
     .chart-expand-btn { display: flex; }
+    .chart-header-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .chart-sort-btn { align-self: flex-end; }
   }
 `;
 
@@ -94,15 +98,15 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
   return (
     <>
       <style>{CHART_RESPONSIVE}</style>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div className="chart-header-row">
         <SectionHeader
           title="Asistencia por partidos"
           description="Distribución de asistencias y faltas por partido. Porcentajes sobre el total de sesiones registradas."
         />
         <button
+          className="chart-sort-btn"
           onClick={() => setAsc((v) => !v)}
           style={{
-            flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
             gap: 4,

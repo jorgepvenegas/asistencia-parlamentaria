@@ -5,7 +5,7 @@ import SiteFooter from './SiteFooter';
 import GeneralAttendance from './GeneralAttendance';
 
 const RESPONSIVE = `
-  .lp-hero-inner   { padding: 80px 64px 64px; }
+  .lp-hero-inner   { padding: 80px 64px 28px; }
   .lp-trust-inner  { padding: 20px 64px; display: flex; gap: 48px; align-items: center; }
   .lp-main-inner   { padding: 48px 64px; }
   .lp-hero-h1      { font-size: 56px; letter-spacing: -2px; }
@@ -107,7 +107,7 @@ export default function LandingPage({
             >
               Conoce quién asiste, quién falta, y por qué. Transparencia para una mejor democracia.
             </p>
-            <div className="lp-cta-row" style={{ display: 'flex', gap: 16 }}>
+            {/* <div className="lp-cta-row" style={{ display: 'flex', gap: 16 }}>
               <a
                 href="#asistencia"
                 style={{
@@ -140,7 +140,7 @@ export default function LandingPage({
               >
                 Comparar partidos
               </a>
-            </div>
+            </div> */}
           </div>
         </section>
 

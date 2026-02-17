@@ -36,14 +36,14 @@ const RAW_KEY_MAP: Record<(typeof ATTENDANCE_CATEGORIES)[number]['key'], RawKey>
   attendance: 'totalAttendance',
   justified: 'totalValid',
   unjustified: 'totalInvalid',
-  noJustification: 'totalNoJust',
+  noJust: 'totalNoJust',
 };
 
 const PCT_KEY_MAP: Record<(typeof ATTENDANCE_CATEGORIES)[number]['key'], CategoryKey> = {
   attendance: 'pctAttendance',
   justified: 'pctValid',
   unjustified: 'pctInvalid',
-  noJustification: 'pctNoJust',
+  noJust: 'pctNoJust',
 };
 
 const CATEGORIES = ATTENDANCE_CATEGORIES.map((cat) => ({
