@@ -42,33 +42,66 @@ export default function GeneralAttendance({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Section header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <SectionHeader
-          title="Asistencia general"
-          description="Resumen de asistencia a sesiones de sala de todos los diputados"
-        />
-        <select
-          value={initialYear}
-          aria-label="Seleccionar año"
-          onChange={(e) => {
-            window.location.href = `/${e.target.value}`;
-          }}
-          style={{
-            padding: '10px 16px',
-            border: '1px solid #E5E5E5',
-            background: 'transparent',
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: 'pointer',
-            appearance: 'auto',
-          }}
-        >
-          {[2025, 2024, 2023, 2022].map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
+      <style>{`
+        .ga-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 20px;
+        }
+        .ga-header-left {
+          flex: 1;
+          min-width: 0;
+        }
+        .ga-year-selector {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+        }
+        @media (max-width: 767px) {
+          .ga-header-row {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-end;
+          }
+          .ga-year-selector {
+            width: auto;
+          }
+        }
+      `}</style>
+      <div className="ga-header-row">
+        <div className="ga-header-left">
+          <SectionHeader
+            title={`Asistencia general ${initialYear}`}
+            description="Resumen de asistencia a sesiones de sala de todos los diputados"
+          />
+        </div>
+        <div className="ga-year-selector">
+          <span style={{ fontSize: 14, color: '#5E5E5E' }}>Año</span>
+          <select
+            value={initialYear}
+            aria-label="Seleccionar año"
+            onChange={(e) => {
+              window.location.href = `/${e.target.value}`;
+            }}
+            style={{
+              padding: '10px 16px',
+              border: '1px solid #E5E5E5',
+              background: 'transparent',
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+              appearance: 'auto',
+            }}
+          >
+            {[2025, 2024, 2023, 2022].map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Party tabs (informational, no selection) */}

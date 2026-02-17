@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { label: 'Asistencia', href: '#asistencia', active: true },
   { label: 'Partidos', href: '#partidos', active: false },
   { label: 'Ranking', href: '#ranking', active: false },
-  { label: 'Acerca de', href: '#acerca', active: false },
+  { label: 'Acerca de', href: '/acerca-de', active: false },
 ];
 
 export default function SiteHeader() {
@@ -99,7 +98,6 @@ export default function SiteHeader() {
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              display: 'flex',
               flexDirection: 'column',
               gap: 5,
               alignItems: 'flex-end',

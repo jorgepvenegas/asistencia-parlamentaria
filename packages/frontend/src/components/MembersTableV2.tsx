@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { PoliticianAttendance } from '../types/dashboard';
 import { ATTENDANCE_COLORS } from '../constants/colors';
 import { formatName } from '@/utils/formatName';
@@ -12,23 +12,68 @@ const COUNT_KEY: Record<Exclude<SortKey, 'name'>, keyof PoliticianAttendance> = 
   avgNoJust: 'absentCount',
 };
 
-const COLUMNS: { key: SortKey; label: string }[] = [
-  { key: 'name', label: 'DIPUTADO/A' },
-  { key: 'pct', label: 'ASISTENCIA' },
-  { key: 'avgValidJust', label: 'AUSENTE CON JUSTIFICACION VALIDA' },
-  { key: 'avgInvalidJust', label: 'AUSENTE CON JUSTIFICACION INVALIDA' },
-  { key: 'avgNoJust', label: 'AUSENTE SIN JUSTIFICACION' },
+const COLUMNS: { key: SortKey; label: string; shortLabel: string }[] = [
+  { key: 'name', label: 'DIPUTADO/A', shortLabel: '' },
+  { key: 'pct', label: 'ASISTENCIA', shortLabel: '' },
+  { key: 'avgValidJust', label: 'CON JUSTIFICACIÓN VÁLIDA', shortLabel: 'AUSENTE' },
+  { key: 'avgInvalidJust', label: 'CON JUSTIFICACIÓN INVÁLIDA', shortLabel: '' },
+  { key: 'avgNoJust', label: 'SIN JUSTIFICACIÓN', shortLabel: '' },
 ];
 
 interface MembersTableV2Props {
   members: PoliticianAttendance[];
   party: string;
   showPct?: boolean;
+  onQueryChange?: (queryString: string) => void;
 }
 
-export default function MembersTableV2({ members, party, showPct = true }: MembersTableV2Props) {
+export default function MembersTableV2({
+  members,
+  party,
+  showPct = true,
+  onQueryChange,
+}: MembersTableV2Props) {
   const [sortKey, setSortKey] = useState<SortKey>('pct');
   const [sortAsc, setSortAsc] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Read initial state from URL on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlSort = params.get('sort') as SortKey | null;
+    const urlDir = params.get('dir');
+    const urlSearch = params.get('search') || '';
+
+    if (urlSort && COLUMNS.some((c) => c.key === urlSort)) {
+      setSortKey(urlSort);
+    }
+    if (urlDir === 'asc' || urlDir === 'desc') {
+      setSortAsc(urlDir === 'asc');
+    }
+    setSearchQuery(urlSearch);
+    setIsInitialized(true);
+  }, []);
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (!isInitialized || typeof window === 'undefined') return;
+
+    const params = new URLSearchParams();
+    if (sortKey !== 'pct') params.set('sort', sortKey);
+    if (sortAsc) params.set('dir', 'asc');
+    if (searchQuery.trim()) params.set('search', searchQuery.trim());
+
+    const queryString = params.toString();
+    const newUrl = queryString
+      ? `${window.location.pathname}?${queryString}`
+      : window.location.pathname;
+
+    window.history.replaceState({}, '', newUrl);
+    onQueryChange?.(queryString);
+  }, [sortKey, sortAsc, searchQuery, isInitialized, onQueryChange]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -39,7 +84,11 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
     }
   };
 
-  const sorted = [...members].sort((a, b) => {
+  const filtered = searchQuery.trim()
+    ? members.filter((m) => m.name.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+    : members;
+
+  const sorted = [...filtered].sort((a, b) => {
     let cmp: number;
     if (sortKey === 'name') {
       cmp = a.name.localeCompare(b.name, 'es');
@@ -54,22 +103,79 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
     showPct ? `${(d[key] as number).toFixed(1)}%` : String(d[COUNT_KEY[key]] as number);
 
   return (
-    <div>
+    <div className="w-full">
+      {/* Search */}
+      <div className="mb-4 flex items-center gap-2 flex-wrap">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Buscar por nombre..."
+          className="w-full sm:w-80 px-4 py-2 border border-[#E5E5E5] dark:border-white/[0.10] bg-transparent text-sm text-black dark:text-white placeholder:text-[#999] focus:outline-none focus:border-[#999]"
+        />
+        {searchQuery && (
+          <>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-sm text-[#5E5E5E] hover:text-black dark:hover:text-white underline cursor-pointer"
+            >
+              Limpiar filtro
+            </button>
+            <span className="text-xs text-[#5E5E5E]">
+              {filtered.length} de {members.length} resultados
+            </span>
+          </>
+        )}
+      </div>
+
       {/* Desktop Table */}
-      <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] overflow-hidden">
+      <div className="hidden sm:block w-full overflow-x-auto">
+        <table
+          className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] overflow-hidden"
+          style={{ tableLayout: 'fixed' }}
+        >
           <caption className="sr-only">Tabla de asistencia de miembros del partido {party}</caption>
           <thead>
+            {/* Top header row - Group labels */}
+            <tr className="bg-[#F5F5F5] dark:bg-white/[0.04] border-b border-[#E5E5E5] dark:border-white/[0.06]">
+              <th className="text-left px-5 py-2" style={{ width: '30%' }} rowSpan={2}>
+                <span className="inline-flex items-center gap-1 font-[600] text-[11px] text-black dark:text-white tracking-[1px] font-mono">
+                  {COLUMNS[0].label}
+                  {sortKey === 'name' && <span className="opacity-50">{sortAsc ? '↑' : '↓'}</span>}
+                </span>
+              </th>
+              <th
+                className="text-left px-5 py-2 cursor-pointer select-none hover:bg-[#EBEBEB] dark:hover:bg-white/[0.06] transition-colors"
+                style={{ width: '15%' }}
+                rowSpan={2}
+                onClick={() => handleSort('pct')}
+                aria-sort={sortKey === 'pct' ? (sortAsc ? 'ascending' : 'descending') : undefined}
+              >
+                <span className="inline-flex items-center gap-1 font-[600] text-[11px] text-black dark:text-white tracking-[1px] font-mono">
+                  {COLUMNS[1].label}
+                  {sortKey === 'pct' && <span className="opacity-50">{sortAsc ? '↑' : '↓'}</span>}
+                </span>
+              </th>
+              <th
+                className="text-center px-5 py-2 border-b border-[#E5E5E5] dark:border-white/[0.10]"
+                colSpan={3}
+              >
+                <span className="font-[600] text-[11px] text-black dark:text-white tracking-[1px] font-mono">
+                  AUSENTE
+                </span>
+              </th>
+            </tr>
+            {/* Bottom header row - Sub labels */}
             <tr className="bg-[#F5F5F5] dark:bg-white/[0.04] border-b border-[#E5E5E5] dark:border-white/[0.10]">
-              {COLUMNS.map((col) => (
+              {COLUMNS.slice(2).map((col) => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
                   aria-sort={
                     sortKey === col.key ? (sortAsc ? 'ascending' : 'descending') : undefined
                   }
-                  className="text-left px-5 py-3.5 cursor-pointer select-none hover:bg-[#EBEBEB] dark:hover:bg-white/[0.06] transition-colors"
-                  style={{ width: col.key === 'name' ? 220 : 80 }}
+                  className="text-left px-5 py-2 cursor-pointer select-none hover:bg-[#EBEBEB] dark:hover:bg-white/[0.06] transition-colors"
+                  style={{ width: '18.33%' }}
                 >
                   <span className="inline-flex items-center gap-1 font-[600] text-[11px] text-black dark:text-white tracking-[1px] font-mono">
                     {col.label}
@@ -88,27 +194,27 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
                   key={d.id}
                   className="border-b border-[#E5E5E5] dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
                 >
-                  <td className="px-5 py-3.5" style={{ width: 220 }}>
+                  <td className="px-5 py-3.5" style={{ width: '30%' }}>
                     <span className="font-[500] text-[13px] text-black dark:text-white font-[Sora,sans-serif]">
                       {formatName(d.name)}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5" style={{ width: 80 }}>
+                  <td className="px-5 py-3.5" style={{ width: '15%' }}>
                     <span className="font-[500] text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'pct')}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5" style={{ width: 80 }}>
+                  <td className="px-5 py-3.5" style={{ width: '18.33%' }}>
                     <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgValidJust')}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5" style={{ width: 80 }}>
+                  <td className="px-5 py-3.5" style={{ width: '18.33%' }}>
                     <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgInvalidJust')}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5" style={{ width: 80 }}>
+                  <td className="px-5 py-3.5" style={{ width: '18.33%' }}>
                     <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgNoJust')}
                     </span>
