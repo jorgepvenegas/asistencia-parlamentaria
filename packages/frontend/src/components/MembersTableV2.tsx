@@ -83,8 +83,6 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
           </thead>
           <tbody>
             {sorted.map((d) => {
-              const attendColor =
-                d.pct >= 75 ? ATTENDANCE_COLORS.attendance : ATTENDANCE_COLORS.noJust;
               return (
                 <tr
                   key={d.id}
@@ -96,34 +94,22 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
                     </span>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: 80 }}>
-                    <span
-                      className="font-[500] text-[13px] font-mono tabular-nums"
-                      style={{ color: attendColor }}
-                    >
+                    <span className="font-[500] text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'pct')}
                     </span>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: 80 }}>
-                    <span
-                      className="text-[13px] font-mono tabular-nums"
-                      style={{ color: ATTENDANCE_COLORS.justified }}
-                    >
+                    <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgValidJust')}
                     </span>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: 80 }}>
-                    <span
-                      className="text-[13px] font-mono tabular-nums"
-                      style={{ color: ATTENDANCE_COLORS.unjustified }}
-                    >
+                    <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgInvalidJust')}
                     </span>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: 80 }}>
-                    <span
-                      className="text-[13px] font-mono tabular-nums"
-                      style={{ color: ATTENDANCE_COLORS.noJust }}
-                    >
+                    <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
                       {fmt(d, 'avgNoJust')}
                     </span>
                   </td>
@@ -137,7 +123,6 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
       {/* Mobile Cards */}
       <div className="sm:hidden space-y-3">
         {sorted.map((d) => {
-          const attendColor = d.pct >= 75 ? ATTENDANCE_COLORS.attendance : ATTENDANCE_COLORS.noJust;
           return (
             <div
               key={d.id}
@@ -147,10 +132,7 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
                 <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">
                   {formatName(d.name)}
                 </span>
-                <span
-                  className="font-semibold tabular-nums font-mono text-sm"
-                  style={{ color: attendColor }}
-                >
+                <span className="font-semibold tabular-nums font-mono text-sm text-black dark:text-white">
                   {fmt(d, 'pct')}
                 </span>
               </div>
@@ -179,28 +161,19 @@ export default function MembersTableV2({ members, party, showPct = true }: Membe
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400">F. Just.</span>
-                  <span
-                    className="tabular-nums font-mono font-medium"
-                    style={{ color: ATTENDANCE_COLORS.justified }}
-                  >
+                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
                     {fmt(d, 'avgValidJust')}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400">F. S/V.</span>
-                  <span
-                    className="tabular-nums font-mono font-medium"
-                    style={{ color: ATTENDANCE_COLORS.unjustified }}
-                  >
+                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
                     {fmt(d, 'avgInvalidJust')}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400">F. S/J.</span>
-                  <span
-                    className="tabular-nums font-mono font-medium"
-                    style={{ color: ATTENDANCE_COLORS.noJust }}
-                  >
+                  <span className="tabular-nums font-mono font-medium text-black dark:text-white">
                     {fmt(d, 'avgNoJust')}
                   </span>
                 </div>
