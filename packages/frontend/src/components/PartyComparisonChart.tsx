@@ -131,24 +131,20 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
       >
         {visibleParties.map((party) => {
           const seg = partySegments(party);
+          const partySlug = toPartySlug(party.partyName) || String(party.partyId);
           return (
-            <div
+            <a
               key={party.partyId}
+              href={`/${initialYear}/${partySlug}`}
               className="chart-row"
-              role="button"
-              tabIndex={0}
               aria-label={`Ver detalle del partido ${party.partyName}`}
-              style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
-              onClick={() => {
-                const partySlug = toPartySlug(party.partyName) || String(party.partyId);
-                window.location.href = `/${initialYear}/${partySlug}`;
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  const partySlug = toPartySlug(party.partyName) || String(party.partyId);
-                  window.location.href = `/${initialYear}/${partySlug}`;
-                }
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                cursor: 'pointer',
+                textDecoration: 'none',
+                color: 'inherit',
               }}
               onMouseMove={(e) => {
                 setTooltip({ party, x: e.clientX, y: e.clientY });
@@ -166,10 +162,14 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
                 }}
                 title={party.partyName}
               >
                 {party.partyName}
+                <span style={{ color: '#999', flexShrink: 0 }}>→</span>
               </span>
               <div className="chart-row-bar">
                 <div style={{ flex: seg.a, background: C.attendance, height: '100%' }} />
@@ -187,7 +187,7 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
               >
                 {seg.a.toFixed(1)}%
               </span>
-            </div>
+            </a>
           );
         })}
         {isMobile && !expanded && partiesSorted.length > MOBILE_PREVIEW && (
