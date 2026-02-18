@@ -51,7 +51,10 @@ export default function LandingPage({
 
         {/* HERO */}
         <section style={{ background: '#000' }}>
-          <div className="lp-hero-inner" style={{ maxWidth: 1536, margin: '0 auto' }}>
+          <div
+            className="lp-hero-inner"
+            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
+          >
             <div
               style={{
                 display: 'inline-flex',
@@ -146,7 +149,10 @@ export default function LandingPage({
 
         {/* TRUST BAR */}
         <section style={{ background: '#F5F5F5', borderBottom: '1px solid #E5E5E5' }}>
-          <div className="lp-trust-inner" style={{ maxWidth: 1536, margin: '0 auto' }}>
+          <div
+            className="lp-trust-inner"
+            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
+          >
             {[
               { value: politicians.length.toString(), label: 'diputados', highlight: false },
               { value: partyCount.toString(), label: 'partidos políticos', highlight: false },
@@ -178,7 +184,10 @@ export default function LandingPage({
 
         {/* CONTENT */}
         <main id="asistencia">
-          <div className="lp-main-inner" style={{ maxWidth: 1536, margin: '0 auto' }}>
+          <div
+            className="lp-main-inner"
+            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
+          >
             <GeneralAttendance partyAttendance={partyAttendance} initialYear={initialYear} />
           </div>
         </main>

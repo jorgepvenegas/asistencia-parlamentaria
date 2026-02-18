@@ -1,9 +1,9 @@
 ---
-import PageLayout from '../../layouts/PageLayout.astro';
-import StatCards from '../../components/StatCards';
-import { ATTENDANCE_COLORS, PARTY_ABBREV, PARTY_COLORS } from '../../constants/colors';
-import { toPartySlug } from '../../utils/partySlug';
-import type { PoliticianAttendance, PartyAttendance } from '../../types/dashboard';
+import PageLayout from '../../../layouts/PageLayout.astro';
+import StatCards from '../../../components/StatCards';
+import { ATTENDANCE_COLORS, PARTY_ABBREV, PARTY_COLORS } from '../../../constants/colors';
+import { toPartySlug } from '../../../utils/partySlug';
+import type { PoliticianAttendance, PartyAttendance } from '../../../types/dashboard';
 import {
   politicianResponseSchema,
   partyResponseSchema,
@@ -35,7 +35,7 @@ const yearNum = parseInt(Astro.params.year ?? '', 10);
 const partySlugParam = Astro.params.partySlug ?? '';
 
 if (!Number.isFinite(yearNum) || yearNum < 2022 || !partySlugParam) {
-  return Astro.redirect('/2025');
+  return Astro.redirect('/partidos/2025');
 }
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
@@ -180,7 +180,7 @@ const selectedParty =
   partyAttendance.find((party) => toPartySlug(party.partyName) === partySlugParam) ?? null;
 
 if (!error && !selectedParty) {
-  return Astro.redirect(`/${yearNum}`);
+  return Astro.redirect(`/partidos/${yearNum}`);
 }
 
 const selectedPartyMembers = selectedParty
@@ -193,13 +193,14 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
   title={`QuienAtiende - ${selectedParty?.partyName ?? 'Detalle partido'}`}
   description="Detalle de asistencia por partido político"
   year={yearNum}
-  backLink={`/${yearNum}`}
+  backLink="/"
 >
   <style>
     .party-header-row {
       display: flex;
       gap: 20px;
       justify-content: space-between;
+      align-items: flex-end;
       padding: 15px 0 40px;
     }
     .party-header-left {
@@ -210,9 +211,11 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
+    }
+    .year-label {
       font-size: 14px;
       color: #5e5e5e;
-      white-space: nowrap;
     }
     @media (max-width: 767px) {
       .party-header-row {
@@ -253,28 +256,20 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
       </div>
     ) : (
       selectedParty && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
           <div class="party-header-row">
             <div class="party-header-left">
               <SectionHeader
                 title={selectedParty.partyName}
-                description={`Totales de asistencia anual por miembro de partido`}
+                description={`Resumen de asistencia del partido en el periodo ${yearNum}`}
               />
             </div>
             <div class="year-selector">
-              <span>Año</span>
+              <span class="year-label">Año</span>
               <select
                 aria-label="Seleccionar año"
-                onchange={`const qs = window.location.search; window.location.href='/' + this.value + '/${partySlugParam}' + qs`}
-                style={{
-                  padding: '10px 16px',
-                  border: '1px solid #E5E5E5',
-                  background: 'transparent',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  appearance: 'auto',
-                }}
+                onchange={`const qs = window.location.search; window.location.href='/partidos/${partySlugParam}/' + this.value + qs`}
+                style="padding: 10px 16px; border: 1px solid #E5E5E5; background: transparent; font-size: 12px; font-weight: 500; cursor: pointer; appearance: auto;"
               >
                 {AVAILABLE_YEARS.map((y) => (
                   <option key={y} value={y} selected={y === yearNum}>

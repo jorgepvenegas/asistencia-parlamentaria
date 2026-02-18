@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { label: 'Partidos', href: '#partidos', active: false },
-  { label: 'Ranking', href: '#ranking', active: false },
+  { label: 'Partidos', href: '/partidos', active: false },
+  { label: 'Ranking', href: '/diputados', active: false },
   { label: 'Acerca de', href: '/acerca-de', active: false },
 ];
 
@@ -32,11 +32,15 @@ export default function SiteHeader() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            boxSizing: 'border-box',
           }}
           className="site-header-inner"
         >
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <a
+            href="/"
+            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
+          >
             <div
               style={{
                 background: '#DC2626',
@@ -69,7 +73,7 @@ export default function SiteHeader() {
             >
               CongresoAbierto
             </span>
-          </div>
+          </a>
 
           {/* Desktop nav */}
           <nav className="site-nav-desktop" style={{ gap: 32 }}>

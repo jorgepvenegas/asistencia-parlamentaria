@@ -98,7 +98,7 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
   return (
     <>
       <style>{CHART_RESPONSIVE}</style>
-      <div className="chart-header-row">
+      <div className="chart-header-row" id="partidos">
         <SectionHeader
           title="Asistencia por partidos"
           description="Distribución de asistencias y faltas por partido. Porcentajes sobre el total de sesiones registradas."
@@ -139,7 +139,7 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
           return (
             <a
               key={party.partyId}
-              href={`/${initialYear}/${partySlug}`}
+              href={`/partidos/${partySlug}/${initialYear}`}
               className="chart-row"
               aria-label={`Ver detalle del partido ${party.partyName}`}
               style={{
