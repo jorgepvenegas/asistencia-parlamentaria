@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const NAV_ITEMS = [
   { label: 'Partidos', href: '/partidos', active: false },
-  { label: 'Ranking', href: '/diputados', active: false },
+  { label: 'Diputados', href: '/diputados', active: false },
   { label: 'Acerca de', href: '/acerca-de', active: false },
 ];
 
