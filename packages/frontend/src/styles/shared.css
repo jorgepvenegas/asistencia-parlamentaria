@@ -1,0 +1,15 @@
+.header-row {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 15px 0 40px;
+}
+
+@media (max-width: 767px) {
+  .header-row {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-end;
+  }
+}

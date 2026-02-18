@@ -45,6 +45,9 @@ export default function LandingPage({
           color: '#000',
           margin: 0,
           width: '100%',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <SiteHeader />
@@ -183,7 +186,7 @@ export default function LandingPage({
         </section>
 
         {/* CONTENT */}
-        <main id="asistencia">
+        <main id="asistencia" style={{ flex: 1 }}>
           <div
             className="lp-main-inner"
             style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}

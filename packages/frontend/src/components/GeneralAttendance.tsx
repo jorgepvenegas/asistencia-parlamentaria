@@ -3,7 +3,6 @@ import type { PartyAttendance } from '../types/dashboard';
 import { ATTENDANCE_COLORS } from '../constants/colors';
 import StatCards from './StatCards';
 import PartyComparisonChart from './PartyComparisonChart';
-import SectionHeader from './SectionHeader';
 
 interface GeneralAttendanceProps {
   partyAttendance: PartyAttendance[];
@@ -48,7 +47,7 @@ export default function GeneralAttendance({
           justify-content: space-between;
           align-items: flex-end;
           gap: 20px;
-          padding: 15px 0 40px;
+          padding: 15px 0;
         }
         .ga-header-left {
           flex: 1;
@@ -75,7 +74,7 @@ export default function GeneralAttendance({
           }
         }
       `}</style>
-      <div className="ga-header-row">
+      {/* <div className="ga-header-row">
         <div className="ga-header-left">
           <SectionHeader
             title="Asistencia por partidos"
@@ -107,7 +106,7 @@ export default function GeneralAttendance({
             ))}
           </select>
         </div>
-      </div>
+      </div> */}
 
       {/* Party tabs (informational, no selection) */}
       {/* <PartyTabs parties={sorted} memberCounts={memberCounts} /> */}

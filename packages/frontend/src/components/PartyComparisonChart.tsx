@@ -4,7 +4,6 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { toPartySlug } from '../utils/partySlug';
 import AttendanceLegend from './AttendanceLegend';
 import HoverTooltip from './HoverTooltip';
-import SectionHeader from './SectionHeader';
 
 const MOBILE_PREVIEW = 7;
 
@@ -14,7 +13,6 @@ const CHART_RESPONSIVE = `
   .chart-row-pct  { width: 50px; flex-shrink: 0; text-align: right; }
   .chart-container { padding: 24px; }
   .chart-expand-btn { display: none; }
-  .chart-header-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
   .chart-sort-btn { flex-shrink: 0; }
   @media (max-width: 767px) {
     .chart-container { padding: 0 !important; }
@@ -24,7 +22,6 @@ const CHART_RESPONSIVE = `
     .chart-row-pct  { order: 2; width: auto !important; font-size: 13px !important; font-weight: 600 !important; }
     .chart-row-bar  { order: 3; width: 100%; flex: none; height: 8px; margin-top: 10px; gap: 1px; }
     .chart-expand-btn { display: flex; }
-    .chart-header-row { flex-direction: column; align-items: flex-start; gap: 12px; }
     .chart-sort-btn { align-self: flex-end; }
   }
 `;
@@ -98,11 +95,8 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
   return (
     <>
       <style>{CHART_RESPONSIVE}</style>
-      <div className="chart-header-row" id="partidos">
-        <SectionHeader
-          title="Asistencia por partidos"
-          description="Distribución de asistencias y faltas por partido. Porcentajes sobre el total de sesiones registradas."
-        />
+      <AttendanceLegend />
+      <div className="flex flex-row-reverse">
         <button
           className="chart-sort-btn"
           onClick={() => setAsc((v) => !v)}
@@ -123,7 +117,6 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
           {asc ? '↑ Menor a mayor' : '↓ Mayor a menor'}
         </button>
       </div>
-      <AttendanceLegend />
       <div
         className="chart-container"
         style={{
