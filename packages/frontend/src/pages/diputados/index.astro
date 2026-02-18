@@ -122,13 +122,6 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
   backLink="/"
 >
   <style>
-    .diputados-header-row {
-      display: flex;
-      gap: 20px;
-      justify-content: space-between;
-      align-items: flex-end;
-      padding: 15px 0 40px;
-    }
     .diputados-header-left {
       flex: 1;
       min-width: 0;
@@ -144,11 +137,6 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
       color: #5e5e5e;
     }
     @media (max-width: 767px) {
-      .diputados-header-row {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-end;
-      }
       .year-selector {
         width: auto;
       }
@@ -182,10 +170,10 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
       </div>
     ) : (
       <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-        <div class="diputados-header-row">
+        <div class="header-row">
           <div class="diputados-header-left">
             <SectionHeader
-              title="Todos los diputados"
+              title="Asistencia por diputado/a"
               description={`Resumen de asistencia de ${politicians.length} diputados en el periodo ${yearNum}`}
             />
           </div>
@@ -203,13 +191,6 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
               ))}
             </select>
           </div>
-        </div>
-
-        <div style={{ marginTop: 16 }}>
-          <SectionHeader
-            title="Asistencia por diputado/a"
-            description="Totales de asistencia, ausencias justificadas e injustificadas"
-          />
         </div>
         <MembersTableV2
           client:load

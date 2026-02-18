@@ -1,11 +1,12 @@
 ## Purpose
+
 Keep changes minimal, verifiable, scoped.
 
 ## Key Conventions
 
 - **Data flow**: Astro pages fetch server-side → pass to React components via `client:load`
 - **Types**: Shared schemas from `@quienatiende/shared`, frontend-specific in `src/types/`
-- **Styles**: Inline styles + Tailwind (migrating to Tailwind)
+- **Styles**: Prefer shared `src/styles/shared.css` for customizations. Inline styles + Tailwind (migrating to Tailwind)
 - **Colors**: `ATTENDANCE_COLORS` in `constants/colors.ts` - single source of truth
 - **Validation**: Zod schemas for all API responses
 - **Routing**: Year-based static paths (2022-2025)
