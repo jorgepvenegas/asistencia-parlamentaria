@@ -40,7 +40,7 @@ export default function GeneralAttendance({
   }, [partyAttendance]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32, width: '100%' }}>
       {/* Section header */}
       <style>{`
         .ga-header-row {
@@ -48,6 +48,7 @@ export default function GeneralAttendance({
           justify-content: space-between;
           align-items: flex-end;
           gap: 20px;
+          padding: 15px 0 40px;
         }
         .ga-header-left {
           flex: 1;
@@ -58,6 +59,10 @@ export default function GeneralAttendance({
           align-items: center;
           gap: 8px;
           white-space: nowrap;
+        }
+        .ga-year-label {
+          font-size: 14px;
+          color: #5E5E5E;
         }
         @media (max-width: 767px) {
           .ga-header-row {
@@ -73,17 +78,17 @@ export default function GeneralAttendance({
       <div className="ga-header-row">
         <div className="ga-header-left">
           <SectionHeader
-            title={`Asistencia general ${initialYear}`}
-            description="Resumen de asistencia a sesiones de sala de todos los diputados"
+            title="Asistencia por partidos"
+            description={`Resumen de asistencia de partidos políticos en el periodo ${initialYear}`}
           />
         </div>
         <div className="ga-year-selector">
-          <span style={{ fontSize: 14, color: '#5E5E5E' }}>Año</span>
+          <span className="ga-year-label">Año</span>
           <select
             value={initialYear}
             aria-label="Seleccionar año"
             onChange={(e) => {
-              window.location.href = `/${e.target.value}`;
+              window.location.href = `/partidos/${e.target.value}`;
             }}
             style={{
               padding: '10px 16px',

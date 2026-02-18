@@ -1,29 +1,34 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import type { PoliticianAttendance } from '../../types/dashboard';
+import type { PoliticianAttendance, PartyAttendance } from '../../types/dashboard';
 import {
   politicianResponseSchema,
   partyResponseSchema,
   attendanceYearlyResponseSchema,
+  partyAttendanceYearlyResponseSchema,
   type PoliticianResponse,
   type PartyResponse,
   type AttendanceYearlyResponse,
+  type PartyAttendanceYearlyResponse,
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
-import MembersTableV2 from '@/components/MembersTableV2';
-import SectionHeader from '@/components/SectionHeader';
+import GeneralAttendance from '@/components/GeneralAttendance';
 
 const yearNum = 2025;
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
 
+// Array schemas for validation
 const politiciansArraySchema = z.array(politicianResponseSchema);
 const partiesArraySchema = z.array(partyResponseSchema);
 const attendanceArraySchema = z.array(attendanceYearlyResponseSchema);
+const partyAttendanceArraySchema = z.array(partyAttendanceYearlyResponseSchema);
 
+// Types from schemas
 type ApiPolitician = PoliticianResponse;
 type ApiParty = PartyResponse;
 type ApiAttendance = AttendanceYearlyResponse;
+type ApiPartyAttendance = PartyAttendanceYearlyResponse;
 
 async function parseResponse<T>(
   res: Response,
@@ -39,13 +44,16 @@ async function parseResponse<T>(
 }
 
 let politicians: PoliticianAttendance[] = [];
+let partyAttendance: PartyAttendance[] = [];
 let error: string | null = null;
 
 try {
-  const [politiciansRes, partiesRes, attendanceRes] = await Promise.all([
+  // Fetch all data in parallel
+  const [politiciansRes, partiesRes, attendanceRes, partyAttendanceRes] = await Promise.all([
     fetch(`${API_URL}/api/politicians`),
     fetch(`${API_URL}/api/parties`),
     fetch(`${API_URL}/api/attendance/yearly?year=${yearNum}`),
+    fetch(`${API_URL}/api/attendance/parties/yearly?year=${yearNum}`),
   ]);
 
   const politiciansData =
@@ -56,15 +64,25 @@ try {
   const attendanceData =
     (await parseResponse<ApiAttendance[]>(attendanceRes, attendanceArraySchema, 'Attendance')) ??
     [];
+  const partyAttendanceData =
+    (await parseResponse<ApiPartyAttendance[]>(
+      partyAttendanceRes,
+      partyAttendanceArraySchema,
+      'Party attendance'
+    )) ?? [];
 
+  // Create lookup maps
   const politicianMap = new Map(politiciansData.map((p) => [p.id, p]));
   const partyMap = new Map(partiesData.map((p) => [p.id, p]));
 
+  // Transform data for Dashboard
   politicians = attendanceData
     .map((att) => {
       const politician = politicianMap.get(att.politicianId);
       if (!politician) return null;
       const party = partyMap.get(politician.partyId);
+
+      // const totalSessions = att.attendanceCount + att.unjustifiedAbsentCount + att.
 
       const adjustedTotalSessions =
         att.attendanceCount +
@@ -89,7 +107,7 @@ try {
           ? ((att.absentCount / adjustedTotalSessions) * 100).toFixed(2)
           : '0.00';
 
-      return {
+      const val = {
         id: att.politicianId,
         name: politician.name,
         party: party?.name || 'Sin partido',
@@ -104,57 +122,53 @@ try {
         avgNoJust: parseFloat(avgNoJust),
         pct: parseFloat(att.attendanceAverage.toFixed(2)),
       } as PoliticianAttendance;
+
+      return val;
     })
-    .filter((p): p is PoliticianAttendance => p !== null)
-    .sort((a, b) => b.pct - a.pct);
+    .filter((p): p is PoliticianAttendance => p !== null);
+
+  const memberCountByParty = new Map<number, number>();
+  for (const p of politiciansData) {
+    memberCountByParty.set(p.partyId, (memberCountByParty.get(p.partyId) ?? 0) + 1);
+  }
+
+  partyAttendance = partyAttendanceData.map((p) => {
+    const adjustedTotalSessions =
+      p.attendanceCount + p.justifiedAbsentCount + p.unjustifiedAbsentCount + p.absentCount;
+
+    return {
+      ...p,
+      avgAttendance:
+        adjustedTotalSessions > 0
+          ? parseFloat(((p.attendanceCount / adjustedTotalSessions) * 100).toFixed(2))
+          : 0,
+      avgValidJust:
+        adjustedTotalSessions > 0
+          ? parseFloat(((p.justifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2))
+          : 0,
+      avgInvalidJust:
+        adjustedTotalSessions > 0
+          ? parseFloat(((p.unjustifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2))
+          : 0,
+      avgNoJust:
+        adjustedTotalSessions > 0
+          ? parseFloat(((p.absentCount / adjustedTotalSessions) * 100).toFixed(2))
+          : 0,
+      memberCount: memberCountByParty.get(p.partyId) ?? 0,
+    };
+  });
 } catch (err) {
   error = 'Error connecting to server';
   console.error(err);
 }
-
-const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
 ---
 
 <PageLayout
-  title="QuienAtiende - Todos los diputados"
-  description="Lista completa de diputados y su asistencia parlamentaria"
+  title="QuienAtiende - Asistencia Parlamentaria por Partidos"
+  description="Transparencia sobre la asistencia de diputados a sesiones parlamentarias por partido político"
   year={yearNum}
   backLink="/"
 >
-  <style>
-    .diputados-header-row {
-      display: flex;
-      gap: 20px;
-      justify-content: space-between;
-      align-items: flex-end;
-      padding: 15px 0 40px;
-    }
-    .diputados-header-left {
-      flex: 1;
-      min-width: 0;
-    }
-    .year-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .year-label {
-      font-size: 14px;
-      color: #5e5e5e;
-    }
-    @media (max-width: 767px) {
-      .diputados-header-row {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-end;
-      }
-      .year-selector {
-        width: auto;
-      }
-    }
-  </style>
-
   {
     error ? (
       <div
@@ -180,43 +194,31 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
           <p style={{ color: '#777' }}>{error}</p>
         </div>
       </div>
+    ) : politicians.length === 0 ? (
+      <div
+        style={{
+          minHeight: '60vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            background: '#16162a',
+            borderRadius: 16,
+            padding: 32,
+            border: '1px solid rgba(255,255,255,0.06)',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ color: '#F4A261', fontWeight: 600 }}>No hay datos disponibles</p>
+          <p style={{ color: '#777' }}>Verifica que el servidor API esté ejecutándose.</p>
+        </div>
+      </div>
     ) : (
       <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-        <div class="diputados-header-row">
-          <div class="diputados-header-left">
-            <SectionHeader
-              title="Todos los diputados"
-              description={`Resumen de asistencia de ${politicians.length} diputados en el periodo ${yearNum}`}
-            />
-          </div>
-          <div class="year-selector">
-            <span class="year-label">Año</span>
-            <select
-              aria-label="Seleccionar año"
-              onchange={`const qs = window.location.search; window.location.href='/diputados/' + this.value + qs`}
-              style="padding: 10px 16px; border: 1px solid #E5E5E5; background: transparent; font-size: 12px; font-weight: 500; cursor: pointer; appearance: auto;"
-            >
-              {AVAILABLE_YEARS.map((y) => (
-                <option key={y} value={y} selected={y === yearNum}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={{ marginTop: 16 }}>
-          <SectionHeader
-            title="Asistencia por diputado/a"
-            description="Totales de asistencia, ausencias justificadas e injustificadas"
-          />
-        </div>
-        <MembersTableV2
-          client:load
-          members={politicians}
-          party="Todos los partidos"
-          showPct={false}
-        />
+        <GeneralAttendance client:load partyAttendance={partyAttendance} initialYear={yearNum} />
       </div>
     )
   }

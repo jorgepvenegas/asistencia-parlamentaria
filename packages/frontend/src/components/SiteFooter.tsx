@@ -16,9 +16,31 @@ interface SiteFooterProps {
 }
 
 const FOOTER_COLS = [
-  { title: 'DATOS', links: ['Asistencia', 'Partidos', 'Ranking', 'Estadísticas'] },
-  { title: 'LEGAL', links: ['Términos de uso', 'Privacidad', 'Fuentes de datos'] },
-  { title: 'CONTACTO', links: ['GitHub', 'Twitter / X', 'Reportar error'] },
+  {
+    title: 'DATOS',
+    links: [
+      { label: 'Asistencia', href: '/' },
+      { label: 'Partidos', href: '/partidos' },
+      { label: 'Ranking', href: '/diputados' },
+      { label: 'Estadísticas', href: '/#ranking' },
+    ],
+  },
+  {
+    title: 'LEGAL',
+    links: [
+      { label: 'Términos de uso', href: '#' },
+      { label: 'Privacidad', href: '#' },
+      { label: 'Fuentes de datos', href: '/acerca-de' },
+    ],
+  },
+  {
+    title: 'CONTACTO',
+    links: [
+      { label: 'GitHub', href: 'https://github.com/jorgepvenegas/asistencia-camara' },
+      { label: 'Twitter / X', href: '#' },
+      { label: 'Reportar error', href: '#' },
+    ],
+  },
 ];
 
 export default function SiteFooter({ year }: SiteFooterProps) {
@@ -26,28 +48,36 @@ export default function SiteFooter({ year }: SiteFooterProps) {
     <>
       <style>{RESPONSIVE}</style>
       <footer style={{ background: '#000' }}>
-        <div className="footer-inner" style={{ maxWidth: 1536, margin: '0 auto' }}>
+        <div
+          className="footer-inner"
+          style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
+        >
           <div className="footer-top">
             <div style={{ maxWidth: 360 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div
-                  style={{
-                    background: '#DC2626',
-                    width: 24,
-                    height: 24,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                  }}
+                <a
+                  href="/"
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}
                 >
-                  <span style={{ color: '#FAFAFA', fontWeight: 700, fontSize: 12 }}>C</span>
-                </div>
-                <span
-                  style={{ color: '#FAFAFA', fontWeight: 600, fontSize: 14, letterSpacing: -1 }}
-                >
-                  CongresoAbierto
-                </span>
+                  <div
+                    style={{
+                      background: '#DC2626',
+                      width: 24,
+                      height: 24,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <span style={{ color: '#FAFAFA', fontWeight: 700, fontSize: 12 }}>C</span>
+                  </div>
+                  <span
+                    style={{ color: '#FAFAFA', fontWeight: 600, fontSize: 14, letterSpacing: -1 }}
+                  >
+                    CongresoAbierto
+                  </span>
+                </a>
               </div>
               <p style={{ color: '#9a9a9a', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
                 Plataforma ciudadana de transparencia parlamentaria. Datos públicos para una
@@ -70,11 +100,11 @@ export default function SiteFooter({ year }: SiteFooterProps) {
                   </span>
                   {links.map((link) => (
                     <a
-                      key={link}
-                      href="#"
+                      key={link.label}
+                      href={link.href}
                       style={{ color: '#9a9a9a', fontSize: 13, textDecoration: 'none' }}
                     >
-                      {link}
+                      {link.label}
                     </a>
                   ))}
                 </div>

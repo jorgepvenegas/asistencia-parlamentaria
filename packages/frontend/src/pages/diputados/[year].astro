@@ -132,13 +132,14 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
   title={`QuienAtiende - Todos los diputados ${yearNum}`}
   description="Lista completa de diputados y su asistencia parlamentaria"
   year={yearNum}
-  backLink={`/${yearNum}`}
+  backLink="/"
 >
   <style>
     .diputados-header-row {
       display: flex;
       gap: 20px;
       justify-content: space-between;
+      align-items: flex-end;
       padding: 15px 0 40px;
     }
     .diputados-header-left {
@@ -149,9 +150,11 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
+    }
+    .year-label {
       font-size: 14px;
       color: #5e5e5e;
-      white-space: nowrap;
     }
     @media (max-width: 767px) {
       .diputados-header-row {
@@ -191,28 +194,20 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
         </div>
       </div>
     ) : (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
         <div class="diputados-header-row">
           <div class="diputados-header-left">
             <SectionHeader
               title="Todos los diputados"
-              description={`${politicians.length} diputados en el periodo ${yearNum}`}
+              description={`Resumen de asistencia de ${politicians.length} diputados en el periodo ${yearNum}`}
             />
           </div>
           <div class="year-selector">
-            <span>Año</span>
+            <span class="year-label">Año</span>
             <select
               aria-label="Seleccionar año"
               onchange={`const qs = window.location.search; window.location.href='/diputados/' + this.value + qs`}
-              style={{
-                padding: '10px 16px',
-                border: '1px solid #E5E5E5',
-                background: 'transparent',
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: 'pointer',
-                appearance: 'auto',
-              }}
+              style="padding: 10px 16px; border: 1px solid #E5E5E5; background: transparent; font-size: 12px; font-weight: 500; cursor: pointer; appearance: auto;"
             >
               {AVAILABLE_YEARS.map((y) => (
                 <option key={y} value={y} selected={y === yearNum}>

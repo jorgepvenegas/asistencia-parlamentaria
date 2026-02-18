@@ -1,7 +1,6 @@
 ---
-import DashboardLayout from '../layouts/DashboardLayout.astro';
-import LandingPage from '../components/LandingPage';
-import type { PoliticianAttendance, PartyAttendance } from '../types/dashboard';
+import PageLayout from '../../layouts/PageLayout.astro';
+import type { PoliticianAttendance, PartyAttendance } from '../../types/dashboard';
 import {
   politicianResponseSchema,
   partyResponseSchema,
@@ -13,6 +12,7 @@ import {
   type PartyAttendanceYearlyResponse,
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
+import GeneralAttendance from '@/components/GeneralAttendance';
 
 export function getStaticPaths() {
   return [
@@ -25,7 +25,7 @@ export function getStaticPaths() {
 
 const yearNum = parseInt(Astro.params.year, 10);
 if (yearNum < 2022) {
-  return Astro.redirect('/2025');
+  return Astro.redirect('/partidos/2025');
 }
 
 const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
@@ -151,21 +151,20 @@ try {
 }
 ---
 
-<DashboardLayout
-  title="QuienAtiende - Asistencia Parlamentaria"
-  description="Transparencia sobre la asistencia de diputados a sesiones parlamentarias"
+<PageLayout
+  title={`QuienAtiende - Asistencia por Partidos ${yearNum}`}
+  description="Resumen de asistencia parlamentaria por partidos políticos"
+  year={yearNum}
+  backLink="/"
 >
   {
     error ? (
       <div
         style={{
-          minHeight: '100vh',
-          background: '#0f0f1a',
-          color: '#e0e0e0',
+          minHeight: '60vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: "'Source Sans 3', sans-serif",
         }}
       >
         <div
@@ -186,13 +185,10 @@ try {
     ) : politicians.length === 0 ? (
       <div
         style={{
-          minHeight: '100vh',
-          background: '#0f0f1a',
-          color: '#e0e0e0',
+          minHeight: '60vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: "'Source Sans 3', sans-serif",
         }}
       >
         <div
@@ -209,12 +205,9 @@ try {
         </div>
       </div>
     ) : (
-      <LandingPage
-        client:load
-        politicians={politicians}
-        partyAttendance={partyAttendance}
-        initialYear={yearNum}
-      />
+      <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
+        <GeneralAttendance client:load partyAttendance={partyAttendance} initialYear={yearNum} />
+      </div>
     )
   }
-</DashboardLayout>
+</PageLayout>

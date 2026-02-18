@@ -36,6 +36,7 @@ const {
     />
     <style is:global>
       .page-container {
+        width: 100%;
         max-width: 1536px;
         margin: 0 auto;
         padding: 48px 64px;
@@ -97,7 +98,7 @@ const {
     >
       <SiteHeader client:load />
 
-      <main class="page-container" style={{ flex: 1 }}>
+      <main class="page-container" style="flex: 1;">
         {
           backLink && (
             <a href={backLink} class="back-link">
