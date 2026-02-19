@@ -17,11 +17,9 @@
       "Bash(gh pr create:*)",
       "Bash(pnpm -F @quienatiende/frontend lint:*)",
       "Bash(pnpm -F @quienatiende/frontend build:*)",
-      "Bash(pnpm -F @quienatiende/frontend exec eslint:*)"
+      "Bash(pnpm -F @quienatiende/frontend exec eslint:*)",
+      "Skill(document)"
     ]
-  },
-  "enabledPlugins": {
-    "arscontexta@agenticnotetaking": true
   },
   "hooks": {
     "SessionStart": [
@@ -60,5 +58,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "arscontexta@agenticnotetaking": true
   }
 }
