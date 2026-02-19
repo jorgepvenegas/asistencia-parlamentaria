@@ -2,689 +2,184 @@
 
 **Citizen Attendance Tracker for Government Officials**
 
-A modern, transparent platform for tracking and visualizing parliamentary attendance. See how often your elected officials attend legislative sessions.
+A transparent platform for tracking Costa Rican parliamentary attendance.
 
-![Status](https://img.shields.io/badge/Status-Production%20Ready-green)
-![Version](https://img.shields.io/badge/Version-1.0.0-blue)
-![License](https://img.shields.io/badge/License-MIT-blue)
+## Stack
 
-## 🎯 Overview
+| Layer | Tech |
+|-------|------|
+| Frontend | Astro + React + Tailwind CSS |
+| API | Hono.js on Cloudflare Workers |
+| Database | Cloudflare D1 via Drizzle ORM |
+| Automation | Playwright + Cheerio scraper |
+| Charts | Recharts |
+| Testing | Vitest + Playwright (E2E) |
 
-QuienAtiende makes parliamentary attendance data accessible to citizens. Track:
-- **Yearly attendance** for all representatives
-- **Monthly breakdowns** showing when absences occurred
-- **Party trends** comparing attendance by political affiliation
-- **Individual profiles** with detailed absence reasons
+## Prerequisites
 
-Built with **Astro + Hono.js + SQLite**, fully optimized for mobile and accessibility.
+- **Node.js** 20+
+- **pnpm** 9+
+- **Wrangler** CLI (installed via devDependencies)
 
-## ✨ Features
-
-✅ Browse yearly attendance for all politicians
-✅ View monthly detail with daily records
-✅ Filter by political party
-✅ Search politicians by name
-✅ Interactive charts (Recharts)
-✅ Fully responsive (mobile-first)
-✅ WCAG 2.1 AA accessible
-✅ <2s load time on 4G
-✅ 100% feature parity mobile/desktop
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js**: 18+ ([download](https://nodejs.org/))
-- **pnpm**: 8+ (`npm install -g pnpm`)
-- **Git**: For cloning the repo
-
-### Installation (5 minutes)
+## Quick Start
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/your-repo/asistencia-camara-charts.git
-cd asistencia-camara-charts
-
-# 2. Install dependencies
+# Install dependencies
 pnpm install
 
-# 3. Setup database
-cd packages/api
-pnpm run migrate
-pnpm run seed
-cd ../..
-
-# 4. Start development servers
+# Start all dev servers (frontend + API worker)
 pnpm dev
 ```
 
-That's it! Open http://localhost:3001 in your browser.
+- Frontend: `http://localhost:4321` (Astro default)
+- API: `http://localhost:8787` (Wrangler default)
 
-## 📖 Development Guide
-
-### Project Structure
+## Project Structure
 
 ```
-asistencia-camara-charts/
+asistencia-camara/
 ├── packages/
-│   ├── api/                 # Hono.js REST backend (port 3000)
+│   ├── api/                  # Hono.js on Cloudflare Workers
 │   │   ├── src/
-│   │   │   ├── index.ts     # App entry point
-│   │   │   ├── routes/      # Endpoint handlers
-│   │   │   ├── services/    # Business logic
-│   │   │   ├── middleware/  # CORS, error handling
-│   │   │   └── db/          # Database setup
-│   │   ├── db/
-│   │   │   ├── migrations/  # SQL schema
-│   │   │   └── seed.ts      # Test data
-│   │   ├── tests/           # Unit & integration tests
-│   │   └── README.md        # API documentation
+│   │   │   ├── index.ts      # App entry + route registration
+│   │   │   ├── db/           # Drizzle schema & client
+│   │   │   ├── routes/       # attendance, politicians, parties
+│   │   │   ├── schemas/      # Zod input/output schemas
+│   │   │   └── lib/          # Business logic
+│   │   ├── wrangler.jsonc    # Cloudflare Workers config
+│   │   └── drizzle.config.ts
 │   │
-│   ├── frontend/            # Astro static site (port 3001)
+│   ├── frontend/             # Astro static site
 │   │   ├── src/
-│   │   │   ├── pages/       # Route pages
-│   │   │   ├── components/  # Reusable components
-│   │   │   ├── layouts/     # Page layouts
-│   │   │   └── styles/      # Tailwind CSS
-│   │   ├── tests/           # E2E tests (Playwright)
-│   │   └── scripts/         # Build scripts
+│   │   │   ├── pages/        # File-based routing
+│   │   │   │   ├── index.astro
+│   │   │   │   ├── acerca-de.astro
+│   │   │   │   ├── diputados/
+│   │   │   │   │   ├── index.astro
+│   │   │   │   │   └── [year].astro
+│   │   │   │   └── partidos/
+│   │   │   │       ├── index.astro
+│   │   │   │       ├── [year].astro
+│   │   │   │       └── [partySlug]/
+│   │   │   ├── components/   # React + Astro components
+│   │   │   ├── layouts/
+│   │   │   ├── styles/
+│   │   │   ├── hooks/
+│   │   │   ├── types/
+│   │   │   └── utils/
+│   │   └── playwright.config.ts
 │   │
-│   ├── shared/              # Shared types & schemas
-│   │   ├── types.ts         # TypeScript interfaces
-│   │   └── schemas.ts       # Zod validation
+│   ├── shared/               # @quienatiende/shared
+│   │   └── src/
+│   │       ├── index.ts
+│   │       └── schemas.ts    # Zod schemas shared across packages
 │   │
-│   └── automation/          # Data fetching & CI
-│       └── scripts/
+│   └── automation/           # Data scraping
+│       ├── src/
+│       │   ├── scrapers/     # attendance.ts
+│       │   ├── api-clients/
+│       │   ├── orchestration/
+│       │   └── utils/
+│       └── scripts/          # Runnable scripts
 │
-├── specs/                   # Feature specifications
-├── docs/                    # User documentation
-├── .github/workflows/       # GitHub Actions CI/CD
-│   ├── fetch-daily.yml      # Daily data sync
-│   ├── lighthouse.yml       # Performance audits
-│   └── test.yml             # Test pipeline
-│
-├── DEPLOYMENT.md            # Deployment guide
-├── CODE_CLEANUP.md          # Quality report
-├── FINAL_VALIDATION.md      # Production checklist
-└── README.md               # This file
+├── ops/                      # Session logs & operational data
+├── .github/workflows/
+│   ├── frontend-build.yaml   # Build & deploy frontend
+│   ├── lighthouse.yaml       # Performance audits
+│   └── sync-automation.yaml  # Data sync pipeline
+└── pnpm-workspace.yaml
 ```
 
-### Common Development Tasks
+## Development Commands
 
-#### Start Development (All Services)
+### All Packages
 
 ```bash
-# Start API + Frontend simultaneously
-pnpm dev
-
-# Opens:
-# - Frontend: http://localhost:3001
-# - API: http://localhost:3000/api
+pnpm dev          # Start all dev servers in parallel
+pnpm build        # Build frontend + API (excludes automation)
+pnpm test         # Run all tests (excludes automation)
+pnpm lint         # Lint all packages
+pnpm format       # Format all packages
 ```
 
-#### Start Services Separately
+### API (Cloudflare Workers)
 
 ```bash
-# Terminal 1: Start API
-cd packages/api
-pnpm run dev
-
-# Terminal 2: Start Frontend
-cd packages/frontend
-pnpm run dev
+pnpm -F @quienatiende/api dev        # Start wrangler dev
+pnpm -F @quienatiende/api test       # Vitest
+pnpm -F @quienatiende/api db:push    # Push schema to D1
+pnpm -F @quienatiende/api db:generate # Generate migrations
+pnpm -F @quienatiende/api db:migrate  # Run migrations
+pnpm -F @quienatiende/api db:studio  # Drizzle Studio
+pnpm -F @quienatiende/api deploy     # Deploy to Cloudflare
 ```
 
-#### Database Management
+### Frontend (Astro)
 
 ```bash
-# Run migrations
-cd packages/api
-pnpm run migrate
-
-# Seed test data
-pnpm run seed
-
-# Inspect database directly
-sqlite3 quienatiende.db
-
-# Query example
-sqlite3 quienatiende.db "SELECT COUNT(*) as total FROM politicians;"
+pnpm -F @quienatiende/frontend dev       # Astro dev server
+pnpm -F @quienatiende/frontend build     # Static build
+pnpm -F @quienatiende/frontend test      # Vitest
+pnpm -F @quienatiende/frontend test:e2e  # Playwright E2E
+pnpm -F @quienatiende/frontend deploy    # Deploy to CF Pages
 ```
 
-#### Code Quality
+### Automation (Scraper)
 
 ```bash
-# Check linting
-pnpm lint
-
-# Format code
-pnpm format
-
-# Check formatting without changes
-pnpm format:check
+pnpm -F @quienatiende/automation scrape-attendance  # Scrape attendance data
+pnpm -F @quienatiende/automation create-parties      # Seed parties
+pnpm -F @quienatiende/automation create-politicians  # Seed politicians
+pnpm -F @quienatiende/automation sync                # Full sync
+pnpm -F @quienatiende/automation sync:year           # Sync by year
 ```
 
-#### Testing
+## API Routes
+
+Base URL: `https://api.quienatiende.cr` (or `http://localhost:8787` locally)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/politicians` | List politicians with attendance |
+| GET | `/api/politicians/:id` | Politician detail |
+| GET | `/api/parties` | List parties |
+| GET | `/api/attendance/summary` | Attendance summary |
+
+## GitHub Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `frontend-build.yaml` | Push / PR | Build & deploy frontend to CF Pages |
+| `lighthouse.yaml` | Schedule / Manual | Lighthouse performance audits |
+| `sync-automation.yaml` | Schedule / Manual | Scrape & sync attendance data |
+
+## Key Conventions (from AGENTS.md)
+
+- Data flow: Astro SSR fetch → pass to React via `client:load`
+- Colors: `ATTENDANCE_COLORS` in `constants/colors.ts` is single source of truth
+- Types: shared schemas from `@quienatiende/shared`; frontend-specific in `src/types/`
+- Validation: Zod schemas for all API responses
+- Routing: year-based static paths (2022–2025)
+
+## Deployment
 
 ```bash
-# Run all tests (unit + integration)
-pnpm test
+# Frontend → Cloudflare Pages
+pnpm -F @quienatiende/frontend deploy
 
-# Run specific test suite
-pnpm -F api run test
-pnpm -F frontend run test
-
-# Run E2E tests
-pnpm -F frontend run test:e2e
-
-# Run tests in watch mode
-pnpm -F api run test:watch
+# API → Cloudflare Workers
+pnpm -F @quienatiende/api deploy
 ```
 
-#### Building for Production
+Configure D1 bindings in `wrangler.jsonc` before deploying.
 
-```bash
-# Build all packages
-pnpm build
+## Security
 
-# Build specific package
-pnpm -F frontend run build
-pnpm -F api run build
+- Prepared statements via Drizzle ORM (no SQL injection)
+- XSS protection via Astro auto-escaping
+- CORS configured in Hono middleware
+- No secrets committed — use Wrangler secrets or `.env`
 
-# Check bundle size
-pnpm -F frontend run analyze:bundle
-```
+## License
 
-## 🔄 GitHub Workflows
-
-### Available Workflows
-
-Three GitHub Actions workflows are configured:
-
-1. **fetch-daily.yml** - Daily data synchronization
-2. **lighthouse.yml** - Performance monitoring & Lighthouse audits
-3. **test.yml** - CI/CD pipeline (lint, test, E2E)
-
-### View Workflows
-
-```bash
-# List all workflows
-gh workflow list
-
-# View workflow status
-gh run list
-
-# View specific workflow run
-gh run view <run-id>
-```
-
-### Triggering Workflows Locally
-
-#### Option 1: Using Act (Run Docker Container)
-
-[Act](https://github.com/nektos/act) lets you run GitHub Actions locally in Docker.
-
-```bash
-# Install act (macOS)
-brew install act
-
-# List available workflows
-act -l
-
-# Run a specific workflow
-act -j fetch-data -l
-
-# Run test workflow
-act -j quality
-
-# Run with secrets
-act -s GITHUB_TOKEN=$(gh auth token)
-```
-
-#### Option 2: Manual Trigger via GitHub CLI
-
-```bash
-# Trigger fetch-daily workflow
-gh workflow run fetch-daily.yml
-
-# Trigger lighthouse workflow
-gh workflow run lighthouse.yml
-
-# Trigger test workflow
-gh workflow run test.yml
-
-# View triggered runs
-gh run list --workflow=test.yml
-```
-
-#### Option 3: Simulate Workflow Locally (Manual Steps)
-
-Run the workflow steps manually on your machine:
-
-```bash
-# Simulate fetch-daily.yml
-cd packages/api
-pnpm run migrate  # Step 2
-cd ../automation
-pnpm run fetch-attendance  # Step 3
-
-# Simulate test.yml
-pnpm lint         # Linting
-pnpm test         # Tests
-pnpm -F frontend run test:e2e  # E2E tests
-
-# Simulate lighthouse.yml
-pnpm build        # Build all packages
-pnpm -F frontend run analyze:bundle  # Bundle size
-```
-
-### Example: Testing Daily Fetch Locally
-
-```bash
-# 1. Install act if not already installed
-brew install act  # macOS
-# or use your package manager
-
-# 2. Run the fetch-daily workflow locally
-act schedule --job fetch-data
-
-# 3. Or trigger manually and watch
-gh workflow run fetch-daily.yml
-sleep 2
-gh run list --workflow=fetch-daily.yml --limit=1
-gh run view --log <run-id>
-```
-
-### Monitoring Workflow Runs
-
-```bash
-# Watch test workflow in real-time
-watch -n 5 'gh run list --workflow=test.yml --limit=3'
-
-# View detailed logs for a run
-gh run view <run-id> --log
-
-# Download artifacts from a run
-gh run download <run-id> --dir=./artifacts
-```
-
-## 📊 API Endpoints
-
-All endpoints available at `http://localhost:3000/api`
-
-```bash
-# Get system metadata
-curl http://localhost:3000/api/metadata
-
-# List all parties
-curl http://localhost:3000/api/parties
-
-# Get politicians (yearly)
-curl 'http://localhost:3000/api/politicians?year=2026&limit=10'
-
-# Get politician details
-curl http://localhost:3000/api/politicians/POL_001
-
-# Get attendance history
-curl 'http://localhost:3000/api/politicians/POL_001/attendance?year=2026'
-
-# Search politicians
-curl 'http://localhost:3000/api/search?q=juan'
-
-# Get party summary
-curl 'http://localhost:3000/api/attendance/summary?year=2026'
-```
-
-See [packages/api/README.md](packages/api/README.md) for detailed API documentation.
-
-## 📱 Frontend
-
-### Pages
-
-- **`/`** - Home page (yearly attendance overview)
-- **`/:year/:month`** - Monthly detail view
-- **`/politician/:id`** - Individual politician profile
-
-### Features
-
-- **Search**: Type politician name (2+ chars)
-- **Filter**: Select one or more parties
-- **Sort**: By attendance ↑↓ or name A-Z
-- **Charts**: Interactive attendance breakdown
-- **Mobile**: Full feature parity, no horizontal scroll
-
-See [docs/user-guide.md](docs/user-guide.md) for user documentation.
-
-## 🔒 Security
-
-### Environment Variables
-
-Create `.env` file in root (see `.env.example`):
-
-```bash
-NODE_ENV=development
-API_URL=http://localhost:3000
-API_PORT=3000
-FRONTEND_URL=http://localhost:3001
-FRONTEND_PORT=3001
-DB_PATH=./quienatiende.db
-```
-
-**Never commit secrets** - `.env` is in `.gitignore`
-
-### Data Safety
-
-- ✅ All database queries use prepared statements
-- ✅ No SQL injection vulnerabilities
-- ✅ XSS protection via Astro auto-escaping
-- ✅ CORS properly configured for public API
-- ✅ No secrets in code
-
-## 🧪 Testing
-
-### Test Coverage
-
-- **35+ unit tests** (API services, schemas)
-- **11+ integration tests** (database, migrations)
-- **25+ E2E tests** (Playwright, desktop + mobile)
-- **Accessibility tests** (WCAG 2.1 AA)
-
-### Running Tests
-
-```bash
-# All tests
-pnpm test
-
-# Specific package
-pnpm -F api run test
-pnpm -F frontend run test
-
-# E2E only
-pnpm -F frontend run test:e2e
-
-# With coverage
-pnpm -F api run test:coverage
-
-# Watch mode
-pnpm -F api run test:watch
-```
-
-### Mobile Testing
-
-```bash
-# Run mobile E2E tests (Playwright emulation)
-pnpm -F frontend run test:e2e -- mobile.e2e.ts
-
-# Tests include:
-# - iPhone 12, Pixel 5 emulation
-# - Touch target validation
-# - 4G throttling
-# - No horizontal scrolling
-```
-
-## 📦 Deployment
-
-### Quick Deploy (Local Testing)
-
-```bash
-# Deploy to local/staging/production
-./deploy.sh local
-./deploy.sh staging
-./deploy.sh production
-```
-
-The script will:
-- Install dependencies
-- Run migrations
-- Build all packages
-- Verify bundle size
-- Run tests
-
-### Production Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for:
-- Cloud provider setup (Vercel, Railway, AWS)
-- SSL/TLS configuration
-- Web server setup (Nginx, Apache, Docker)
-- Monitoring & backups
-- Troubleshooting
-
-### Quick Production Checklist
-
-```bash
-# 1. Verify tests pass
-pnpm test
-
-# 2. Check bundle size
-pnpm -F frontend run analyze:bundle
-
-# 3. Build for production
-pnpm build
-
-# 4. Deploy
-./deploy.sh production
-
-# 5. Verify health
-curl https://quienatiende.cr/api/metadata
-```
-
-## 📚 Documentation
-
-- **[API Reference](packages/api/README.md)** - Complete API documentation with examples
-- **[User Guide](docs/user-guide.md)** - How to use the platform (users, FAQ, accessibility)
-- **[Deployment Guide](DEPLOYMENT.md)** - How to deploy (local, staging, production)
-- **[Mobile Optimization](MOBILE_OPTIMIZATION.md)** - Mobile testing & optimization details
-- **[Code Cleanup Report](CODE_CLEANUP.md)** - Code quality & standards compliance
-- **[Final Validation](FINAL_VALIDATION.md)** - Production readiness checklist
-- **[Quickstart Guide](specs/001-attendance-visibility/quickstart.md)** - Original setup guide
-- **[Feature Spec](specs/001-attendance-visibility/spec.md)** - Requirements & user stories
-- **[Architecture Plan](specs/001-attendance-visibility/plan.md)** - Technical design & decisions
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
-
-```bash
-# Find process using port 3000
-lsof -i :3000
-
-# Kill the process
-kill -9 <pid>
-
-# Or use different ports
-API_PORT=3002 FRONTEND_PORT=3003 pnpm dev
-```
-
-### Database Locked
-
-```bash
-# Close any sqlite3 connections
-killall sqlite3
-
-# Or remove the database and reseed
-rm quienatiende.db
-cd packages/api
-pnpm run migrate
-pnpm run seed
-```
-
-### Dependency Issues
-
-```bash
-# Clear cache and reinstall
-rm -rf node_modules pnpm-lock.yaml
-pnpm install --frozen-lockfile
-
-# Or just for one package
-rm -rf packages/api/node_modules
-pnpm -F api install
-```
-
-### Build Failures
-
-```bash
-# Clean all build artifacts
-pnpm -r run clean  # if available
-
-# Or manually
-rm -rf packages/*/dist packages/*/build
-
-# Rebuild
-pnpm build
-```
-
-### Tests Failing
-
-```bash
-# Check environment
-node --version  # Should be 18+
-pnpm --version  # Should be 8+
-
-# Run specific failing test
-pnpm -F api run test -- --reporter=verbose
-
-# Update test snapshots if needed
-pnpm -F api run test -- --update
-```
-
-## 🤝 Contributing
-
-### Code Style
-
-- **TypeScript**: Strict mode enabled
-- **Formatting**: Prettier (100 char line width)
-- **Linting**: ESLint with strict rules
-- **Naming**: camelCase for variables/functions, PascalCase for types
-
-### Before Committing
-
-```bash
-# Format code
-pnpm format
-
-# Check linting
-pnpm lint
-
-# Run tests
-pnpm test
-```
-
-### Commit Messages
-
-Use conventional commits:
-```
-feat: Add new feature
-fix: Fix a bug
-docs: Update documentation
-refactor: Reorganize code
-test: Add or update tests
-chore: Update dependencies
-```
-
-## 📋 Requirements
-
-### System
-- Node.js 18+
-- pnpm 8+
-- 500MB disk space (node_modules)
-
-### Browsers (Supported)
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-### Accessibility
-- WCAG 2.1 AA compliant
-- Tested with screen readers (NVDA, JAWS, VoiceOver, TalkBack)
-- Keyboard navigation fully supported
-
-## 📈 Performance
-
-### Targets (All Met ✅)
-- Bundle size: <500KB gzipped ✅ (450KB)
-- Load time: <2s on 4G ✅ (1.5s)
-- API response: <500ms p95 ✅
-- Lighthouse score: >80 ✅ (86+)
-
-### Monitoring
-
-```bash
-# Check bundle size
-pnpm -F frontend run analyze:bundle
-
-# Run Lighthouse audit
-pnpm run lighthouse
-
-# Check Core Web Vitals (if deployed)
-curl https://quienatiende.cr/api/metadata
-```
-
-## 🎯 Project Status
-
-| Aspect | Status |
-|--------|--------|
-| Implementation | ✅ Complete (38/38 tasks) |
-| Testing | ✅ 71+ tests passing |
-| Documentation | ✅ Comprehensive |
-| Performance | ✅ All targets met |
-| Accessibility | ✅ WCAG 2.1 AA |
-| Security | ✅ Hardened |
-| Production Ready | ✅ YES |
-
-## 📞 Support
-
-### Getting Help
-
-```bash
-# See package-specific README
-cat packages/api/README.md
-cat docs/user-guide.md
-
-# Check detailed documentation
-cat DEPLOYMENT.md
-cat CODE_CLEANUP.md
-
-# Run tests to verify setup
-pnpm test
-```
-
-### Common Questions
-
-**Q: How do I change the database location?**
-A: Set `DB_PATH` in `.env` file
-
-**Q: How do I add a new API endpoint?**
-A: See [packages/api/README.md](packages/api/README.md) for structure
-
-**Q: How do I customize the UI?**
-A: Edit `.astro` files in `packages/frontend/src/`
-
-**Q: How do I disable mobile optimization?**
-A: Remove Tailwind responsive classes (`md:`, `lg:`)
-
-**Q: How do I add authentication?**
-A: See `packages/api/src/middleware/` to add auth middleware
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
-## 🙏 Acknowledgments
-
-Built with:
-- [Astro](https://astro.build) - Static site generation
-- [Hono.js](https://hono.dev) - Lightweight web framework
-- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS
-- [Recharts](https://recharts.org) - React charting library
-- [SQLite](https://sqlite.org) - Database
-- [TypeScript](https://www.typescriptlang.org) - Type safety
-- [Playwright](https://playwright.dev) - E2E testing
-
----
-
-**Version**: 1.0.0
-**Last Updated**: 2026-01-27
-**Status**: Production Ready ✅
-
-Ready to get started? Run `pnpm install && pnpm dev`! 🚀
+MIT
