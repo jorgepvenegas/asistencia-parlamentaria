@@ -11,7 +11,7 @@ import {
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
 import MembersTableV2 from '@/components/MembersTableV2';
-import SectionHeader from '@/components/SectionHeader';
+import PageHeaderRow from '@/components/PageHeaderRow.astro';
 
 const yearNum = 2025;
 
@@ -121,77 +121,23 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
   year={yearNum}
   backLink="/"
 >
-  <style>
-    .diputados-header-left {
-      flex: 1;
-      min-width: 0;
-    }
-    .year-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .year-label {
-      font-size: 14px;
-      color: #5e5e5e;
-    }
-    @media (max-width: 767px) {
-      .year-selector {
-        width: auto;
-      }
-    }
-  </style>
-
   {
     error ? (
-      <div
-        style={{
-          minHeight: '60vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#E63946', fontWeight: 600, marginBottom: 8 }}>
-            Error al cargar datos
-          </p>
-          <p style={{ color: '#777' }}>{error}</p>
+      <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
+          <p class="text-error font-semibold mb-2">Error al cargar datos</p>
+          <p class="text-[#777]">{error}</p>
         </div>
       </div>
     ) : (
-      <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-        <div class="header-row">
-          <div class="diputados-header-left">
-            <SectionHeader
-              title="Asistencia por diputado/a"
-              description={`Resumen de asistencia de ${politicians.length} diputados en el periodo ${yearNum}`}
-            />
-          </div>
-          <div class="year-selector">
-            <span class="year-label">Año</span>
-            <select
-              aria-label="Seleccionar año"
-              onchange={`const qs = window.location.search; window.location.href='/diputados/' + this.value + qs`}
-              style="padding: 10px 16px; border: 1px solid #E5E5E5; background: transparent; font-size: 12px; font-weight: 500; cursor: pointer; appearance: auto;"
-            >
-              {AVAILABLE_YEARS.map((y) => (
-                <option key={y} value={y} selected={y === yearNum}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+      <div class="flex flex-col gap-6 w-full">
+        <PageHeaderRow
+          title="Todos los diputados"
+          description={`Resumen de asistencia de ${politicians.length} diputados en el periodo ${yearNum}`}
+          year={yearNum}
+          availableYears={AVAILABLE_YEARS}
+          basePath="/diputados/"
+        />
         <MembersTableV2
           client:load
           members={politicians}

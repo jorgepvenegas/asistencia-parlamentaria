@@ -34,29 +34,20 @@ const COLS: Col[] = [
   {
     label: 'PARTIDO',
     width: 300,
-    render: (party) => <span style={{ fontSize: 13, fontWeight: 500 }}>{party.partyName}</span>,
+    render: (party) => <span className="text-sm font-medium">{party.partyName}</span>,
   },
   {
     label: 'MIEMBROS',
     width: 100,
     render: (party, _seg, memberCounts) => (
-      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, fontWeight: 500 }}>
-        {memberCounts[party.partyName] || 0}
-      </span>
+      <span className="font-mono text-sm font-medium">{memberCounts[party.partyName] || 0}</span>
     ),
   },
   {
     label: 'DIAS DE ASISTENCIA',
     width: 180,
     render: (_party, seg, _memberCounts, attendColor) => (
-      <span
-        style={{
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: 13,
-          fontWeight: 500,
-          color: attendColor,
-        }}
-      >
+      <span className="font-mono text-sm font-medium" style={{ color: attendColor }}>
         {seg.a.toFixed(1)}%
       </span>
     ),
@@ -65,7 +56,7 @@ const COLS: Col[] = [
     label: 'AUSENTE CON JUSTIFICACION VALIDA',
     width: 180,
     render: (_party, seg) => (
-      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.justified }}>
+      <span className="font-mono text-sm" style={{ color: C.justified }}>
         {seg.b.toFixed(1)}%
       </span>
     ),
@@ -74,9 +65,7 @@ const COLS: Col[] = [
     label: 'AUSENTE CON JUSTIFICACION INVALIDA',
     width: 180,
     render: (_party, seg) => (
-      <span
-        style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.unjustified }}
-      >
+      <span className="font-mono text-sm" style={{ color: C.unjustified }}>
         {seg.c.toFixed(1)}%
       </span>
     ),
@@ -85,7 +74,7 @@ const COLS: Col[] = [
     label: 'AUSENTE SIN JUSTIFICACION',
     width: 200,
     render: (_party, seg) => (
-      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: C.noJust }}>
+      <span className="font-mono text-sm" style={{ color: C.noJust }}>
         {seg.d.toFixed(1)}%
       </span>
     ),
@@ -108,38 +97,20 @@ function partySegments(p: Party): Segments {
 
 export default function PartyTable({ parties, memberCounts }: PartyTableProps) {
   return (
-    <div role="table" aria-label="Asistencia por partido" style={{ border: '1px solid #E5E5E5' }}>
-      {/* Header */}
+    <div role="table" aria-label="Asistencia por partido" className="border border-border">
       <div role="rowgroup">
         <div
           role="row"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: '#F5F5F5',
-            padding: '14px 20px',
-            borderBottom: '1px solid #E5E5E5',
-            gap: 10,
-          }}
+          className="flex items-center bg-[#F5F5F5] px-5 py-3.5 border-b border-border gap-2.5"
         >
           {COLS.map(({ label, width }) => (
-            <div key={label} role="columnheader" style={{ width, flexShrink: 0 }}>
-              <span
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: 1,
-                }}
-              >
-                {label}
-              </span>
+            <div key={label} role="columnheader" style={{ width }} className="shrink-0">
+              <span className="font-mono text-xs font-semibold tracking-wide">{label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Rows */}
       <div role="rowgroup">
         {parties.map((party) => {
           const seg = partySegments(party);
@@ -148,16 +119,10 @@ export default function PartyTable({ parties, memberCounts }: PartyTableProps) {
             <div
               key={party.partyId}
               role="row"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '14px 20px',
-                borderBottom: '1px solid #E5E5E5',
-                gap: 10,
-              }}
+              className="flex items-center px-5 py-3.5 border-b border-border gap-2.5"
             >
               {COLS.map((col) => (
-                <div key={col.label} role="cell" style={{ width: col.width, flexShrink: 0 }}>
+                <div key={col.label} role="cell" style={{ width: col.width }} className="shrink-0">
                   {col.render(party, seg, memberCounts, attendColor)}
                 </div>
               ))}
