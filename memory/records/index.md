@@ -9,10 +9,10 @@ This is the knowledge graph for the asistencia-camara monorepo. Navigate from he
 
 ## Component Maps
 
-- [[frontend-map]] — Astro + React + Tailwind frontend (coming soon)
-- [[api-map]] — Hono + Drizzle + Cloudflare Workers API (coming soon)
-- [[shared-map]] — shared types, Zod schemas, utilities (coming soon)
-- [[architecture-map]] — cross-cutting decisions and patterns (coming soon)
+- [[frontend-map]] — Astro + React + Tailwind frontend; routing, data flow, styling
+- [[api-map]] — Hono + Drizzle + Cloudflare Workers API; stack, storage, security, schema
+- [[shared-map]] — shared types, Zod schemas; single-source-of-truth cross-package types
+- [[architecture-map]] — monorepo structure, CI/CD, automation, operational guardrails
 
 ## Agent Memory
 
