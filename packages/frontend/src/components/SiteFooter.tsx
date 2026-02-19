@@ -1,16 +1,3 @@
-const RESPONSIVE = `
-  .footer-inner  { padding: 48px 64px; }
-  .footer-top    { display: flex; justify-content: space-between; margin-bottom: 40px; }
-  .footer-cols   { display: flex; gap: 64px; }
-  .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
-  @media (max-width: 767px) {
-    .footer-inner  { padding: 32px 20px; }
-    .footer-top    { flex-direction: column; gap: 32px; }
-    .footer-cols   { gap: 32px; flex-wrap: wrap; }
-    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
-  }
-`;
-
 interface SiteFooterProps {
   year: number;
 }
@@ -19,18 +6,9 @@ const FOOTER_COLS = [
   {
     title: 'DATOS',
     links: [
-      { label: 'Asistencia', href: '/' },
+      { label: 'Home', href: '/' },
       { label: 'Partidos', href: '/partidos' },
-      { label: 'Ranking', href: '/diputados' },
-      { label: 'Estadísticas', href: '/#ranking' },
-    ],
-  },
-  {
-    title: 'LEGAL',
-    links: [
-      { label: 'Términos de uso', href: '#' },
-      { label: 'Privacidad', href: '#' },
-      { label: 'Fuentes de datos', href: '/acerca-de' },
+      { label: 'Diputados', href: '/diputados' },
     ],
   },
   {
@@ -45,86 +23,46 @@ const FOOTER_COLS = [
 
 export default function SiteFooter({ year }: SiteFooterProps) {
   return (
-    <>
-      <style>{RESPONSIVE}</style>
-      <footer style={{ background: '#000' }}>
-        <div
-          className="footer-inner"
-          style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
-        >
-          <div className="footer-top">
-            <div style={{ maxWidth: 360 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <a
-                  href="/"
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}
-                >
-                  <div
-                    style={{
-                      background: '#DC2626',
-                      width: 24,
-                      height: 24,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 2,
-                    }}
-                  >
-                    <span style={{ color: '#FAFAFA', fontWeight: 700, fontSize: 12 }}>C</span>
-                  </div>
-                  <span
-                    style={{ color: '#FAFAFA', fontWeight: 600, fontSize: 14, letterSpacing: -1 }}
-                  >
-                    CongresoAbierto
-                  </span>
-                </a>
-              </div>
-              <p style={{ color: '#9a9a9a', fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                Plataforma ciudadana de transparencia parlamentaria. Datos públicos para una
-                democracia informada.
-              </p>
-            </div>
-            <div className="footer-cols">
-              {FOOTER_COLS.map(({ title, links }) => (
-                <div key={title} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <span
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: '#FAFAFA',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    {title}
-                  </span>
-                  {links.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      style={{ color: '#9a9a9a', fontSize: 13, textDecoration: 'none' }}
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+    <footer className="bg-black">
+      <div className="max-w-[1536px] mx-auto box-border px-4 py-12 md:px-5 md:py-8">
+        <div className="flex flex-col justify-between mb-10 md:flex-row gap-8">
+          <div className="md:max-w-[360px]">
+            <div className="flex items-center gap-3 mb-4">
+              <a href="/" className="flex items-center gap-3 no-underline">
+                <div className="bg-brand-red w-6 h-6 flex items-center justify-center rounded-sm">
+                  <span className="text-surface font-bold text-xs">C</span>
                 </div>
-              ))}
+                <span className="text-surface font-semibold text-sm tracking-tight">
+                  CongresoAbierto
+                </span>
+              </a>
             </div>
+            <p className="text-subtle text-sm leading-relaxed m-0">
+              Plataforma ciudadana de transparencia parlamentaria. Datos públicos para una
+              democracia informada.
+            </p>
           </div>
-          <div className="footer-bottom" style={{ borderTop: '1px solid #333', paddingTop: 24 }}>
-            <span
-              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#9a9a9a' }}
-            >
-              © {year} CongresoAbierto. Datos de dominio público.
-            </span>
-            <span
-              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#9a9a9a' }}
-            >
-              Hecho con datos del Congreso de la República
-            </span>
+          <div className="grid grid-cols-2 md:flex gap-16 md:gap-8 md:flex-wrap">
+            {FOOTER_COLS.map(({ title, links }) => (
+              <div key={title} className="flex flex-col gap-4">
+                <span className="font-mono text-xs font-semibold text-surface tracking-wide">
+                  {title}
+                </span>
+                {links.map((link) => (
+                  <a key={link.label} href={link.href} className="text-subtle text-sm no-underline">
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
-    </>
+        <div className="flex-col justify-between items-center border-t border-[#333] pt-6 md:flex-row md:items-start gap-2">
+          <span className="font-mono text-xs text-subtle">
+            © {year} Datos de dominio público. Hecho con datos de la Cámara de Diputados de Chile.
+          </span>
+        </div>
+      </div>
+    </footer>
   );
 }

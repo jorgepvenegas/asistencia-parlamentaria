@@ -103,116 +103,63 @@ export default function PartyAttendance({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-      {/* Section header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+    <div className="flex flex-col gap-8">
+      <div className="flex justify-between items-end">
         <div>
-          <h2
-            style={{
-              fontSize: 32,
-              fontWeight: 600,
-              letterSpacing: -2,
-              color: '#000',
-              margin: '0 0 8px',
-            }}
-          >
+          <h2 className="text-[32px] font-semibold tracking-tight text-black mb-2">
             Asistencia por partido
           </h2>
-          <p style={{ fontSize: 14, color: '#5E5E5E', margin: 0 }}>
+          <p className="text-sm text-subtle m-0">
             Selecciona un partido para ver la asistencia desglosada de cada congresista
           </p>
         </div>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '10px 16px',
-            border: '1px solid #E5E5E5',
-          }}
-        >
-          <span style={{ fontSize: 12, fontWeight: 500 }}>{initialYear}</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2.5 border border-border">
+          <span className="text-xs font-medium">{initialYear}</span>
         </div>
       </div>
 
-      {/* Party tabs */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className="flex gap-2 flex-wrap">
         {sortedParties.map((party, i) => (
           <button
             key={party.partyId}
             onClick={() => selectParty(i)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              background: i === selectedIdx ? '#000' : 'transparent',
-              border: i === selectedIdx ? 'none' : '1px solid #E5E5E5',
-              cursor: 'pointer',
-              color: i === selectedIdx ? '#FAFAFA' : '#5E5E5E',
-              fontSize: 12,
-              fontWeight: i === selectedIdx ? 600 : 500,
-              fontFamily: "'Sora', sans-serif",
-            }}
+            className={`flex items-center gap-2 px-5 py-2.5 cursor-pointer font-display text-xs font-medium ${
+              i === selectedIdx
+                ? 'bg-black text-surface border-0 font-semibold'
+                : 'bg-transparent text-subtle border border-border'
+            }`}
           >
             {party.partyName}
-            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#999' }}>
+            <span className="font-mono text-xs text-muted">
               {(membersByParty[party.partyName] || []).length}
             </span>
           </button>
         ))}
       </div>
 
-      {/* Stat cards */}
       {statCards && <StatCards cards={statCards} />}
 
-      {/* Legend */}
       <AttendanceLegend />
 
-      {/* Table */}
-      <div style={{ border: '1px solid #E5E5E5' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: '#F5F5F5',
-            padding: '14px 20px',
-            borderBottom: '1px solid #E5E5E5',
-          }}
-        >
-          {(
-            [
-              ['CONGRESISTA', 220],
-              ['ASIST.', 80],
-              ['F. JUST.', 80],
-              ['F. S/V.', 80],
-              ['F. S/J.', 80],
-            ] as [string, number][]
-          ).map(([label, w]) => (
-            <div key={label} style={{ width: w, flexShrink: 0 }}>
-              <span
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: 1,
-                }}
-              >
-                {label}
-              </span>
-            </div>
-          ))}
-          <div style={{ flex: 1 }}>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: 1,
-              }}
-            >
-              DISTRIBUCIÓN
-            </span>
+      <div className="border border-border">
+        <div className="flex items-center bg-[#F5F5F5] px-5 py-3.5 border-b border-border">
+          <div className="w-[220px] shrink-0">
+            <span className="font-mono text-xs font-semibold tracking-wide">CONGRESISTA</span>
+          </div>
+          <div className="w-20 shrink-0">
+            <span className="font-mono text-xs font-semibold tracking-wide">ASIST.</span>
+          </div>
+          <div className="w-20 shrink-0">
+            <span className="font-mono text-xs font-semibold tracking-wide">F. JUST.</span>
+          </div>
+          <div className="w-20 shrink-0">
+            <span className="font-mono text-xs font-semibold tracking-wide">F. S/V.</span>
+          </div>
+          <div className="w-20 shrink-0">
+            <span className="font-mono text-xs font-semibold tracking-wide">F. S/J.</span>
+          </div>
+          <div className="flex-1">
+            <span className="font-mono text-xs font-semibold tracking-wide">DISTRIBUCIÓN</span>
           </div>
         </div>
 
@@ -220,60 +167,27 @@ export default function PartyAttendance({
           const seg = politicianBarSegments(p);
           const attendColor = p.pct >= 80 ? C.attendance : p.pct >= 60 ? C.unjustified : C.noJust;
           return (
-            <div
-              key={p.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '14px 20px',
-                borderBottom: '1px solid #E5E5E5',
-              }}
-            >
-              <div style={{ width: 220, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>{p.name}</span>
+            <div key={p.id} className="flex items-center px-5 py-3.5 border-b border-border">
+              <div className="w-[220px] shrink-0">
+                <span className="text-sm font-medium">{p.name}</span>
               </div>
-              <div style={{ width: 80, flexShrink: 0 }}>
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: attendColor,
-                  }}
-                >
+              <div className="w-20 shrink-0">
+                <span className="font-mono text-sm font-medium" style={{ color: attendColor }}>
                   {p.pct.toFixed(1)}%
                 </span>
               </div>
-              <div style={{ width: 80, flexShrink: 0 }}>
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 13,
-                    color: C.justified,
-                  }}
-                >
+              <div className="w-20 shrink-0">
+                <span className="font-mono text-sm" style={{ color: C.justified }}>
                   {seg.b.toFixed(1)}%
                 </span>
               </div>
-              <div style={{ width: 80, flexShrink: 0 }}>
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 13,
-                    color: C.unjustified,
-                  }}
-                >
+              <div className="w-20 shrink-0">
+                <span className="font-mono text-sm" style={{ color: C.unjustified }}>
                   {seg.c.toFixed(1)}%
                 </span>
               </div>
-              <div style={{ width: 80, flexShrink: 0 }}>
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 13,
-                    color: C.noJust,
-                  }}
-                >
+              <div className="w-20 shrink-0">
+                <span className="font-mono text-sm" style={{ color: C.noJust }}>
                   {seg.d.toFixed(1)}%
                 </span>
               </div>
@@ -283,38 +197,22 @@ export default function PartyAttendance({
         })}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#999' }}>
+        <div className="flex justify-between items-center">
+          <span className="font-mono text-xs text-muted">
             Mostrando {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, members.length)} de{' '}
             {members.length} congresistas
           </span>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div className="flex gap-1.5">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setPage(i + 1)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: i + 1 === page ? '#000' : 'transparent',
-                  border: i + 1 === page ? 'none' : '1px solid #E5E5E5',
-                  color: i + 1 === page ? '#FAFAFA' : '#5E5E5E',
-                  fontSize: 12,
-                  fontFamily: "'Sora', sans-serif",
-                  fontWeight: i + 1 === page ? 600 : 500,
-                  cursor: 'pointer',
-                }}
+                className={`w-9 h-9 flex items-center justify-center font-display text-xs cursor-pointer ${
+                  i + 1 === page
+                    ? 'bg-black text-surface border-0 font-semibold'
+                    : 'bg-transparent text-subtle border border-border font-medium'
+                }`}
               >
                 {i + 1}
               </button>

@@ -13,7 +13,7 @@ import {
 } from '@quienatiende/shared/schemas';
 import { z } from 'zod';
 import PartyComparisonChart from '@/components/PartyComparisonChart';
-import SectionHeader from '@/components/SectionHeader';
+import PageHeaderRow from '@/components/PageHeaderRow.astro';
 
 export function getStaticPaths() {
   return [
@@ -96,8 +96,6 @@ try {
       if (!politician) return null;
       const party = partyMap.get(politician.partyId);
 
-      // const totalSessions = att.attendanceCount + att.unjustifiedAbsentCount + att.
-
       const adjustedTotalSessions =
         att.attendanceCount + att.unjustifiedAbsentCount + att.absentCount;
 
@@ -159,98 +157,30 @@ try {
   year={yearNum}
   backLink="/"
 >
-  <style>
-    .partidos-header-left {
-      flex: 1;
-      min-width: 0;
-    }
-    .year-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .year-label {
-      font-size: 14px;
-      color: #5e5e5e;
-    }
-    @media (max-width: 767px) {
-      .year-selector {
-        width: auto;
-      }
-    }
-  </style>
   {
     error ? (
-      <div
-        style={{
-          minHeight: '60vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#E63946', fontWeight: 600, marginBottom: 8 }}>
-            Error al cargar datos
-          </p>
-          <p style={{ color: '#777' }}>{error}</p>
+      <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
+          <p class="text-error font-semibold mb-2">Error al cargar datos</p>
+          <p class="text-[#777]">{error}</p>
         </div>
       </div>
     ) : politicians.length === 0 ? (
-      <div
-        style={{
-          minHeight: '60vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#F4A261', fontWeight: 600 }}>No hay datos disponibles</p>
-          <p style={{ color: '#777' }}>Verifica que el servidor API esté ejecutándose.</p>
+      <div class="min-h-[60vh] flex items-center justify-center">
+        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
+          <p class="text-warning font-semibold">No hay datos disponibles</p>
+          <p class="text-[#777]">Verifica que el servidor API esté ejecutándose.</p>
         </div>
       </div>
     ) : (
-      <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-        <div class="header-row">
-          <div class="partidos-header-left">
-            <SectionHeader
-              title="Asistencia por partidos"
-              description={`Resumen de asistencia de partidos politicos en el periodo ${yearNum}`}
-            />
-          </div>
-          <div class="year-selector">
-            <span class="year-label">Año</span>
-            <select
-              aria-label="Seleccionar año"
-              onchange={`const qs = window.location.search; window.location.href='/partidos/' + this.value + qs`}
-              style="padding: 10px 16px; border: 1px solid #E5E5E5; background: transparent; font-size: 12px; font-weight: 500; cursor: pointer; appearance: auto;"
-            >
-              {AVAILABLE_YEARS.map((y) => (
-                <option key={y} value={y} selected={y === yearNum}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+      <div class="flex flex-col gap-6 w-full">
+        <PageHeaderRow
+          title="Asistencia por partidos"
+          description={`Resumen de asistencia de partidos politicos en el periodo ${yearNum}`}
+          year={yearNum}
+          availableYears={AVAILABLE_YEARS}
+          basePath="/partidos/"
+        />
         <PartyComparisonChart client:load parties={partyAttendance} initialYear={yearNum} />
       </div>
     )

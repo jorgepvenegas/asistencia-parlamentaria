@@ -5,19 +5,9 @@ interface SectionHeaderProps {
 
 export default function SectionHeader({ title, description }: SectionHeaderProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <h2
-        style={{
-          fontSize: 32,
-          fontWeight: 600,
-          letterSpacing: -2,
-          color: '#000',
-          margin: 0,
-        }}
-      >
-        {title}
-      </h2>
-      {description && <p style={{ fontSize: 16, color: '#5E5E5E', margin: 0 }}>{description}</p>}
+    <div className="flex flex-col gap-2">
+      <h2 className="text-[32px] font-semibold tracking-tight text-black m-0">{title}</h2>
+      {description && <p className="text-base text-subtle m-0">{description}</p>}
     </div>
   );
 }

@@ -10,37 +10,14 @@ interface PartyTabsProps {
 
 export default function PartyTabs({ parties, memberCounts }: PartyTabsProps) {
   return (
-    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <div className="flex gap-2 flex-wrap">
       {parties.map((party) => (
         <div
           key={party.partyId}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '10px 20px',
-            border: '1px solid #E5E5E5',
-          }}
+          className="flex items-center gap-2 px-5 py-2.5 border border-border"
         >
-          <span
-            style={{
-              fontFamily: "'Sora', sans-serif",
-              fontSize: 12,
-              fontWeight: 500,
-              color: '#5E5E5E',
-            }}
-          >
-            {party.partyName}
-          </span>
-          <span
-            style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 11,
-              color: '#999',
-            }}
-          >
-            {memberCounts[party.partyName] || 0}
-          </span>
+          <span className="font-display text-xs font-medium text-subtle">{party.partyName}</span>
+          <span className="font-mono text-xs text-muted">{memberCounts[party.partyName] || 0}</span>
         </div>
       ))}
     </div>

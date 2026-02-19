@@ -13,79 +13,30 @@ interface HoverTooltipProps {
 }
 
 export default function HoverTooltip({ x, y, title, subheader, rows }: HoverTooltipProps) {
+  // NOTE: Dynamic positioning requires inline styles.
+  // Consider migrating to a tooltip library (e.g., Floating UI, Tippy.js)
+  // for better positioning and accessibility in the future.
   return (
     <div
+      className="fixed bg-white text-black border border-border shadow-lg p-4 pointer-events-none z-50 min-w-[200px] flex flex-col gap-2"
       style={{
-        position: 'fixed',
         top: y + 16,
         left: x + 16,
-        background: '#FFF',
-        color: '#000',
-        border: '1px solid #E5E5E5',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        padding: '12px 16px',
-        pointerEvents: 'none',
-        zIndex: 1000,
-        minWidth: 200,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <span
-          style={{
-            fontFamily: "'Sora', sans-serif",
-            fontSize: 12,
-            fontWeight: 600,
-            paddingBottom: 2,
-            color: '#000',
-          }}
-        >
-          {title}
-        </span>
-        <span
-          style={{
-            fontFamily: "'Sora', sans-serif",
-            fontSize: 12,
-            fontWeight: 600,
-            marginBottom: 4,
-            borderBottom: '1px solid #E5E5E5',
-            paddingBottom: 8,
-            color: '#5E5E5E',
-          }}
-        >
+      <div className="flex flex-col">
+        <span className="font-display text-xs font-semibold pb-0.5 text-black">{title}</span>
+        <span className="font-display text-xs font-semibold mb-1 border-b border-border pb-2 text-subtle">
           {subheader}
         </span>
       </div>
       {rows.map(({ label, value, color }) => (
-        <div
-          key={label}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            gap: 24,
-            alignItems: 'center',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 8, height: 8, background: color, flexShrink: 0 }} />
-            <span
-              style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#5E5E5E' }}
-            >
-              {label}
-            </span>
+        <div key={label} className="flex justify-between gap-6 items-center">
+          <div className="flex items-center gap-1.5">
+            <div style={{ width: 8, height: 8, background: color }} className="shrink-0" />
+            <span className="font-mono text-xs text-subtle">{label}</span>
           </div>
-          <span
-            style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#000',
-            }}
-          >
-            {value}
-          </span>
+          <span className="font-mono text-xs font-semibold text-black">{value}</span>
         </div>
       ))}
     </div>

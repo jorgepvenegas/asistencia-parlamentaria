@@ -1,23 +1,8 @@
 import { useMemo } from 'react';
 import type { PoliticianAttendance, PartyAttendance } from '../types/dashboard';
-import SiteHeader from './SiteHeader';
+import Navigation from './Navigation';
 import SiteFooter from './SiteFooter';
 import GeneralAttendance from './GeneralAttendance';
-
-const RESPONSIVE = `
-  .lp-hero-inner   { padding: 80px 64px 28px; }
-  .lp-trust-inner  { padding: 20px 64px; display: flex; gap: 48px; align-items: center; }
-  .lp-main-inner   { padding: 48px 64px; }
-  .lp-hero-h1      { font-size: 56px; letter-spacing: -2px; }
-  .lp-cta-row      { flex-wrap: nowrap; }
-  @media (max-width: 767px) {
-    .lp-hero-inner  { padding: 40px 20px; }
-    .lp-trust-inner { padding: 16px 20px; gap: 24px; flex-wrap: wrap; }
-    .lp-main-inner  { padding: 32px 20px; }
-    .lp-hero-h1     { font-size: 36px; letter-spacing: -1px; }
-    .lp-cta-row     { flex-wrap: wrap; }
-  }
-`;
 
 interface LandingPageProps {
   politicians: PoliticianAttendance[];
@@ -36,167 +21,51 @@ export default function LandingPage({
   }, [politicians]);
 
   return (
-    <>
-      <style>{RESPONSIVE}</style>
-      <div
-        style={{
-          fontFamily: "'Sora', sans-serif",
-          background: '#FAFAFA',
-          color: '#000',
-          margin: 0,
-          width: '100%',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <SiteHeader />
+    <div className="font-display bg-surface text-black m-0 w-full min-h-screen flex flex-col overflow-x-hidden">
+      <Navigation />
 
-        {/* HERO */}
-        <section style={{ background: '#000' }}>
-          <div
-            className="lp-hero-inner"
-            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
-          >
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '6px 14px',
-                border: '1px solid #333',
-                marginBottom: 24,
-              }}
-            >
+      <section className="bg-black">
+        <div className="max-w-[1536px] mx-auto box-border px-6 pt-6 pb-7 md:px-5 md:pt-10 md:pb-5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border border-[#333] mb-6">
+            <span className="bg-brand-green w-2 h-2 rounded-full inline-block" />
+            <span className="font-mono text-xs text-muted font-medium">
+              Datos actualizados — Periodo {initialYear}
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-surface max-w-[700px] mb-6 break-words">
+            Quién atendió sesiones del Congreso?
+          </h1>
+          <p className="text-muted text-base leading-relaxed max-w-[600px] mb-8">
+            Conoce quién asiste, quién falta, y por qué. Transparencia para una mejor democracia.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-[#F5F5F5] border-b border-border">
+        <div className="max-w-[1536px] mx-auto box-border px-6 py-4 flex gap-12 items-center md:px-5 md:py-4 md:gap-6 md:flex-wrap">
+          {[
+            { value: politicians.length.toString(), label: 'diputados', highlight: false },
+            { value: partyCount.toString(), label: 'partidos políticos', highlight: false },
+          ].map(({ value, label, highlight }) => (
+            <div key={label} className="flex items-center gap-2">
               <span
-                style={{
-                  background: '#22C55E',
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 12,
-                  color: '#999',
-                  fontWeight: 500,
-                }}
+                className={`text-xl font-bold tracking-tight ${highlight ? 'text-brand-red' : 'text-black'}`}
               >
-                Datos actualizados — Periodo {initialYear}
+                {value}
               </span>
+              <span className="font-mono text-xs text-subtle">{label}</span>
             </div>
-            <h1
-              className="lp-hero-h1"
-              style={{
-                color: '#FAFAFA',
-                fontWeight: 700,
-                lineHeight: 1.05,
-                maxWidth: 700,
-                margin: '0 0 24px',
-              }}
-            >
-              Quién atendió sesiones
-              <br />
-              del Congreso?
-            </h1>
-            <p
-              style={{
-                color: '#999',
-                fontSize: 16,
-                lineHeight: 1.6,
-                maxWidth: 600,
-                margin: '0 0 32px',
-              }}
-            >
-              Conoce quién asiste, quién falta, y por qué. Transparencia para una mejor democracia.
-            </p>
-            {/* <div className="lp-cta-row" style={{ display: 'flex', gap: 16 }}>
-              <a
-                href="#asistencia"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  background: '#DC2626',
-                  color: '#FAFAFA',
-                  padding: '14px 28px',
-                  textDecoration: 'none',
-                  fontSize: 14,
-                  fontWeight: 600,
-                }}
-              >
-                Ver asistencia ↓
-              </a>
-              <a
-                href="#partidos"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  border: '1px solid #333',
-                  color: '#FAFAFA',
-                  padding: '14px 28px',
-                  textDecoration: 'none',
-                  fontSize: 14,
-                  fontWeight: 500,
-                }}
-              >
-                Comparar partidos
-              </a>
-            </div> */}
-          </div>
-        </section>
+          ))}
+        </div>
+      </section>
 
-        {/* TRUST BAR */}
-        <section style={{ background: '#F5F5F5', borderBottom: '1px solid #E5E5E5' }}>
-          <div
-            className="lp-trust-inner"
-            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
-          >
-            {[
-              { value: politicians.length.toString(), label: 'diputados', highlight: false },
-              { value: partyCount.toString(), label: 'partidos políticos', highlight: false },
-            ].map(({ value, label, highlight }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    letterSpacing: -1,
-                    color: highlight ? '#DC2626' : '#000',
-                  }}
-                >
-                  {value}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 12,
-                    color: '#5E5E5E',
-                  }}
-                >
-                  {label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+      <main id="asistencia" className="flex-1">
+        <div className="max-w-[1536px] mx-auto box-border px-4 py-6 md:px-5 md:py-8">
+          <GeneralAttendance partyAttendance={partyAttendance} initialYear={initialYear} />
+        </div>
+      </main>
 
-        {/* CONTENT */}
-        <main id="asistencia" style={{ flex: 1 }}>
-          <div
-            className="lp-main-inner"
-            style={{ maxWidth: 1536, margin: '0 auto', boxSizing: 'border-box' }}
-          >
-            <GeneralAttendance partyAttendance={partyAttendance} initialYear={initialYear} />
-          </div>
-        </main>
-
-        <SiteFooter year={initialYear} />
-      </div>
-    </>
+      <SiteFooter year={initialYear} />
+    </div>
   );
 }

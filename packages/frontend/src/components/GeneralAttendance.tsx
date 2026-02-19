@@ -15,8 +15,6 @@ export default function GeneralAttendance({
   partyAttendance,
   initialYear,
 }: GeneralAttendanceProps) {
-  // console.table(sorted[1]);
-
   const overall = useMemo(() => {
     const totalAttend = partyAttendance.reduce((s, p) => s + p.attendanceCount, 0);
     const totalJust = partyAttendance.reduce((s, p) => s + p.justifiedAbsentCount, 0);
@@ -39,79 +37,7 @@ export default function GeneralAttendance({
   }, [partyAttendance]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32, width: '100%' }}>
-      {/* Section header */}
-      <style>{`
-        .ga-header-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          gap: 20px;
-          padding: 15px 0;
-        }
-        .ga-header-left {
-          flex: 1;
-          min-width: 0;
-        }
-        .ga-year-selector {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          white-space: nowrap;
-        }
-        .ga-year-label {
-          font-size: 14px;
-          color: #5E5E5E;
-        }
-        @media (max-width: 767px) {
-          .ga-header-row {
-            flex-direction: column;
-            gap: 16px;
-            align-items: flex-end;
-          }
-          .ga-year-selector {
-            width: auto;
-          }
-        }
-      `}</style>
-      {/* <div className="ga-header-row">
-        <div className="ga-header-left">
-          <SectionHeader
-            title="Asistencia por partidos"
-            description={`Resumen de asistencia de partidos políticos en el periodo ${initialYear}`}
-          />
-        </div>
-        <div className="ga-year-selector">
-          <span className="ga-year-label">Año</span>
-          <select
-            value={initialYear}
-            aria-label="Seleccionar año"
-            onChange={(e) => {
-              window.location.href = `/partidos/${e.target.value}`;
-            }}
-            style={{
-              padding: '10px 16px',
-              border: '1px solid #E5E5E5',
-              background: 'transparent',
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: 'pointer',
-              appearance: 'auto',
-            }}
-          >
-            {[2025, 2024, 2023, 2022].map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div> */}
-
-      {/* Party tabs (informational, no selection) */}
-      {/* <PartyTabs parties={sorted} memberCounts={memberCounts} /> */}
-
-      {/* Overall stat cards */}
+    <div>
       {overall && (
         <StatCards
           cards={[
@@ -143,33 +69,7 @@ export default function GeneralAttendance({
         />
       )}
 
-      {/* Party comparison chart */}
       <PartyComparisonChart parties={partyAttendance} initialYear={initialYear} />
-
-      {/* Pagination footer
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span
-          style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#999" }}
-        >
-          Mostrando {partyAttendance.length} de {partyAttendance.length} partidos
-        </span>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "#000",
-            color: "#FAFAFA",
-            fontSize: 12,
-            fontFamily: "'Sora', sans-serif",
-            fontWeight: 600,
-          }}
-        >
-          1
-        </div>
-      </div> */}
     </div>
   );
 }

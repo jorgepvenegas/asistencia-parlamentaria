@@ -1,0 +1,33 @@
+---
+import SectionHeader from './SectionHeader';
+
+interface Props {
+  title: string;
+  description: string;
+  year: number;
+  availableYears: number[];
+  basePath: string;
+}
+
+const { title, description, year, availableYears, basePath } = Astro.props;
+---
+
+<div class="flex flex-col gap-2 justify-between py-2 md:flex-row md:gap-4 md:items-center">
+  <SectionHeader title={title} description={description} />
+  <div class="flex items-center gap-2 whitespace-nowrap justify-end">
+    <span class="text-sm text-subtle">Año</span>
+    <select
+      aria-label="Seleccionar año"
+      onchange={`const qs = window.location.search; window.location.href='${basePath}' + this.value + qs`}
+      class="px-4 py-2.5 border border-border bg-transparent text-xs font-medium cursor-pointer appearance-auto"
+    >
+      {
+        availableYears.map((y) => (
+          <option key={y} value={y} selected={y === year}>
+            {y}
+          </option>
+        ))
+      }
+    </select>
+  </div>
+</div>

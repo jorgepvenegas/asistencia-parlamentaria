@@ -7,25 +7,6 @@ import HoverTooltip from './HoverTooltip';
 
 const MOBILE_PREVIEW = 7;
 
-const CHART_RESPONSIVE = `
-  .chart-party-name { width: 230px; flex-shrink: 0; }
-  .chart-row-bar  { flex: 1; display: flex; height: 20px; overflow: hidden; }
-  .chart-row-pct  { width: 50px; flex-shrink: 0; text-align: right; }
-  .chart-container { padding: 24px; }
-  .chart-expand-btn { display: none; }
-  .chart-sort-btn { flex-shrink: 0; }
-  @media (max-width: 767px) {
-    .chart-container { padding: 0 !important; }
-    .chart-row { flex-wrap: wrap; gap: 0 !important; padding: 14px 16px; border-bottom: 1px solid #E5E5E5; }
-    .chart-row:last-child { border-bottom: none; }
-    .chart-party-name { order: 1; flex: 1; width: auto !important; font-size: 13px !important; }
-    .chart-row-pct  { order: 2; width: auto !important; font-size: 13px !important; font-weight: 600 !important; }
-    .chart-row-bar  { order: 3; width: 100%; flex: none; height: 8px; margin-top: 10px; gap: 1px; }
-    .chart-expand-btn { display: flex; }
-    .chart-sort-btn { align-self: flex-end; }
-  }
-`;
-
 interface Party {
   partyId: number;
   partyName: string;
@@ -94,38 +75,16 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
 
   return (
     <>
-      <style>{CHART_RESPONSIVE}</style>
       <AttendanceLegend />
       <div className="flex flex-row-reverse">
         <button
-          className="chart-sort-btn"
           onClick={() => setAsc((v) => !v)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            border: '1px solid #E5E5E5',
-            background: 'none',
-            cursor: 'pointer',
-            padding: '6px 10px',
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 11,
-            fontWeight: 500,
-            color: '#5E5E5E',
-          }}
+          className="flex items-center gap-1 shrink-0 border border-border bg-transparent cursor-pointer px-2.5 py-1.5 font-mono text-xs font-medium text-subtle"
         >
           {asc ? '↑ Menor a mayor' : '↓ Mayor a menor'}
         </button>
       </div>
-      <div
-        className="chart-container"
-        style={{
-          border: '1px solid #E5E5E5',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-        }}
-      >
+      <div className="border flex flex-col md:p-5 ">
         {visibleParties.map((party) => {
           const seg = partySegments(party);
           const partySlug = toPartySlug(party.partyName) || String(party.partyId);
@@ -133,16 +92,8 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
             <a
               key={party.partyId}
               href={`/partidos/${partySlug}/${initialYear}`}
-              className="chart-row"
+              className="md:flex md:flex-row md:items-center gap-3 cursor-pointer no-underline text-inherit px-4 py-3 md:px-0 border-b border-border last:border-b-0 md:border-b-0"
               aria-label={`Ver detalle del partido ${party.partyName}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                cursor: 'pointer',
-                textDecoration: 'none',
-                color: 'inherit',
-              }}
               onMouseMove={(e) => {
                 setTooltip({ party, x: e.clientX, y: e.clientY });
               }}
@@ -150,38 +101,38 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
                 setTooltip(null);
               }}
             >
+              {/* Desktop: Party name (left) */}
+              {/* Mobile: Hidden (shown in row below) */}
               <span
-                className="chart-party-name"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: '#000',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                }}
+                className="hidden md:inline text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap w-[230px] shrink-0"
                 title={party.partyName}
               >
                 {party.partyName}
-                <span style={{ color: '#999', flexShrink: 0 }}>→</span>
+                <span className="text-muted ml-1">→</span>
               </span>
-              <div className="chart-row-bar">
+
+              {/* Mobile: Row 1 - Party name + percentage */}
+              <div className="flex md:hidden justify-between items-center w-full pb-2">
+                <span
+                  className="text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap inline-flex items-center gap-1"
+                  title={party.partyName}
+                >
+                  {party.partyName}
+                  <span className="text-muted shrink-0">→</span>
+                </span>
+                <span className="font-mono text-xs font-semibold">{seg.a.toFixed(1)}%</span>
+              </div>
+
+              {/* Bar - Desktop: middle, Mobile: row 2 */}
+              <div className="w-full h-2 md:flex-1 md:h-5 md:overflow-hidden flex gap-px">
                 <div style={{ flex: seg.a, background: C.attendance, height: '100%' }} />
                 <div style={{ flex: seg.b, background: C.justified, height: '100%' }} />
                 <div style={{ flex: seg.c, background: C.unjustified, height: '100%' }} />
                 <div style={{ flex: seg.d, background: C.noJust, height: '100%' }} />
               </div>
-              <span
-                className="chart-row-pct"
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 12,
-                  fontWeight: 500,
-                }}
-              >
+
+              {/* Desktop: Percentage (right) */}
+              <span className="hidden md:inline font-mono text-xs font-medium w-[50px] shrink-0 text-right">
                 {seg.a.toFixed(1)}%
               </span>
             </a>
@@ -189,22 +140,8 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
         })}
         {isMobile && !expanded && partiesSorted.length > MOBILE_PREVIEW && (
           <button
-            className="chart-expand-btn"
             onClick={() => setExpanded(true)}
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '14px 16px',
-              background: 'none',
-              border: 'none',
-              borderTop: '1px solid #E5E5E5',
-              cursor: 'pointer',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#000',
-              width: '100%',
-            }}
+            className="flex md:hidden items-center justify-center py-3.5 px-4 bg-transparent border-0 border-t border-border cursor-pointer font-mono text-xs font-semibold text-black w-full"
           >
             Ver todos ({partiesSorted.length - MOBILE_PREVIEW} más)
           </button>

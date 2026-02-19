@@ -10,7 +10,7 @@ interface DistributionBarProps {
 
 export default function DistributionBar({ a, b, c, d, height = 12 }: DistributionBarProps) {
   return (
-    <div style={{ flex: 1, display: 'flex', height, overflow: 'hidden' }}>
+    <div className="flex-1 flex overflow-hidden" style={{ height }}>
       <div style={{ flex: a, background: ATTENDANCE_COLORS.attendance, height: '100%' }} />
       <div style={{ flex: b, background: ATTENDANCE_COLORS.justified, height: '100%' }} />
       <div style={{ flex: c, background: ATTENDANCE_COLORS.unjustified, height: '100%' }} />

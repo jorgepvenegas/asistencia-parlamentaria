@@ -82,8 +82,6 @@ try {
       if (!politician) return null;
       const party = partyMap.get(politician.partyId);
 
-      // const totalSessions = att.attendanceCount + att.unjustifiedAbsentCount + att.
-
       const adjustedTotalSessions =
         att.attendanceCount +
         att.justifiedAbsentCount +
@@ -169,55 +167,17 @@ try {
 >
   {
     error ? (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: '#0f0f1a',
-          color: '#e0e0e0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: "'Source Sans 3', sans-serif",
-        }}
-      >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#E63946', fontWeight: 600, marginBottom: 8 }}>
-            Error al cargar datos
-          </p>
-          <p style={{ color: '#777' }}>{error}</p>
+      <div class="min-h-screen bg-[#0f0f1a] text-[#e0e0e0] flex items-center justify-center font-body">
+        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
+          <p class="text-error font-semibold mb-2">Error al cargar datos</p>
+          <p class="text-[#777]">{error}</p>
         </div>
       </div>
     ) : politicians.length === 0 ? (
-      <div
-        style={{
-          minHeight: '100vh',
-          background: '#0f0f1a',
-          color: '#e0e0e0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: "'Source Sans 3', sans-serif",
-        }}
-      >
-        <div
-          style={{
-            background: '#16162a',
-            borderRadius: 16,
-            padding: 32,
-            border: '1px solid rgba(255,255,255,0.06)',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ color: '#F4A261', fontWeight: 600 }}>No hay datos disponibles</p>
-          <p style={{ color: '#777' }}>Verifica que el servidor API esté ejecutándose.</p>
+      <div class="min-h-screen bg-[#0f0f1a] text-[#e0e0e0] flex items-center justify-center font-body">
+        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
+          <p class="text-warning font-semibold">No hay datos disponibles</p>
+          <p class="text-[#777]">Verifica que el servidor API esté ejecutándose.</p>
         </div>
       </div>
     ) : (
