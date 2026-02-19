@@ -19,10 +19,10 @@ The automation package is excluded from the root `pnpm build` and `pnpm test` co
 ---
 
 Relevant Records:
-- [[pnpm -F flag is required to scope commands to individual packages]] — automation is the package most often forgotten in this pattern
-- [[monorepo uses pnpm workspaces with four packages]] — automation is the fourth package
-- [[Turso (libsql) is the database backend accessed via Drizzle from Cloudflare Workers]] — scraped attendance data syncs to Turso as the final output
-- [[Three GitHub Actions workflows cover deployment, Lighthouse audits, and data sync]] — sync-automation.yaml is how this scraper runs in production
+- [[pnpm-f-flag-required-for-package-scoped-commands]] — automation is the package most often forgotten in this pattern
+- [[monorepo-pnpm-workspaces-four-packages]] — automation is the fourth package
+- [[turso-libsql-database-backend]] — scraped attendance data syncs to Turso as the final output
+- [[github-workflows-three-pipelines]] — sync-automation.yaml is how this scraper runs in production
 
 Topics:
 - [[architecture-map]]

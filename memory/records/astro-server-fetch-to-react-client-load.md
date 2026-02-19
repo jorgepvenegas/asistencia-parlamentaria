@@ -14,10 +14,10 @@ This pattern works because the API runs on Cloudflare Workers and is not directl
 ---
 
 Relevant Records:
-- [[monorepo uses pnpm workspaces with four packages]] — the API package runs in CF Workers, which shapes this data flow
-- [[the API uses Hono + Drizzle and runs on Cloudflare Workers]] — the API endpoint that Astro pages fetch from
-- [[Zod schemas validate all API responses at system boundaries]] — parsing happens in Astro page scripts before passing data to React
-- [[frontend routing uses year-based static paths covering 2022 to 2025]] — each static route triggers a server-side fetch for that year's data
+- [[monorepo-pnpm-workspaces-four-packages]] — the API package runs in CF Workers, which shapes this data flow
+- [[hono-drizzle-cloudflare-workers-api]] — the API endpoint that Astro pages fetch from
+- [[zod-schemas-validate-api-responses]] — parsing happens in Astro page scripts before passing data to React
+- [[year-based-static-routing]] — each static route triggers a server-side fetch for that year's data
 
 Topics:
 - [[frontend-map]]

@@ -20,8 +20,8 @@ This is a constraint: if a future change bypasses Drizzle for raw SQL (e.g., for
 ---
 
 Relevant Records:
-- [[Turso (libsql) is the database backend accessed via Drizzle from Cloudflare Workers]] — the credentials managed as Wrangler secrets
-- [[the API uses Hono + Drizzle and runs on Cloudflare Workers]] — the layer where CORS and prepared statements operate
+- [[turso-libsql-database-backend]] — the credentials managed as Wrangler secrets
+- [[hono-drizzle-cloudflare-workers-api]] — the layer where CORS and prepared statements operate
 
 Topics:
 - [[api-map]]

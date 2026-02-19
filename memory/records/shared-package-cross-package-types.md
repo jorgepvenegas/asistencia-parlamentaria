@@ -15,8 +15,8 @@ Zod schemas in shared serve double duty: they validate API responses at the boun
 ---
 
 Relevant Records:
-- [[Zod schemas validate all API responses at system boundaries]] — how shared schemas are used
-- [[monorepo uses pnpm workspaces with four packages]] — the package structure this pattern lives in
+- [[zod-schemas-validate-api-responses]] — how shared schemas are used
+- [[monorepo-pnpm-workspaces-four-packages]] — the package structure this pattern lives in
 
 Topics:
 - [[shared-map]]

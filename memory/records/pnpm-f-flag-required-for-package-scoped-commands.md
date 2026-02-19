@@ -20,7 +20,7 @@ Omitting `-F` will run root-level scripts or fail silently depending on the scri
 ---
 
 Relevant Records:
-- [[monorepo uses pnpm workspaces with four packages]] — the workspace structure that makes this necessary
+- [[monorepo-pnpm-workspaces-four-packages]] — the workspace structure that makes this necessary
 
 Topics:
 - [[architecture-map]]

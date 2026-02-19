@@ -17,9 +17,9 @@ Alternatives not chosen: PlanetScale (MySQL protocol, Workers-compatible but mor
 ---
 
 Relevant Records:
-- [[the API uses Hono + Drizzle and runs on Cloudflare Workers]] — Turso is the storage layer in that stack
-- [[schema changes are high impact and require documented migration]] — db:push and db:migrate commands target this Turso instance
-- [[Playwright and Cheerio power the attendance scraper in the automation package]] — scraped data flows into this database via the sync workflow
+- [[hono-drizzle-cloudflare-workers-api]] — Turso is the storage layer in that stack
+- [[schema-changes-require-documented-migration]] — db:push and db:migrate commands target this Turso instance
+- [[playwright-cheerio-scraper-automation]] — scraped data flows into this database via the sync workflow
 
 Topics:
 - [[api-map]]

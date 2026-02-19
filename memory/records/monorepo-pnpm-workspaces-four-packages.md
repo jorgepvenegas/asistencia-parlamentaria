@@ -19,10 +19,10 @@ The monorepo boundary enforces that shared types live in one place and are impor
 ---
 
 Relevant Records:
-- [[shared package is the single source of truth for cross-package types]] — what shared exports
-- [[Astro pages fetch server-side and pass data to React components via client:load]] — consequence of API being in CF Workers
-- [[pnpm -F flag is required to scope commands to individual packages]] — gotcha that applies across all four packages
-- [[Playwright and Cheerio power the attendance scraper in the automation package]] — the fourth package and how it runs
+- [[shared-package-cross-package-types]] — what shared exports
+- [[astro-server-fetch-to-react-client-load]] — consequence of API being in CF Workers
+- [[pnpm-f-flag-required-for-package-scoped-commands]] — gotcha that applies across all four packages
+- [[playwright-cheerio-scraper-automation]] — the fourth package and how it runs
 
 Topics:
 - [[architecture-map]]

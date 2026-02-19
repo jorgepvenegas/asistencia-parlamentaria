@@ -7,7 +7,7 @@ type: moc
 
 ## Principles
 
-- **Prose-as-title** — every record is a proposition. `[[Astro pages fetch server-side to avoid CORS issues]]` works as a sentence.
+- **Prose-as-title** — every record is a proposition. `[[astro-server-fetch-to-react-client-load]]` works as a sentence.
 - **Wiki links** — connections as graph edges. Each link carries a relationship.
 - **Maps** — component maps are attention hubs. They tell me what to read without reading everything.
 - **Capture fast, document slow** — inbox first, structure later.

@@ -14,8 +14,8 @@ This convention means: if you're working with API data and the type isn't derive
 ---
 
 Relevant Records:
-- [[shared package is the single source of truth for cross-package types]] — where schemas live
-- [[Astro pages fetch server-side and pass data to React components via client:load]] — where parsing happens
+- [[shared-package-cross-package-types]] — where schemas live
+- [[astro-server-fetch-to-react-client-load]] — where parsing happens
 
 Topics:
 - [[api-map]]

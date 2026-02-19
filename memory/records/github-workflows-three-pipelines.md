@@ -21,9 +21,9 @@ Manual triggers on `lighthouse.yaml` and `sync-automation.yaml` allow out-of-sch
 ---
 
 Relevant Records:
-- [[Playwright and Cheerio power the attendance scraper in the automation package]] — sync-automation.yaml runs that scraper
-- [[deploy commands must never be run unless explicitly requested]] — deploy commands are automated here; avoid running them locally unless explicitly asked
-- [[Turso (libsql) is the database backend accessed via Drizzle from Cloudflare Workers]] — sync workflow writes scraped data to Turso as its final step
+- [[playwright-cheerio-scraper-automation]] — sync-automation.yaml runs that scraper
+- [[never-run-deploy-commands]] — deploy commands are automated here; avoid running them locally unless explicitly asked
+- [[turso-libsql-database-backend]] — sync workflow writes scraped data to Turso as its final step
 
 Topics:
 - [[architecture-map]]

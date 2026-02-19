@@ -14,7 +14,7 @@ Prefer non-destructive git operations for the same reason — no force-push, no 
 ---
 
 Relevant Records:
-- [[schema changes are high impact and require documented migration]] — similar caution for another irreversible action
+- [[schema-changes-require-documented-migration]] — similar caution for another irreversible action
 
 Topics:
 - [[architecture-map]]

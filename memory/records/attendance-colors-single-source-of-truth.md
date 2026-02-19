@@ -13,8 +13,8 @@ All attendance state colors (present, absent, leave, etc.) are defined once in `
 ---
 
 Relevant Records:
-- [[shared package is the single source of truth for cross-package types]] — same single-source pattern applied to a different concern
-- [[the frontend is mid-migration from inline styles and shared.css to Tailwind]] — migration must not break the colors contract
+- [[shared-package-cross-package-types]] — same single-source pattern applied to a different concern
+- [[tailwind-migration-in-progress]] — migration must not break the colors contract
 
 Topics:
 - [[frontend-map]]

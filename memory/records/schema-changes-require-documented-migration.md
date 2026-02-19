@@ -14,9 +14,9 @@ This applies to both additive changes (new columns) and destructive ones (column
 ---
 
 Relevant Records:
-- [[deploy commands must never be run unless explicitly requested]] — same class of irreversible action
-- [[monorepo uses pnpm workspaces with four packages]] — Drizzle lives in the api package
-- [[Turso (libsql) is the database backend accessed via Drizzle from Cloudflare Workers]] — db:push and db:migrate target this Turso instance
+- [[never-run-deploy-commands]] — same class of irreversible action
+- [[monorepo-pnpm-workspaces-four-packages]] — Drizzle lives in the api package
+- [[turso-libsql-database-backend]] — db:push and db:migrate target this Turso instance
 
 Topics:
 - [[api-map]]

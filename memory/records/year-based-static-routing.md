@@ -14,8 +14,8 @@ When a new legislative year is added, the static path list must be updated. This
 ---
 
 Relevant Records:
-- [[Astro pages fetch server-side and pass data to React components via client:load]] — how data is fetched for each static route
-- [[the API uses Hono + Drizzle and runs on Cloudflare Workers]] — the API that each year route queries at build time
+- [[astro-server-fetch-to-react-client-load]] — how data is fetched for each static route
+- [[hono-drizzle-cloudflare-workers-api]] — the API that each year route queries at build time
 
 Topics:
 - [[frontend-map]]

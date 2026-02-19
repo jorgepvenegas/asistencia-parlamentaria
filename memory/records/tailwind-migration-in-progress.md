@@ -15,8 +15,8 @@ Do not remove shared.css entries until their Tailwind equivalents are confirmed 
 ---
 
 Relevant Records:
-- [[monorepo uses pnpm workspaces with four packages]] — Tailwind lives in the frontend package
-- [[ATTENDANCE_COLORS in constants/colors.ts is the single source of truth for attendance colors]] — colors defined there must be preserved during Tailwind migration
+- [[monorepo-pnpm-workspaces-four-packages]] — Tailwind lives in the frontend package
+- [[attendance-colors-single-source-of-truth]] — colors defined there must be preserved during Tailwind migration
 
 Topics:
 - [[frontend-map]]
