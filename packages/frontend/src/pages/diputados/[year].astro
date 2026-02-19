@@ -1,15 +1,15 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
+import ErrorState from '../../components/ErrorState.astro';
 import type { PoliticianAttendance } from '../../types/dashboard';
 import {
-  politicianResponseSchema,
-  partyResponseSchema,
-  attendanceYearlyResponseSchema,
-  type PoliticianResponse,
-  type PartyResponse,
-  type AttendanceYearlyResponse,
-} from '@quienatiende/shared/schemas';
-import { z } from 'zod';
+  API_URL,
+  parseResponse,
+  politiciansArraySchema,
+  partiesArraySchema,
+  attendanceArraySchema,
+} from '../../utils/api';
+import { transformPolitician } from '../../utils/transform';
 import MembersTableV2 from '@/components/MembersTableV2';
 import PageHeaderRow from '@/components/PageHeaderRow.astro';
 
@@ -28,28 +28,7 @@ if (!Number.isFinite(yearNum) || yearNum < 2022) {
   return Astro.redirect('/diputados');
 }
 
-const API_URL = import.meta.env.PUBLIC_BASE_URL_API || 'http://localhost:3000';
-
-const politiciansArraySchema = z.array(politicianResponseSchema);
-const partiesArraySchema = z.array(partyResponseSchema);
-const attendanceArraySchema = z.array(attendanceYearlyResponseSchema);
-
-type ApiPolitician = PoliticianResponse;
-type ApiParty = PartyResponse;
-type ApiAttendance = AttendanceYearlyResponse;
-
-async function parseResponse<T>(
-  res: Response,
-  schema: z.ZodType<T>,
-  label: string
-): Promise<T | null> {
-  if (!res.ok) return null;
-  const { data } = await res.json();
-  const result = schema.safeParse(data);
-  if (result.success) return result.data;
-  console.error(`${label} validation failed:`, result.error);
-  return null;
-}
+const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
 
 let politicians: PoliticianAttendance[] = [];
 let error: string | null = null;
@@ -62,70 +41,22 @@ try {
   ]);
 
   const politiciansData =
-    (await parseResponse<ApiPolitician[]>(politiciansRes, politiciansArraySchema, 'Politicians')) ??
-    [];
-  const partiesData =
-    (await parseResponse<ApiParty[]>(partiesRes, partiesArraySchema, 'Parties')) ?? [];
+    (await parseResponse(politiciansRes, politiciansArraySchema, 'Politicians')) ?? [];
+  const partiesData = (await parseResponse(partiesRes, partiesArraySchema, 'Parties')) ?? [];
   const attendanceData =
-    (await parseResponse<ApiAttendance[]>(attendanceRes, attendanceArraySchema, 'Attendance')) ??
-    [];
+    (await parseResponse(attendanceRes, attendanceArraySchema, 'Attendance')) ?? [];
 
   const politicianMap = new Map(politiciansData.map((p) => [p.id, p]));
   const partyMap = new Map(partiesData.map((p) => [p.id, p]));
 
   politicians = attendanceData
-    .map((att) => {
-      const politician = politicianMap.get(att.politicianId);
-      if (!politician) return null;
-      const party = partyMap.get(politician.partyId);
-
-      const adjustedTotalSessions =
-        att.attendanceCount +
-        att.justifiedAbsentCount +
-        att.unjustifiedAbsentCount +
-        att.absentCount;
-
-      const avgAttendance =
-        adjustedTotalSessions > 0
-          ? ((att.attendanceCount / adjustedTotalSessions) * 100).toFixed(2)
-          : '0.00';
-      const avgValidJust =
-        adjustedTotalSessions > 0
-          ? ((att.justifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2)
-          : '0.00';
-      const avgInvalidJust =
-        adjustedTotalSessions > 0
-          ? ((att.unjustifiedAbsentCount / adjustedTotalSessions) * 100).toFixed(2)
-          : '0.00';
-      const avgNoJust =
-        adjustedTotalSessions > 0
-          ? ((att.absentCount / adjustedTotalSessions) * 100).toFixed(2)
-          : '0.00';
-
-      return {
-        id: att.politicianId,
-        name: politician.name,
-        party: party?.name || 'Sin partido',
-        partyId: politician.partyId,
-        attendanceCount: att.attendanceCount,
-        avgAttendance: parseFloat(avgAttendance),
-        justifiedAbsentCount: att.justifiedAbsentCount,
-        avgValidJust: parseFloat(avgValidJust),
-        unjustifiedAbsentCount: att.unjustifiedAbsentCount,
-        avgInvalidJust: parseFloat(avgInvalidJust),
-        absentCount: att.absentCount,
-        avgNoJust: parseFloat(avgNoJust),
-        pct: parseFloat(att.attendanceAverage.toFixed(2)),
-      } as PoliticianAttendance;
-    })
+    .map((att) => transformPolitician(att, politicianMap, partyMap))
     .filter((p): p is PoliticianAttendance => p !== null)
     .sort((a, b) => b.pct - a.pct);
 } catch (err) {
   error = 'Error connecting to server';
   console.error(err);
 }
-
-const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
 ---
 
 <PageLayout
@@ -136,12 +67,7 @@ const AVAILABLE_YEARS = [2025, 2024, 2023, 2022];
 >
   {
     error ? (
-      <div class="min-h-[60vh] flex items-center justify-center">
-        <div class="bg-surface-dark rounded-2xl p-8 border border-white/[0.06] text-center">
-          <p class="text-error font-semibold mb-2">Error al cargar datos</p>
-          <p class="text-[#777]">{error}</p>
-        </div>
-      </div>
+      <ErrorState message={error} />
     ) : (
       <div class="flex flex-col gap-6 w-full">
         <PageHeaderRow
