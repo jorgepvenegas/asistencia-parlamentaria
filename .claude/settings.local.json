@@ -18,7 +18,8 @@
       "Bash(pnpm -F @quienatiende/frontend lint:*)",
       "Bash(pnpm -F @quienatiende/frontend build:*)",
       "Bash(pnpm -F @quienatiende/frontend exec eslint:*)",
-      "Skill(document)"
+      "Skill(document)",
+      "Skill(connect)"
     ]
   },
   "hooks": {
