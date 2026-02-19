@@ -10,7 +10,7 @@ A transparent platform for tracking Costa Rican parliamentary attendance.
 |-------|------|
 | Frontend | Astro + React + Tailwind CSS |
 | API | Hono.js on Cloudflare Workers |
-| Database | Cloudflare D1 via Drizzle ORM |
+| Database | Turso (libsql) via Drizzle ORM |
 | Automation | Playwright + Cheerio scraper |
 | Charts | Recharts |
 | Testing | Vitest + Playwright (E2E) |
@@ -107,11 +107,11 @@ pnpm format       # Format all packages
 ```bash
 pnpm -F @quienatiende/api dev        # Start wrangler dev
 pnpm -F @quienatiende/api test       # Vitest
-pnpm -F @quienatiende/api db:push    # Push schema to D1
+pnpm -F @quienatiende/api db:push    # Push schema to Turso
 pnpm -F @quienatiende/api db:generate # Generate migrations
 pnpm -F @quienatiende/api db:migrate  # Run migrations
 pnpm -F @quienatiende/api db:studio  # Drizzle Studio
-pnpm -F @quienatiende/api deploy     # Deploy to Cloudflare
+pnpm -F @quienatiende/api deploy     # Deploy to Cloudflare Workers
 ```
 
 ### Frontend (Astro)
@@ -171,7 +171,7 @@ pnpm -F @quienatiende/frontend deploy
 pnpm -F @quienatiende/api deploy
 ```
 
-Configure D1 bindings in `wrangler.jsonc` before deploying.
+Set `DATABASE_URL` and `DATABASE_AUTH_TOKEN` as Wrangler secrets before deploying.
 
 ## Security
 
