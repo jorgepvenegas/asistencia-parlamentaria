@@ -19,5 +19,8 @@
       "Bash(pnpm -F @quienatiende/frontend build:*)",
       "Bash(pnpm -F @quienatiende/frontend exec eslint:*)"
     ]
+  },
+  "enabledPlugins": {
+    "arscontexta@agenticnotetaking": true
   }
 }
