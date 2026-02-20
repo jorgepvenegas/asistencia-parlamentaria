@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const NAV_ITEMS = [
-  { label: 'Partidos', href: '/partidos', active: false },
-  { label: 'Diputados', href: '/diputados', active: false },
-  { label: 'Acerca de', href: '/acerca-de', active: false },
+  { label: 'Partidos', href: '/partidos' },
+  { label: 'Diputados', href: '/diputados' },
+  { label: 'Acerca de', href: '/acerca-de' },
 ];
+
+function isActive(href: string, path: string): boolean {
+  if (href === '/') return path === '/';
+  return path.startsWith(href);
+}
 
 export default function Navigation() {
   const [open, setOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState('');
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
 
   return (
     <header className="bg-black relative">
@@ -22,15 +32,18 @@ export default function Navigation() {
         </a>
 
         <nav className="hidden md:hidden lg:flex gap-8">
-          {NAV_ITEMS.map(({ label, href, active }) => (
-            <a
-              key={label}
-              href={href}
-              className={`text-sm no-underline ${active ? 'text-surface font-medium' : 'text-muted font-normal'}`}
-            >
-              {label}
-            </a>
-          ))}
+          {NAV_ITEMS.map(({ label, href }) => {
+            const active = isActive(href, currentPath);
+            return (
+              <a
+                key={label}
+                href={href}
+                className={`text-sm no-underline pb-0.5 ${active ? 'text-surface font-medium border-b border-surface' : 'text-muted font-normal border-b border-transparent hover:text-surface/80'} transition-colors`}
+              >
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         <button
@@ -49,16 +62,19 @@ export default function Navigation() {
 
       {open && (
         <nav className="lg:hidden flex flex-col bg-black border-t border-[#222] px-5 py-2">
-          {NAV_ITEMS.map(({ label, href, active }) => (
-            <a
-              key={label}
-              href={href}
-              onClick={() => setOpen(false)}
-              className={`text-sm no-underline py-3 border-b border-[#1a1a1a] ${active ? 'text-surface font-medium' : 'text-muted font-normal'}`}
-            >
-              {label}
-            </a>
-          ))}
+          {NAV_ITEMS.map(({ label, href }) => {
+            const active = isActive(href, currentPath);
+            return (
+              <a
+                key={label}
+                href={href}
+                onClick={() => setOpen(false)}
+                className={`text-sm no-underline py-3 border-b border-[#1a1a1a] ${active ? 'text-surface font-medium' : 'text-muted font-normal hover:text-surface/80'} transition-colors`}
+              >
+                {label}
+              </a>
+            );
+          })}
         </nav>
       )}
     </header>
