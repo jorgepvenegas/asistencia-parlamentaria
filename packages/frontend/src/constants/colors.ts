@@ -13,8 +13,18 @@ export const PARTY_COLORS: Record<string, string> = {
   'Frente Amplio': '#06D6A0',
   'Partido Liberal de Chile': '#118AB2',
   Evópoli: '#8B5CF6',
+  'Evolución Política': '#8B5CF6',
   'Partido por la Democracia': '#EC4899',
+  'Partido Por la Democracia': '#EC4899',
   'Partido Radical': '#F97316',
+  'Partido Radical de Chile': '#F97316',
+  'Partido Ecologista Verde': '#16A34A',
+  'Movimiento Amarillos por Chile': '#EAB308',
+  'Partido Demócratas Chile': '#3B82F6',
+  'Partido Humanista': '#A855F7',
+  'Partido Nacional Libertario': '#0891B2',
+  'Partido Acción Humanista': '#D946EF',
+  'Federación Regionalista Verde Social': '#65A30D',
 };
 
 export function getPartyColor(party: string): string {

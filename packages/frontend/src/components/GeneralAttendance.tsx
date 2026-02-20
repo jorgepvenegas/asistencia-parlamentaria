@@ -37,7 +37,7 @@ export default function GeneralAttendance({
   }, [partyAttendance]);
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       {overall && (
         <StatCards
           cards={[

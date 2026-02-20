@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ATTENDANCE_COLORS } from '../constants/colors';
+import { ATTENDANCE_COLORS, getPartyColor } from '../constants/colors';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { toPartySlug } from '../utils/partySlug';
 import AttendanceLegend from './AttendanceLegend';
@@ -84,7 +84,7 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
           {asc ? '↑ Menor a mayor' : '↓ Mayor a menor'}
         </button>
       </div>
-      <div className="border flex flex-col md:p-5 ">
+      <div className="border rounded-xl flex flex-col md:p-5 ">
         {visibleParties.map((party) => {
           const seg = partySegments(party);
           const partySlug = toPartySlug(party.partyName) || String(party.partyId);
@@ -104,19 +104,29 @@ export default function PartyComparisonChart({ parties, initialYear }: PartyComp
               {/* Desktop: Party name (left) */}
               {/* Mobile: Hidden (shown in row below) */}
               <span
-                className="hidden md:inline text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap w-[230px] shrink-0"
+                className="hidden md:inline-flex items-center gap-2 text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap w-[230px] shrink-0"
                 title={party.partyName}
               >
-                {party.partyName}
-                <span className="text-muted ml-1">→</span>
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: getPartyColor(party.partyName) }}
+                />
+                <span className="overflow-hidden text-ellipsis">
+                  {party.partyName}
+                  <span className="text-muted ml-1">→</span>
+                </span>
               </span>
 
               {/* Mobile: Row 1 - Party name + percentage */}
               <div className="flex md:hidden justify-between items-center w-full pb-2">
                 <span
-                  className="text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap inline-flex items-center gap-1"
+                  className="text-xs font-medium text-black overflow-hidden text-ellipsis whitespace-nowrap inline-flex items-center gap-1.5"
                   title={party.partyName}
                 >
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: getPartyColor(party.partyName) }}
+                  />
                   {party.partyName}
                   <span className="text-muted shrink-0">→</span>
                 </span>

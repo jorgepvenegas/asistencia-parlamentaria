@@ -9,49 +9,67 @@ import PageLayout from '../layouts/PageLayout.astro';
   backLink="/"
 >
   <div class="max-w-[800px]">
-    <h2 class="text-2xl font-semibold mt-8 mb-4 text-black">Acerca de QuienAtiende</h2>
-    <p class="text-base leading-relaxed text-subtle mb-4">
+    <h1 class="text-3xl md:text-4xl font-bold mt-8 mb-3 text-black">Acerca de QuienAtiende</h1>
+    <p class="text-base leading-relaxed text-subtle mb-8">
       QuienAtiende es una plataforma ciudadana de transparencia parlamentaria que busca facilitar el
       acceso a información sobre la asistencia de diputados a sesiones del Congreso de la República.
     </p>
-    <p class="text-base leading-relaxed text-subtle mb-4">
-      Creemos que una democracia informada es una democracia más fuerte. Por eso, compilamos datos
-      públicos de asistencia parlamentaria y los presentamos de manera clara y accesible para todos
-      los ciudadanos.
-    </p>
 
-    <h2 class="text-2xl font-semibold mt-8 mb-4 text-black">¿Qué datos mostramos?</h2>
-    <ul class="my-4 pl-6">
-      <li class="text-base leading-relaxed text-subtle mb-2">
-        Asistencia a sesiones de sala por diputado
-      </li>
-      <li class="text-base leading-relaxed text-subtle mb-2">
-        Faltas justificadas y sin justificar
-      </li>
-      <li class="text-base leading-relaxed text-subtle mb-2">Comparativas por partido político</li>
-      <li class="text-base leading-relaxed text-subtle mb-2">
-        Estadísticas históricas por año legislativo
-      </li>
-    </ul>
+    <div class="bg-[#F9FAFB] border border-border rounded-xl p-6 mb-8">
+      <p class="text-base leading-relaxed text-subtle m-0">
+        Creemos que una democracia informada es una democracia más fuerte. Por eso, compilamos datos
+        públicos de asistencia parlamentaria y los presentamos de manera clara y accesible para
+        todos los ciudadanos.
+      </p>
+    </div>
 
-    <h2 class="text-2xl font-semibold mt-8 mb-4 text-black">Fuentes de datos</h2>
-    <p class="text-base leading-relaxed text-subtle mb-4">
+    <h2 class="text-xl font-semibold mt-8 mb-4 text-black">¿Qué datos mostramos?</h2>
+    <div class="flex flex-col gap-3 mb-8">
+      {
+        [
+          'Asistencia a sesiones de sala por diputado',
+          'Faltas justificadas y sin justificar',
+          'Comparativas por partido político',
+          'Estadísticas históricas por año legislativo',
+        ].map((item) => (
+          <div key={item} class="flex items-start gap-3">
+            <span class="w-5 h-5 rounded-full bg-attendance/10 flex items-center justify-center shrink-0 mt-0.5">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path
+                  d="M2.5 6L5 8.5L9.5 3.5"
+                  stroke="#4ab170"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            <span class="text-base leading-relaxed text-subtle">{item}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2 class="text-xl font-semibold mt-8 mb-4 text-black">Fuentes de datos</h2>
+    <p class="text-base leading-relaxed text-subtle mb-8">
       Toda la información presentada en esta plataforma proviene de datos públicos del Congreso de
       la República. Los datos se actualizan regularmente para mantener la información lo más
       actualizada posible.
     </p>
 
-    <h2 class="text-2xl font-semibold mt-8 mb-4 text-black">Objetivo</h2>
-    <p class="text-base leading-relaxed text-subtle mb-4">
+    <h2 class="text-xl font-semibold mt-8 mb-4 text-black">Objetivo</h2>
+    <p class="text-base leading-relaxed text-subtle mb-8">
       Nuestro objetivo es promover la rendición de cuentas y la transparencia en el ejercicio
       parlamentario. Al hacer accesible esta información, esperamos contribuir a un debate público
       más informado sobre el trabajo de nuestros representantes.
     </p>
 
-    <h2 class="text-2xl font-semibold mt-8 mb-4 text-black">Contacto</h2>
-    <p class="text-base leading-relaxed text-subtle mb-4">
-      Si tienes preguntas, sugerencias o encuentras algún error en los datos, no dudes en
-      contactarnos a través de nuestros canales de comunicación.
-    </p>
+    <div class="bg-[#F9FAFB] border border-border rounded-xl p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-3 text-black">Contacto</h2>
+      <p class="text-base leading-relaxed text-subtle m-0">
+        Si tienes preguntas, sugerencias o encuentras algún error en los datos, no dudes en
+        contactarnos a través de nuestros canales de comunicación.
+      </p>
+    </div>
   </div>
 </PageLayout>

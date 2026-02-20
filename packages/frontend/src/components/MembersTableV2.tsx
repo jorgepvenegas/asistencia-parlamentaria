@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { PoliticianAttendance } from '../types/dashboard';
-import { ATTENDANCE_COLORS } from '../constants/colors';
+import { ATTENDANCE_COLORS, getPartyColor } from '../constants/colors';
 import { formatName } from '@/utils/formatName';
 
 type SortKey = 'name' | 'pct' | 'avgValidJust' | 'avgInvalidJust' | 'avgNoJust';
@@ -111,7 +111,7 @@ export default function MembersTableV2({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Buscar por nombre..."
-          className="w-full sm:w-80 px-4 py-2 border border-[#E5E5E5] dark:border-white/[0.10] bg-transparent text-sm text-black dark:text-white placeholder:text-[#999] focus:outline-none focus:border-[#999]"
+          className="w-full sm:w-80 px-4 py-2 border border-[#E5E5E5] dark:border-white/[0.10] bg-transparent text-sm text-black dark:text-white placeholder:text-[#999] rounded-lg focus:outline-none focus:border-[#999] focus:ring-1 focus:ring-[#999]/20"
         />
         {searchQuery && (
           <>
@@ -131,7 +131,7 @@ export default function MembersTableV2({
       {/* Desktop Table */}
       <div className="hidden sm:block w-full overflow-x-auto">
         <table
-          className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] overflow-hidden"
+          className="w-full text-sm border border-[#E5E5E5] dark:border-white/[0.10] rounded-lg overflow-hidden"
           style={{ tableLayout: 'fixed' }}
         >
           <caption className="sr-only">Tabla de asistencia de miembros del partido {party}</caption>
@@ -188,21 +188,44 @@ export default function MembersTableV2({
             </tr>
           </thead>
           <tbody>
-            {sorted.map((d) => {
+            {sorted.map((d, i) => {
+              const pctValue = showPct ? (d.pct as number) : null;
               return (
                 <tr
                   key={d.id}
-                  className="border-b border-[#E5E5E5] dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+                  className={`border-b border-[#E5E5E5] dark:border-white/[0.06] hover:bg-blue-50/50 dark:hover:bg-white/[0.03] transition-colors ${i % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-white/[0.02]' : ''}`}
                 >
                   <td className="px-5 py-3.5" style={{ width: '30%' }}>
-                    <span className="font-[500] text-[13px] text-black dark:text-white font-[Sora,sans-serif]">
+                    <span className="inline-flex items-center gap-2 font-[500] text-[13px] text-black dark:text-white font-[Sora,sans-serif]">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: getPartyColor(d.party) }}
+                      />
                       {formatName(d.name)}
                     </span>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: '15%' }}>
-                    <span className="font-[500] text-[13px] font-mono tabular-nums text-black dark:text-white">
-                      {fmt(d, 'pct')}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-[500] text-[13px] font-mono tabular-nums text-black dark:text-white">
+                        {fmt(d, 'pct')}
+                      </span>
+                      {pctValue !== null && (
+                        <div className="hidden lg:block w-12 h-1.5 rounded-full bg-border/50 overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${pctValue}%`,
+                              backgroundColor:
+                                pctValue >= 90
+                                  ? ATTENDANCE_COLORS.attendance
+                                  : pctValue >= 80
+                                    ? ATTENDANCE_COLORS.justified
+                                    : ATTENDANCE_COLORS.unjustified,
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-5 py-3.5" style={{ width: '18.33%' }}>
                     <span className="text-[13px] font-mono tabular-nums text-black dark:text-white">
@@ -227,7 +250,7 @@ export default function MembersTableV2({
       </div>
 
       {/* Mobile Table */}
-      <div className="sm:hidden border border-[#E5E7EB] dark:border-white/[0.06] overflow-hidden">
+      <div className="sm:hidden border border-[#E5E7EB] dark:border-white/[0.06] rounded-lg overflow-hidden">
         {/* Header */}
         <div
           className="dark:bg-white/[0.04] dark:border-white/[0.10]"
@@ -291,10 +314,10 @@ export default function MembersTableV2({
           ))}
         </div>
         {/* Rows */}
-        {sorted.map((d) => (
+        {sorted.map((d, i) => (
           <div
             key={d.id}
-            className="border-b border-[#F3F4F6] dark:border-white/[0.06] last:border-b-0"
+            className={`border-b border-[#F3F4F6] dark:border-white/[0.06] last:border-b-0 ${i % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-white/[0.02]' : ''}`}
             style={{ display: 'flex', alignItems: 'center', height: 40, padding: '0 12px' }}
           >
             <div
@@ -304,10 +327,20 @@ export default function MembersTableV2({
                 paddingRight: 4,
                 display: 'flex',
                 alignItems: 'center',
+                gap: 6,
                 height: '100%',
                 overflow: 'hidden',
               }}
             >
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  backgroundColor: getPartyColor(d.party),
+                  flexShrink: 0,
+                }}
+              />
               <span
                 style={{
                   fontFamily: "'Sora', sans-serif",

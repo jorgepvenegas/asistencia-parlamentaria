@@ -15,11 +15,14 @@ const ITEMS = [
 
 export default function AttendanceLegend() {
   return (
-    <div className="flex flex-col gap-4 py-6">
+    <div className="flex flex-wrap gap-x-5 gap-y-2 py-4">
       {ITEMS.map(({ color, label }) => (
         <div key={label} className="flex items-center gap-1.5">
-          <div style={{ background: color, width: 10, height: 10 }} className="shrink-0" />
-          <span className="font-mono text-xs font-medium text-subtle">{label}</span>
+          <div
+            style={{ background: color, width: 10, height: 10 }}
+            className="shrink-0 rounded-sm"
+          />
+          <span className="font-mono text-[11px] font-medium text-subtle">{label}</span>
         </div>
       ))}
     </div>
